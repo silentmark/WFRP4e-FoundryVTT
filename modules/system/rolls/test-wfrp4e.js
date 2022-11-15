@@ -535,12 +535,7 @@ export default class TestWFRP {
       chatOptions.sound = undefined;
 
     //this.result.other = this.result.other.join("<br>")
-    if (this.preData.other.length > 0) {
-      this.result.other = this.preData.other.join("<br>");
-    } 
-    else if (this.result.other instanceof Array) {
-       this.result.other = this.result.other.join("<br>")
-    }
+    this.result.other = this.preData.other.join("<br>")
 
     let chatData = {
       title: chatOptions.title,
