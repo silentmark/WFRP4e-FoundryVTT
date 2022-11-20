@@ -6,22 +6,32 @@ export default function() {
   Hooks.on("preUpdateCombat", CombatHelpers.preUpdateCombat)
   Hooks.on("deleteCombat", CombatHelpers.endCombat)
 
-  Hooks.on("preCreateCombatant", (combatant, data) => {
-    let mask = combatant.hidden;
-    if (mask)
-    {
+  Hooks.on("createCombatant", async combatant => {
+    if (game.settings.get("wfrp4e", "useGroupAdvantage")) {
+      let advantage = game.settings.get("wfrp4e", "groupAdvantageValues")
+      await combatant.actor.update({"system.status.advantage.value" : advantage[combatant.actor.advantageGroup]}, {fromGroupAdvantage : true})
+    }
+    let mask = combatant.token.hidden
+    if (mask) {
+      let data = {};
       data.img = "systems/wfrp4e/tokens/unknown.png"
       data.name = "???"
+      await combatant.update(data);
     }
-  })
+  });
 
-  Hooks.on("createCombatant", combatant => {
-    if (game.settings.get("wfrp4e", "useGroupAdvantage"))
-    {
-      let advantage = game.settings.get("wfrp4e", "groupAdvantageValues")
-      combatant.actor.update({"system.status.advantage.value" : advantage[combatant.actor.advantageGroup]}, {fromGroupAdvantage : true})
+  Hooks.on("tokenUpdate", async function(scene, tokenData, diffData, options, userId) {
+  
+    if (game.combat.active) {
+      let mask = tokenData.hidden;
+      if (mask) {
+
+      } else {
+
+      }
     }
-  })
+  });
+
 
   /* Custom Combat Carousel */
   Hooks.on('renderCombatCarousel', () => {

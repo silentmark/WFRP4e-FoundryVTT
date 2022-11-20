@@ -31,7 +31,7 @@ export default class SocketHandlers  {
             return
         game.wfrp4e.utility.applyEffectToTarget(data.payload.effect, data.payload.targets.map(t => new TokenDocument(t, {parent: game.scenes.get(data.payload.scene)})))
     }
-    static applyOneTimeEffect(data){
+    static async applyOneTimeEffect(data){
         if (game.user.id != data.payload.userId)
             return
 
@@ -39,7 +39,7 @@ export default class SocketHandlers  {
         let actor = new ActorWfrp4e(data.payload.actorData)
         let effect = new EffectWfrp4e(data.payload.effect)
         
-        game.wfrp4e.utility.runSingleEffect(effect, actor, null, {actor});
+        await game.wfrp4e.utility.runSingleEffect(effect, actor, null, {actor});
     }
     static changeGroupAdvantage(data){
         if (!game.user.isGM || !game.settings.get("wfrp4e", "useGroupAdvantage")) 
@@ -71,4 +71,42 @@ export default class SocketHandlers  {
             actor.createEmbeddedDocuments("Item", items)
         }
     }
+
+    static async setupSocket(data) {
+        let actorId = data.payload.actorId; 
+        let type = data.payload.type;
+        let options = data.payload.options;
+        let messageId = data.payload.messageId;
+        let actor = game.actors.get(actorId);
+        let owner = game.wfrp4e.utility.getActorOwner(actor);
+
+        let test;
+        if (owner.id == game.user.id) {
+            if (type == "setupCharacteristic") {
+                let characteristicId = data.payload.characteristicId;
+                test = await actor.setupCharacteristic(characteristicId, options);
+            } else if (type == "setupSkill") {
+                let skillName = data.payload.skillName;
+                test = await actor.setupSkill(skillName, options);
+            } else if (type == "setupWeapon") {
+                let weapon = data.payload.weapon;
+                test = await actor.setupWeapon(weapon, options = {});
+            } else if (type == "setupCast") {
+                let spell = data.payload.spell;
+                test = await actor.setupCast(spell, options = {});
+            } else if (type == "setupChannell") {
+                let spell = data.payload.spell;
+                test = await actor.setupChannell(spell, options = {});
+            } else if (type == "setupPrayer") {
+                let prayer = data.payload.prayer;
+                test = await actor.setupPrayer(prayer, options = {});
+            } else if (type == "setupTrait") {
+                let trait = data.payload.trait;
+                test = await actor.setupTrait(trait, options = {});
+            }
+        }
+        let message = game.messages.get(messageId);
+        await message.update({"flags.data.test": test});
+    }
+
 }

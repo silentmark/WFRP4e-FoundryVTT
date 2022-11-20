@@ -2,6 +2,7 @@ import MarketWfrp4e from "../apps/market-wfrp4e.js";
 import WFRP_Tables from "./tables-wfrp4e.js";
 import ItemWfrp4e from "../item/item-wfrp4e.js";
 import ChatWFRP from "./chat-wfrp4e.js";
+import TestWFRP from "./rolls/test-wfrp4e.js"
 
 
 /**
@@ -870,7 +871,7 @@ export default class WFRP_Utility {
     let html;
     let chatOptions = this.chatDataSetup("", game.settings.get("core", "rollMode"), true)
 
-    if (event.button == 0) {
+    if (event.button == 0 && game.user.isGM) {
       let clickText = event.target.text || event.target.textContent;
       if (clickText.trim() == game.i18n.localize("ROLL.CritCast")) {
         html = game.wfrp4e.tables.criticalCastMenu($(event.currentTarget).attr("data-table"));
@@ -1047,6 +1048,7 @@ export default class WFRP_Utility {
     if (!targets)
       targets = Array.from(game.user.targets);
 
+    let targetsBackup = Array.from(game.user.targets.map(t=>t.id));
       // Remove targets now so they don't start opposed tests
     if (canvas.scene)
       game.user.updateTokenTargets([])
@@ -1076,10 +1078,11 @@ export default class WFRP_Utility {
       ui.notifications.notify(game.i18n.localize("APPLYREQUESTGM"))
       game.socket.emit("system.wfrp4e", { type: "applyEffects", payload: { effect, targets: [...targets].map(t => t.document.toObject()), scene: canvas.scene.id } })
     }
+    game.user.updateTokenTargets(targetsBackup);
   }
 
   /** Send effect for owner to apply, unless there isn't one or they aren't active. In that case, do it yourself */
-  static applyOneTimeEffect(effect, actor) {
+  static async applyOneTimeEffect(effect, actor) {
     if (game.user.isGM) {
       if (actor.hasPlayerOwner) {
         for (let u of game.users.contents.filter(u => u.active && !u.isGM)) {
@@ -1093,21 +1096,15 @@ export default class WFRP_Utility {
       }
     }
 
-    WFRP_Utility.runSingleEffect(effect, actor, null, { actor });
+    await WFRP_Utility.runSingleEffect(effect, actor, null, { actor });
   }
 
-  static async runSingleEffect(effect, actor, item, scriptArgs, options = {}) {
+  static runSingleEffectSync(effect, actor, item, scriptArgs) {
     try {
       let func;
-      if (!options.async) {
+      if (effect.script) {
         func = new Function("args", effect.script).bind({ actor, effect, item })
         WFRP_Utility.log(`${this.name} > Running ${effect.label}`)
-      } else if (options.async) {
-        let asyncFunction = Object.getPrototypeOf(async function () { }).constructor
-        func = new asyncFunction("args", effect.script).bind({ actor, effect, item })
-        WFRP_Utility.log(`${this.name} > Running Async ${effect.label}`)
-      }
-      if (func) {
         func(scriptArgs);
       }
     }
@@ -1118,7 +1115,34 @@ export default class WFRP_Utility {
     }
   }
 
-  static invokeEffect(actor, effectId, itemId) {
+  static async runSingleEffect(effect, actor, item, scriptArgs, options = {}) {
+    try {
+      let func;
+      if (effect.script?.indexOf("await ") == -1) {
+        func = new Function("args", effect.script).bind({ actor, effect, item })
+        WFRP_Utility.log(`${this.name} > Running ${effect.label}`)
+      } else if (effect.script?.indexOf("await ") != -1) {
+        let asyncFunction = Object.getPrototypeOf(async function () { }).constructor
+        func = new asyncFunction("args", effect.script).bind({ actor, effect, item })
+        WFRP_Utility.log(`${this.name} > Running Async ${effect.label}`)
+      }
+      if (func) {        
+        if (effect.script?.indexOf("await ") == -1) {
+          func(scriptArgs);
+        }
+        if (effect.script?.indexOf("await ") != -1) {
+          await func(scriptArgs);
+        }
+      }
+    }
+    catch (ex) {
+      ui.notifications.error(game.i18n.format("ERROR.EFFECT", { effect: effect.label }))
+      console.error("Error when running effect " + effect.label + " - If this effect comes from an official module, try replacing the actor/item from the one in the compendium. If it still throws this error, please use the Bug Reporter and paste the details below, as well as selecting which module and 'Effect Report' as the label.")
+      console.error(`REPORT\n-------------------\nEFFECT:\t${effect.label}\nACTOR:\t${actor.name} - ${actor.id}\nERROR:\t${ex}`)
+    }
+  }
+
+  static async invokeEffect(actor, effectId, itemId) {
 
     let item, effect
     if (itemId)
@@ -1134,7 +1158,7 @@ export default class WFRP_Utility {
      
 
     effect.reduceItemQuantity()
-    WFRP_Utility.runSingleEffect(effect, actor, item, {actor, effect, item});
+    await WFRP_Utility.runSingleEffect(effect, actor, item, {actor, effect, item});
   }
 
   /**
@@ -1261,6 +1285,45 @@ export default class WFRP_Utility {
       text = link
     }
     return text
+  }
+
+  static getActorOwner(actor) { 
+    if (actor.hasPlayerOwner) {
+      for (let u of game.users.contents.filter(u => u.active && !u.isGM)) {
+          if (actor.ownership.default >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER || actor.ownership[u.id] >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
+              return u;
+          }
+      }
+    }
+    return game.users.contents.find(u => u.active && u.isGM);
+  }
+
+  static async setupSocket(owner, payload, content) {
+    let msg = await WFRP_Utility.createTestRequestMessage(owner, content);
+    payload.messageId = msg.id;
+    game.socket.emit("system.wfrp4e", {
+      type: "setupSocket",
+      payload: payload
+    });
+    return WFRP_Utility.recreateTestFromMessage(msg);
+  }
+
+  static async createTestRequestMessage(owner, content) {
+    let chatData = {
+      user: owner,
+      content: "<b><u>" + owner.name + "</u></b>: " + content,
+      whisper: ChatMessage.getWhisperRecipients("GM")
+    }
+    let msg = await ChatMessage.create(chatData);
+    return msg;
+  }
+
+  static async recreateTestFromMessage(msg) {
+    do {
+      await new Promise(r => setTimeout(r, 1000));
+      msg = game.messages.get(msg.id);
+    } while(!msg.flags?.data?.test)
+    return TestWFRP.recreate(msg.flags.data.test.data);
   }
 }
 

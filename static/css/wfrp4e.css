@@ -3554,9 +3554,9 @@
   .app.window-app.sheet.wfrp4e.actor .general {
     display: flex;
     flex-direction: row;
-    height: 105px;
     width: 100%;
     margin: 0px 0px 0px 0px;
+    padding-bottom: 10px;
   }
 
   .app.window-app.sheet.item-sheet input::placeholder,
@@ -3683,11 +3683,20 @@
 /* ==================== (E) TAB SELECTIONS ==================== */
   .app.window-app.sheet.wfrp4e.actor #tab-sections {
     width: inherit;
-    height: calc(100% - 167px);
+    height: calc(100% - 206px);
     padding: 0px;
     margin: 0px;
     /* background: var(--debug-background-color-green); */
   }
+
+  .app.window-app.sheet.wfrp4e.actor.character-sheet #tab-sections {
+    width: inherit;
+    height: calc(100% - 168px);
+    padding: 0px;
+    margin: 0px;
+    /* background: var(--debug-background-color-green); */
+  }
+
     .app.window-app.sheet.wfrp4e.actor .sheet-tabs > .item {
       line-height: 20px;
       padding: 1px 0px 0px 0px;
@@ -4420,6 +4429,106 @@
           margin: 0px 0px 0px 0px;
           padding: 5px 0px 0px 0px;
           text-align: center;
+        }
+
+  /* ================== 3. THIRD ROW ========================= */
+  .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row.third {
+    display: flex;
+    height: 47px;
+    margin: 6px 0px 0px 0px;
+    /* background: var(--debug-background-color-blue); */
+  }
+
+  .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section {
+    display: flex;
+    margin: 0px 0px 0px 0px;
+    border: 1px solid #736953a6;
+    flex-grow: 0;
+    flex-basis: 97px;
+    width: 200px;
+    /* background: var(--debug-background-color-red); */
+  }
+  .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .roundsToPassOut-section {
+    display: flex;
+    flex-direction: column;
+    height: inherit;
+    width: inherit;
+    margin: 0px 0px 0px 0px;
+    border-right: 1px solid #736953a6;
+    flex-grow: 1;
+    /* background: var(--debug-background-color-green); */
+  }
+  .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section div:last-of-type {
+    border-right: none;
+  }
+    .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .top.label {
+      border-right: none;
+      border: none;
+      height: 22px;
+      font-family: var(--actor-label-font-family);
+      font-size: var(--actor-label-font-size);
+      font-weight: var(--actor-label-font-weight);
+      color: var(--actor-label-color);
+      text-align: center;
+      box-shadow: 0 0 10px #00000052 inset;
+      margin: 0px;
+      padding: 2px 0px 0px 0px;
+      /* background: red; */
+    }
+    .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box {
+      border: none;
+      border-top: 1px solid #736953a6;
+      height: 23px;
+      margin: 0px;
+      padding: 0px 0px 0px 0px;
+      font-family: var(--actor-input-font-family);
+      font-size: var(--actor-input-font-size);
+      font-weight: var(--actor-input-font-weight);
+      color: var(--actor-input-color);
+      text-align: center;
+      display: flex;
+      flex-direction: row;
+      /* box-shadow: 0 0 10px #00000052 inset; */
+      /* background: red; */
+    }
+      .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #value {
+        height: 100%;
+        width: 50%;
+        flex-grow: 1;
+        /* background: red; */
+      }
+        .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #value > input {
+          width: 100%;
+          height: inherit;
+          margin: 0px 0px 0px 0px;
+          padding: 5px 0px 0px 0px;
+          text-align: center;
+        }
+      .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #divisor {
+        width: fit-content;
+        height: 22px;
+        padding: 5px 0px 0px 0px;
+        flex-grow: 0;
+        /* background: green; */
+      }
+      .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #roundsToPassOut-max {
+        flex-grow: 1;
+        height: 22px;
+        width: 50%;
+        padding: 0px 0px 0px 0px;
+        /* background: blue; */
+      }
+        .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #roundsToPassOut-max > a {
+          width: inherit;
+          height: inherit;
+          position: relative;
+          top: 5px;
+          text-align: center;
+        }
+        .app.window-app.sheet.wfrp4e.actor.character-sheet .tab.main.active .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #roundsToPassOut-max > input {
+          width: 100%;
+          height: 22px;
+          padding: 5px 0px 0px 0px;
         }
 
   /* ================== 4. CAREER LIST ======================== */
@@ -10390,6 +10499,100 @@
           padding: 5px 0px 0px 0px;
         }
 
+
+        .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section {
+          display: flex;
+          width: 180px;
+          margin: 0px 0px 0px 0px;
+          border: 1px solid #736953a6;
+          flex-grow: 0;
+          flex-basis: 85px;
+          /* background: var(--debug-background-color-red); */
+        }
+        .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .roundsToPassOut-section {
+          display: flex;
+          flex-direction: column;
+          height: inherit;
+          width: inherit;
+          margin: 0px 0px 0px 0px;
+          border-right: 1px solid #736953a6;
+          flex-grow: 1;
+          /* background: var(--debug-background-color-green); */
+        }
+        .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section div:last-of-type {
+          border-right: none;
+        }
+          .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .top.label {
+            border-right: none;
+            border: none;
+            height: 22px;
+            font-family: var(--actor-label-font-family);
+            font-size: var(--actor-label-font-size);
+            font-weight: var(--actor-label-font-weight);
+            color: var(--actor-label-color);
+            text-align: center;
+            box-shadow: 0 0 10px #00000052 inset;
+            margin: 0px;
+            padding: 2px 0px 0px 0px;
+            /* background: red; */
+          }
+          .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box {
+            border: none;
+            border-top: 1px solid #736953a6;
+            height: 23px;
+            margin: 0px;
+            padding: 0px 0px 0px 0px;
+            font-family: var(--actor-input-font-family);
+            font-size: var(--actor-input-font-size);
+            font-weight: var(--actor-input-font-weight);
+            color: var(--actor-input-color);
+            text-align: center;
+            display: flex;
+            flex-direction: row;
+            /* box-shadow: 0 0 10px #00000052 inset; */
+            /* background: red; */
+          }
+            .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #value {
+              width: 100%;
+              min-width: 79px;
+              max-width: 79px;
+              height: 100%;
+              flex-grow: 1;
+              /* background: red; */
+            }
+              .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #value > input {
+                width: inherit;
+                height: inherit;
+                margin: 0px 0px 0px 0px;
+                padding: 5px 0px 0px 0px;
+                text-align: center;
+              }
+            .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #divisor {
+              width: fit-content;
+              height: 22px;
+              padding: 5px 0px 0px 0px;
+              /* background: green; */
+            }
+            .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #roundsToPassOut-max {
+              flex-grow: 1;
+              min-width: 79px;
+              max-width: 79px;
+              height: 22px;
+              padding: 0px 0px 0px 0px;
+              /* background: blue; */
+            }
+              .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #roundsToPassOut-max > a {
+                width: inherit;
+                height: inherit;
+                position: relative;
+                top: 5px;
+                text-align: center;
+              }
+              .app.window-app.sheet.wfrp4e.actor  .main-row .roundsToPassOut.row-section .roundsToPassOut-value-box #roundsToPassOut-max > input {
+                width: 100%;
+                height: 22px;
+                padding: 5px 0px 0px 0px;
+              }
 
     .app.window-app.sheet.wfrp4e.actor.vehicle-sheet .general .items .main-row,
       .app.window-app.sheet.wfrp4e.actor.vehicle-sheet .general .items {

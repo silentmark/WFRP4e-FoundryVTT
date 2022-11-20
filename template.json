@@ -122,6 +122,12 @@
             "value": 0,
             "max": 2
           },
+          "roundsToPassOut": {
+            "type": "Number",
+            "label": "Rundy do utraty przytomności",
+            "value": 0,
+            "max": 2
+          },
           "sin": {
             "type": "Number",
             "label": "Sin",
