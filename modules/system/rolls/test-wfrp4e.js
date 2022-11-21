@@ -613,12 +613,13 @@ export default class TestWFRP {
   }
 
 
-  async createOpposedMessage(token)
-  {
+  async createOpposedMessage(token) {
     let oppose = new OpposedWFRP();
     await oppose.setAttacker(this.message);
     let opposeMessageId = await oppose.startOppose(token);
-    this.context.opposedMessageIds.push(opposeMessageId);
+    if (opposeMessageId) {
+      this.context.opposedMessageIds.push(opposeMessageId);
+    }
     await this.updateMessageFlags();
   }
 
