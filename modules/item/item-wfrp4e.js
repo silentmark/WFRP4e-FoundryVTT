@@ -1563,8 +1563,10 @@ export default class ItemWfrp4e extends Item {
     let skill
     if (this.type == "weapon") {
       skill = skills.find(x => x.name.toLowerCase() == this.skill.value.toLowerCase())
-      if (!skill)
-        skill = skills.find(x => x.name.toLowerCase().includes(`(${this.WeaponGroup.toLowerCase()})`))
+      if (!skill) {
+        let weaponGroupName = game.wfrp4e.config.weaponGroups[this.weaponGroup.value];
+        skill = skills.find(x => x.name.toLowerCase().includes(`(${weaponGroupName.toLowerCase()})`))
+      }
     }
     if (this.type == "spell")
     {
