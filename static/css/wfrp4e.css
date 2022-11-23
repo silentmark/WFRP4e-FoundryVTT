@@ -3132,6 +3132,8 @@
       margin: 0px;
       height: 25px;
       width: 7px;
+      min-width: 7px;
+      max-width: 7px;
       background: url(../ui/item-sheet-tab-edges.webp) repeat;
       background-position-x: right;
       position: absolute;
@@ -3143,6 +3145,8 @@
       margin: 0px;
       height: 25px;
       width: 7px;
+      min-width: 7px;
+      max-width: 7px;;
       background: url(../ui/item-sheet-tab-edges.webp) repeat;
       background-position-x: right;
       position: absolute;
