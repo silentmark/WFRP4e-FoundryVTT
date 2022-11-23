@@ -1041,17 +1041,17 @@ export default class WFRP_Utility {
     event.originalEvent.dataTransfer.setData("text/plain", JSON.stringify(dragData));
   }
 
-  static applyEffectToTarget(effect, targets) {
-    if (!targets && !game.user.targets.size)
+  static async applyEffectToTarget(effect, targets, user = game.user) {
+    if (!targets && !user.targets.size)
       return ui.notifications.warn(game.i18n.localize("WARNING.Target"))
 
     if (!targets)
-      targets = Array.from(game.user.targets);
+      targets = Array.from(user.targets);
 
-    let targetsBackup = Array.from(game.user.targets.map(t=>t.id));
+    let targetsBackup = Array.from(user.targets.map(t=>t.id));
       // Remove targets now so they don't start opposed tests
     if (canvas.scene)
-      game.user.updateTokenTargets([])
+      user.updateTokenTargets([])
 
     if (game.user.isGM) {
       setProperty(effect, "flags.wfrp4e.effectApplication", "")
@@ -1060,16 +1060,18 @@ export default class WFRP_Utility {
       let actors = [];
 
       if (effect.flags.wfrp4e.effectTrigger == "oneTime") {
-        targets.forEach(t => {
+        for(let i = 0; i < targets.length; i++) {
+          let t = targets[i];
           actors.push(t.actor.prototypeToken.name)
-          game.wfrp4e.utility.applyOneTimeEffect(effect, t.actor)
-        })
+          await game.wfrp4e.utility.applyOneTimeEffect(effect, t.actor);
+        }
       }
       else {
-        targets.forEach(t => {
+        for(let i = 0; i < targets.length; i++) {
+          let t = targets[i];
           actors.push(t.actor.prototypeToken.name)
-          t.actor.createEmbeddedDocuments("ActiveEffect", [effect])
-        })
+          await t.actor.createEmbeddedDocuments("ActiveEffect", [effect])
+        }
       }
       msg += actors.join(", ");
       ui.notifications.notify(msg)
@@ -1078,7 +1080,7 @@ export default class WFRP_Utility {
       ui.notifications.notify(game.i18n.localize("APPLYREQUESTGM"))
       game.socket.emit("system.wfrp4e", { type: "applyEffects", payload: { effect, targets: [...targets].map(t => t.document.toObject()), scene: canvas.scene.id } })
     }
-    game.user.updateTokenTargets(targetsBackup);
+    user.updateTokenTargets(targetsBackup);
   }
 
   /** Send effect for owner to apply, unless there isn't one or they aren't active. In that case, do it yourself */
@@ -1102,8 +1104,9 @@ export default class WFRP_Utility {
   static runSingleEffectSync(effect, actor, item, scriptArgs) {
     try {
       let func;
-      if (effect.script) {
-        func = new Function("args", effect.script).bind({ actor, effect, item })
+      let script = effect.script ?? effect.flags?.wfrp4e?.script
+      if (script) {
+        func = new Function("args", script).bind({ actor, effect, item })
         WFRP_Utility.log(`${this.name} > Running ${effect.label}`)
         func(scriptArgs);
       }
@@ -1118,19 +1121,20 @@ export default class WFRP_Utility {
   static async runSingleEffect(effect, actor, item, scriptArgs, options = {}) {
     try {
       let func;
-      if (effect.script?.indexOf("await ") == -1) {
-        func = new Function("args", effect.script).bind({ actor, effect, item })
+      let script = effect.script ?? effect.flags?.wfrp4e?.script
+      if (script?.indexOf("await ") == -1) {
+        func = new Function("args", script).bind({ actor, effect, item })
         WFRP_Utility.log(`${this.name} > Running ${effect.label}`)
-      } else if (effect.script?.indexOf("await ") != -1) {
+      } else if (script?.indexOf("await ") != -1) {
         let asyncFunction = Object.getPrototypeOf(async function () { }).constructor
-        func = new asyncFunction("args", effect.script).bind({ actor, effect, item })
+        func = new asyncFunction("args", script).bind({ actor, effect, item })
         WFRP_Utility.log(`${this.name} > Running Async ${effect.label}`)
       }
       if (func) {        
-        if (effect.script?.indexOf("await ") == -1) {
+        if (script?.indexOf("await ") == -1) {
           func(scriptArgs);
         }
-        if (effect.script?.indexOf("await ") != -1) {
+        if (script?.indexOf("await ") != -1) {
           await func(scriptArgs);
         }
       }
