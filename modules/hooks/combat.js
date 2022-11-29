@@ -20,14 +20,23 @@ export default function() {
     }
   });
 
-  Hooks.on("tokenUpdate", async function(scene, tokenData, diffData, options, userId) {
+  Hooks.on("updateToken", async function(scene, tokenData, diffData, options, userId) {
   
     if (game.combat.active) {
-      let mask = tokenData.hidden;
-      if (mask) {
-
-      } else {
-
+      let combatant = game.combat.turns.find(x => x.tokenId == tokenData._id);
+      let token = game.canvas.tokens.getDocuments().find(x => x._id == tokenData._id);
+      let mask = token.hidden;
+      if (combatant && mask && !combatant.hidden && combatant.name != "???") {
+        let data = {};
+        data.img = "systems/wfrp4e/tokens/unknown.png"
+        data.name = "???"
+        await combatant.update(data);
+      }
+      else if (combatant && !mask && !combatant.hidden && combatant.name == "???") {
+        let data = {};
+        data.img = token.texture.src;
+        data.name = token.name;
+        await combatant.update(data);
       }
     }
   });

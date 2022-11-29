@@ -120,6 +120,9 @@ export default class OpposedWFRP {
       if (attacker.hidden) {
         attacker.alias = "???"
         attacker.texture.src = "systems/wfrp4e/tokens/unknown.png"
+      } else {
+        attacker.alias = attacker.name;
+        attacker.texture.src = attacker.texture.src;
       }
 
       // Support opposed start messages when defender is not set yet - allows for manual opposed to use this message
