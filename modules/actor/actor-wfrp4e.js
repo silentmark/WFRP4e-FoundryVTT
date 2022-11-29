@@ -2926,7 +2926,7 @@ export default class ActorWfrp4e extends Actor {
   }
 
   runEffectsSync(trigger, args, options = {}) {
-    let effects = this.actorEffects.filter(e => e.trigger == trigger && e.script && !e.disabled)
+    let effects = this.actorEffects.filter(e => e.trigger == trigger && (e.script ?? e.flags.wfrp4e.script) && !e.disabled)
 
     if (options.item && options.item.effects)
       effects = effects.concat(options.item.effects.filter(e => e.application == "item" && e.trigger == trigger))
@@ -2940,7 +2940,7 @@ export default class ActorWfrp4e extends Actor {
 
   async runEffects(trigger, args, options = {}) {
     // WFRP_Utility.log(`${this.name} > Effect Trigger ${trigger}`)
-    let effects = this.actorEffects.filter(e => e.trigger == trigger && e.script && !e.disabled)
+    let effects = this.actorEffects.filter(e => e.trigger == trigger && (e.script ?? e.flags.wfrp4e.script) && !e.disabled)
 
     if (options.item && options.item.effects)
       effects = effects.concat(options.item.effects.filter(e => e.application == "item" && e.trigger == trigger))
