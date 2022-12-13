@@ -1959,8 +1959,8 @@ export default class ActorWfrp4e extends Actor {
     if (newWounds <= 0) {
       //WFRP_Audio.PlayContextAudio(opposedTest.attackerTest.weapon, {"type": "hit", "equip": "crit"})
       let critAmnt = game.settings.get("wfrp4e", "dangerousCritsMod")
-      if (game.settings.get("wfrp4e", "dangerousCrits") && critAmnt && (Math.abs(newWounds) - actor.characteristics.t.bonus) > 0) {
-        let critModifier = (Math.abs(newWounds) - actor.characteristics.t.bonus) * critAmnt;
+      if (game.settings.get("wfrp4e", "dangerousCrits") && critAmnt) {
+        let critModifier = Math.abs(newWounds) * critAmnt;
         updateMsg += `<br><a class ="table-click critical-roll" data-modifier=${critModifier} data-table = "crit${opposedTest.result.hitloc.value}" ><i class='fas fa-list'></i> ${game.i18n.localize("Critical")} +${critModifier}</a>`
       }
       //@HOUSE
@@ -1985,9 +1985,8 @@ export default class ActorWfrp4e extends Actor {
       newWounds = 0; // Do not go below 0 wounds
 
 
-    if (item.type == "weapon" && item.properties.qualities.slash && updateMsg.includes("critical-roll"))
-    {
-      updateMsg += "<br><b>Slash Property</b>: Cause Bleeding on Critical Wounds"
+    if (item.type == "weapon" && item.properties.qualities.slash && updateMsg.includes("critical-roll")) {
+      updateMsg += "<br><b>Cecha Tnący</b>: Wywołuje Krwawienie przy zadaniu Rany Krytycznej"
     }
 
 
@@ -2031,6 +2030,9 @@ export default class ActorWfrp4e extends Actor {
     await actor.update({ "system.status.wounds.value": newWounds })
     if (newWounds == 0) {
       await actor.addCondition("prone");
+    }
+    if (item.type == "weapon" && item.properties.qualities.slash && updateMsg.includes("critical-roll")) {
+      await actor.addCondition("bleeding", item.properties.qualities.slash.value);
     }
 
     return updateMsg;

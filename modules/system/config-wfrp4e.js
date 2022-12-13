@@ -419,6 +419,7 @@ WFRP4E.weaponQualities = {
     "shield": "PROPERTY.Shield",
     "trapblade": "PROPERTY.TrapBlade",
     "unbreakable": "PROPERTY.Unbreakable",
+    "slash": "PROPERTY.Slash",
     "wrap": "PROPERTY.Wrap"
 };
 
@@ -468,6 +469,7 @@ WFRP4E.propertyHasValue = {
     "pistol": false,
     "precise": false,
     "pummel": false,
+    "slash": true,
     "repeater": true,
     "shield": true,
     "trapblade": false,
@@ -1745,28 +1747,27 @@ WFRP4E.conditionScripts = {
         let value = effect.conditionValue;
         msg += await actor.applyBasicDamage(value, {damageType : game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL, minimumOne : false, suppressMsg : true})
 
-        if (actor.status.wounds.value == 0 && !actor.hasCondition("unconscious"))
-        {
-            await actor.addCondition("unconscious")
-            msg += `<br>${game.i18n.format("BleedUnc", {name: actor.prototypeToken.name })}`
+        if (actor.status.wounds.value == 0 && !actor.hasCondition("unconscious")) {
+            let test = await actor.setupSkill(game.i18n.localize("NAME.Endurance"));
+            await test.roll();
+            if (test.result.outcome == "failure") {
+                await actor.addCondition("unconscious")
+                msg += `<br>${game.i18n.format("BleedUnc", {name: actor.prototypeToken.name })}`
+            }
         }
 
-        if (actor.hasCondition("unconscious"))
-        {
+        if (actor.hasCondition("unconscious")) {
             bleedingAmt = value;
             bleedingRoll = (await new Roll("1d100").roll()).total;
-            if (bleedingRoll <= bleedingAmt * 10)
-            {
+            if (bleedingRoll <= bleedingAmt * 10) {
                 msg += `<br>${game.i18n.format("BleedFail", {name: actor.prototypeToken.name} )} (${game.i18n.localize("Rolled")} ${bleedingRoll})`
                 await actor.addCondition("dead")
             }
-            else if (bleedingRoll % 11 == 0)
-            {
+            else if (bleedingRoll % 11 == 0) {
                 msg += `<br>${game.i18n.format("BleedCrit", { name: actor.prototypeToken.name } )} (${game.i18n.localize("Rolled")} ${bleedingRoll})`
                 await actor.removeCondition("bleeding")
             }
-            else 
-            {
+            else {
                 msg += `<br>${game.i18n.localize("BleedRoll")}: ${bleedingRoll}`
             }
         }
@@ -1781,7 +1782,7 @@ WFRP4E.conditionScripts = {
         let conditionValue = effect.conditionValue;
         let msg = `<h2>${game.i18n.localize("WFRP4E.ConditionName.Stunned")}</h2>`
         if (actor.isOwner) {
-            let test = await actor.setupSkill("Odporność", {appendTitle : " - Oszołomienie"})
+            let test = await actor.setupSkill(game.i18n.localize("NAME.Endurance"), {appendTitle : " - Oszołomienie"})
             await test.roll();
             if (test.result.outcome == "success") {
                 await actor.removeCondition("stunned", Math.min(test.result.SL, conditionValue));
