@@ -1293,7 +1293,7 @@ export default class WFRP_Utility {
 
   static getActorOwner(actor) { 
     if (actor.hasPlayerOwner) {
-      for (let u of game.users.contents.filter(u => u.active && !u.isGM)) {
+      for (let u of game.users.contents.filter(u => u.active && !u.isGM && u.name != "Stream")) {
           if (actor.ownership.default >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER || actor.ownership[u.id] >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
               return u;
           }

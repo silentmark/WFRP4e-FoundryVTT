@@ -720,7 +720,8 @@ export default class ActorSheetWfrp4e extends ActorSheet {
   _onCharClick(ev) {
     ev.preventDefault();
     let characteristic = ev.currentTarget.attributes["data-char"].value;
-    this.actor.setupCharacteristic(characteristic).then(setupData => {
+    let options = {disableSocket: ev.ctrlKey}
+    this.actor.setupCharacteristic(characteristic, options).then(setupData => {
       this.actor.basicTest(setupData)
     })
   }
@@ -731,7 +732,8 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     if (ev.button == 0) {
       skill = this.actor.items.get(itemId);
-      this.actor.setupSkill(skill).then(setupData => {
+      let options = {disableSocket: ev.ctrlKey}
+      this.actor.setupSkill(skill, options).then(setupData => {
         this.actor.basicTest(setupData)
       })
     }
@@ -743,34 +745,41 @@ export default class ActorSheetWfrp4e extends ActorSheet {
   _onExtendedTestSelect(ev) {
     let itemId = this._getItemId(ev)
     let item = this.actor.items.get(itemId)
-    this.actor.setupExtendedTest(item)
+    let options = {disableSocket: ev.ctrlKey };
+    this.actor.setupExtendedTest(item, options)
   }
 
   _onWeaponNameClick(ev) {
     ev.preventDefault();
     let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let weapon = this.actor.items.get(itemId)
-    if (weapon) this.actor.setupWeapon(weapon).then(setupData => {
-      if (!setupData.abort)
-        this.actor.weaponTest(setupData)
-    })
+    if (weapon) {      
+      let options = {disableSocket: ev.ctrlKey}
+      this.actor.setupWeapon(weapon, options).then(setupData => {
+        if (!setupData.abort)
+          this.actor.weaponTest(setupData)
+      })
+    }
   }
   async _onUnarmedClick(ev) {
     ev.preventDefault();
     let unarmed = game.wfrp4e.config.systemItems.unarmed
-    this.actor.setupWeapon(unarmed).then(setupData => {
+    let options = {disableSocket: ev.ctrlKey}
+    this.actor.setupWeapon(unarmed, options).then(setupData => {
       this.actor.weaponTest(setupData)
     })
   }
   async _onDodgeClick(ev) {
-      this.actor.setupSkill(game.i18n.localize("NAME.Dodge")).then(setupData => {
+    let options = {disableSocket: ev.ctrlKey}
+    this.actor.setupSkill(game.i18n.localize("NAME.Dodge"), options).then(setupData => {
         this.actor.basicTest(setupData)
-      });
+    });
   }
   async _onImprovisedClick(ev) {
     ev.preventDefault();
     let improv = game.wfrp4e.config.systemItems.improv;
-    this.actor.setupWeapon(improv).then(setupData => {
+    let options = {disableSocket: ev.ctrlKey}
+    this.actor.setupWeapon(improv, options).then(setupData => {
       this.actor.weaponTest(setupData)
     })
   }
@@ -778,18 +787,20 @@ export default class ActorSheetWfrp4e extends ActorSheet {
   async _onStompClick(ev) {
     ev.preventDefault();
     let stomp = game.wfrp4e.config.systemItems.stomp;
-    this.actor.setupTrait(stomp).then(setupData => {
+    let options = {disableSocket: ev.ctrlKey };
+    this.actor.setupTrait(stomp, options).then(setupData => {
       this.actor.traitTest(setupData)
     })
   }
   async _onRestClick(ev) {
     let skill = this.actor.getItemTypes("skill").find(s => s.name == game.i18n.localize("NAME.Endurance"));
+    let options = {disableSocket: ev.ctrlKey, rest: true, tb: this.actor.characteristics.t.bonus}
     if (skill)
-      this.actor.setupSkill(skill, { rest: true, tb: this.actor.characteristics.t.bonus }).then(setupData => {
+      this.actor.setupSkill(skill, options).then(setupData => {
         this.actor.basicTest(setupData)
       });
     else
-      this.actor.setupCharacteristic("t", { rest: true }).then(setupData => {
+      this.actor.setupCharacteristic("t", options).then(setupData => {
         this.actor.basicTest(setupData)
       })
   }
@@ -801,7 +812,8 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let trait = this.actor.items.get(itemId)
-    this.actor.setupTrait(trait).then(setupData => {
+    let options = {disableSocket: ev.ctrlKey };
+    this.actor.setupTrait(trait, options).then(setupData => {
       this.actor.traitTest(setupData)
     })
   }
@@ -812,7 +824,8 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let spell = this.actor.items.get(itemId)
-    this.spellDialog(spell)
+    let options = {disableSocket: ev.ctrlKey };
+    this.spellDialog(spell, options)
   }
 
   _onPrayerRoll(ev) {
@@ -822,7 +835,8 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let prayer = this.actor.items.get(itemId)
-    this.actor.setupPrayer(prayer).then(setupData => {
+    let options = {disableSocket: ev.ctrlKey };
+    this.actor.setupPrayer(prayer, options).then(setupData => {
       this.actor.prayerTest(setupData)
     })
   }
@@ -1983,7 +1997,13 @@ export default class ActorSheetWfrp4e extends ActorSheet {
         ui.notifications.error(game.i18n.localize("SHEET.NonCurrentCareer"))
         return;
       }
-      this.actor.setupSkill(skill, { title: `${skill.name} - ${game.i18n.localize("Income")}`, income: this.actor.details.status, career: career.toObject() }).then(setupData => {
+      let options = {
+        disableSocket: ev.ctrlKey,
+        title: `${skill.name} - ${game.i18n.localize("Income")}`, 
+        income: this.actor.details.status, 
+        career: career.toObject()
+      };
+      this.actor.setupSkill(skill, options).then(setupData => {
         this.actor.basicTest(setupData)
       });
     })
@@ -2190,10 +2210,12 @@ export default class ActorSheetWfrp4e extends ActorSheet {
         let modifier = parseInt($(ev.currentTarget).attr("data-range"))
 
         let weapon = item
-        if (weapon)
-          this.actor.setupWeapon(weapon, { modify: { modifier } }).then(setupData => {
+        if (weapon) {
+          let options = {disableSocket: ev.ctrlKey, modify: { modifier } };
+          this.actor.setupWeapon(weapon, options).then(setupData => {
             this.actor.weaponTest(setupData)
           });
+        }
       })
 
     }

@@ -597,7 +597,7 @@ export default class ActorWfrp4e extends Actor {
 
   setupSocket(payload, type, options, content) {
     let owner = game.wfrp4e.utility.getActorOwner(this);
-    if (owner.id != game.user.id) {
+    if (owner.id != game.user.id && !options.disableSocket) {
       payload.options = options;
       payload.actorId = this.id;
       payload.type = type;
