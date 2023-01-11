@@ -1867,8 +1867,6 @@ export default class ActorWfrp4e extends Actor {
       }
       //@/HOUSE
 
-
-
       // AP.used is the actual amount of AP considered
       AP.used = AP.value - AP.ignored
       AP.used = AP.used < 0 ? 0 : AP.used;           // AP minimum 0
@@ -1882,11 +1880,23 @@ export default class ActorWfrp4e extends Actor {
 
       // If using a shield, add that AP as well
       let shieldAP = 0;
-      if (opposedTest.defenderTest.weapon) {
-        if (opposedTest.defenderTest.weapon.properties.qualities.shield)
-          shieldAP = opposedTest.defenderTest.weapon.properties.qualities.shield.value
+      if (game.settings.get("wfrp4e", "uiaShields")) // UIA shields don't need to be used, just equipped
+      {
+        shieldAP = opposedTest.defenderTest.actor.itemCategories.weapon
+        .filter(i => 
+          i.type == "weapon" && 
+          i.isEquipped && 
+          i.properties.qualities.shield)
+        .reduce((total, item) => total += item.properties.qualities.shield.value, 0)
       }
-
+      else // RAW Shields required the shield to be used
+      {
+        if (opposedTest.defenderTest.weapon) {
+          if (opposedTest.defenderTest.weapon.properties.qualities.shield)
+          shieldAP = opposedTest.defenderTest.weapon.properties.qualities.shield.value
+        }
+      }
+        
       //@HOUSE
       if (game.settings.get("wfrp4e", "mooShieldAP") && opposedTest.defenderTest.result.outcome == "failure") {
         game.wfrp4e.utility.logHomebrew("mooShieldAP")
@@ -1905,7 +1915,6 @@ export default class ActorWfrp4e extends Actor {
         totalWoundLoss = totalWoundLoss <= 0 ? 1 : totalWoundLoss
       else
         totalWoundLoss = totalWoundLoss <= 0 ? 0 : totalWoundLoss
-
 
       try {
         if (opposedTest.attackerTest.weapon.attackType == "melee") {
@@ -1940,7 +1949,8 @@ export default class ActorWfrp4e extends Actor {
     Hooks.call("wfrp4e:applyDamage", scriptArgs)
 
     let item = opposedTest.attackerTest.item
-    let itemDamageEffects = item.effects.filter(e => e.application == "damage" && !e.disabled)
+    let ammoEffects = item.ammo?.effects?.filter(e => e.application == "damage" && !e.disabled) || []
+    let itemDamageEffects = item.effects.filter(e => e.application == "damage" && !e.disabled).concat(ammoEffects)
     for (let effect of itemDamageEffects) {      
       await game.wfrp4e.utility.runSingleEffect(effect, actor, item, scriptArgs);
     }
@@ -1958,8 +1968,8 @@ export default class ActorWfrp4e extends Actor {
     // If damage taken reduces wounds to 0, show Critical
     if (newWounds <= 0) {
       //WFRP_Audio.PlayContextAudio(opposedTest.attackerTest.weapon, {"type": "hit", "equip": "crit"})
-      let critAmnt = game.settings.get("wfrp4e", "dangerousCritsMod")
-      if (game.settings.get("wfrp4e", "dangerousCrits") && critAmnt) {
+      let critAmnt = game.settings.get("wfrp4e", "uiaCritsMod")
+      if (game.settings.get("wfrp4e", "uiaCrits") && critAmnt) {
         let critModifier = Math.abs(newWounds) * critAmnt;
         updateMsg += `<br><a class ="table-click critical-roll" data-modifier=${critModifier} data-table = "crit${opposedTest.result.hitloc.value}" ><i class='fas fa-list'></i> ${game.i18n.localize("Critical")} +${critModifier}</a>`
       }
@@ -1986,7 +1996,7 @@ export default class ActorWfrp4e extends Actor {
 
 
     if (item.type == "weapon" && item.properties.qualities.slash && updateMsg.includes("critical-roll")) {
-      updateMsg += "<br><b>Cecha Tnący</b>: Wywołuje Krwawienie przy zadaniu Rany Krytycznej"
+      updateMsg += `<br><b>Cecha Tnący</b>: Wywołuje Krwawienie przy zadaniu Rany Krytycznej, Może wykorzystać ${item.properties.qualities.slash.value} Przewag, aby wywołać dodatkowy poziom krwawienia.`
     }
 
 
@@ -2753,6 +2763,7 @@ export default class ActorWfrp4e extends Actor {
     for (let band in weapon.range.bands) {
       if (distance >= weapon.range.bands[band].range[0] && distance <= weapon.range.bands[band].range[1]) {
         currentBand = band;
+        options.rangeBand = band;
         break;
       }
     }
