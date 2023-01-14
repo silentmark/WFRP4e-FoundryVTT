@@ -43,6 +43,7 @@ export default class WFRP_Tables {
 
       // If no die specified, just use the table size and roll
       let roll = await new Roll(`${formula} + @modifier`, { modifier }).roll( { async: true });
+      // roll.toMessage({rollMode : game.settings.get("core", "rollMode"), });
 
       if (game.dice3d && !options.hideDSN)
         await game.dice3d.showForRoll(roll)
@@ -193,9 +194,19 @@ export default class WFRP_Tables {
     let tableSettings = game.settings.get("wfrp4e", "tableSettings");
     WFRP_Utility.log(`Table Settings: `, undefined, tableSettings)
 
-    let id = tableSettings[`${key}${column ? "-"+column : ""}`];
-    if (id)
-      table = game.tables.get(id)
+    // If tableSettings has comma separated ids, return them as columns
+    let id = tableSettings[`${key}${column ? "-"+column : ""}`]?.split(",");
+    if (id && id.length)
+    {
+      if (id.length > 1)
+      {
+        tables = id.map(i => game.tables.get(i));
+      }
+      else // If only one id in table settings, just use that table
+      {
+        table = game.tables.get(id[0]);
+      }
+    }
 
     if (table)
     {
