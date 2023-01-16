@@ -1003,7 +1003,7 @@ export default class WFRP_Utility {
   }
 
   static postCorruptionTest(strength) {
-    renderTemplate("systems/wfrp4e/templates/chat/corruption.html", { strength }).then(html => {
+    renderTemplate("systems/wfrp4e/templates/chat/corruption.hbs", { strength }).then(html => {
       ChatMessage.create({ content: html });
     })
   }
@@ -1020,7 +1020,7 @@ export default class WFRP_Utility {
     let title = `${game.i18n.localize("CHAT.Fear")} ${value}`
     if (name)
       title += ` - ${name}`
-    renderTemplate("systems/wfrp4e/templates/chat/fear.html", { value, name, title }).then(html => {
+    renderTemplate("systems/wfrp4e/templates/chat/fear.hbs", { value, name, title }).then(html => {
       ChatMessage.create({ content: html, speaker: { alias: name } });
     })
   }
@@ -1041,7 +1041,7 @@ export default class WFRP_Utility {
     let title = `${game.i18n.localize("CHAT.Terror")} ${value}`
     if (name)
       title += ` - ${name}`
-    renderTemplate("systems/wfrp4e/templates/chat/terror.html", { value, name, title }).then(html => {
+    renderTemplate("systems/wfrp4e/templates/chat/terror.hbs", { value, name, title }).then(html => {
       ChatMessage.create({ content: html, speaker: { alias: name } });
     })
   }
@@ -1053,7 +1053,7 @@ export default class WFRP_Utility {
 
     let title = `${game.i18n.localize("CHAT.Experience")}`
 
-    renderTemplate("systems/wfrp4e/templates/chat/experience.html", { title, amount, reason }).then(html => {
+    renderTemplate("systems/wfrp4e/templates/chat/experience.hbs", { title, amount, reason }).then(html => {
       ChatMessage.create({ content: html });
     })
   }
