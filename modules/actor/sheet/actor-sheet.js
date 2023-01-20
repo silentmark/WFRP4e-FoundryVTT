@@ -2183,7 +2183,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
    * @private
    * @param {Object} ev    ev triggered by clicking on a wweapon/armor property
    */
-  _expandProperty(ev) {
+  async _expandProperty(ev) {
     ev.preventDefault();
 
     let li = $(ev.currentTarget).parents(".item"),
@@ -2235,7 +2235,9 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     let propertyDescription = "<b>" + property + "</b>" + ": " + propertyDescr[propertyKey];
     if (propertyDescription.includes("(Rating)"))
-      propertyDescription = propertyDescription.replace("(Rating)", property.split(" ")[1])
+      propertyDescription = propertyDescription.replaceAll("(Rating)", property.split(" ")[1])
+
+    propertyDescription = await TextEditor.enrichHTML(propertyDescription, {async: true})
 
     // Toggle expansion 
     if (li.hasClass("expanded")) {
