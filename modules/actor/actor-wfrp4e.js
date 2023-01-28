@@ -598,8 +598,9 @@ export default class ActorWfrp4e extends Actor {
       cardOptions.rollMode = testData.options.rollMode || rollMode
       testData.rollMode = cardOptions.rollMode
       testData.cardOptions = cardOptions;
-      return new testData.rollClass(testData);
+      return new testData.rollClass(testData)
     }
+    reject()
   }
 
 

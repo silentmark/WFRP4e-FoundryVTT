@@ -171,11 +171,9 @@ export default class OpposedWFRP {
     if (this.message && game.user.isGM)
       await this.message.update(updateData)
 
-    else if (this.message)
-    {
+    else if (this.message) {
       this.message.flags.wfrp4e.opposeData = this.data // hopefully temporary solution. Other processes likely need flag data to be present immediately, and the inner socket function cannot be awaited, so set data locally
       game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: this.message.id, updateData } })
-
     }
   }
 

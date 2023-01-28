@@ -299,7 +299,7 @@ export default class CombatHelpers {
               <h2>${conditionName}</h2>
               <a class="condition-script" data-combatant-id="${turn.id}" data-cond-id="${cond.statusId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>
               `
-                    ChatMessage.create({ content: msgContent, speaker: { alias: turn.token.name } })
+                    await ChatMessage.create({ content: msgContent, speaker: { alias: turn.token.name } })
 
                 }
             }
@@ -322,7 +322,7 @@ export default class CombatHelpers {
 
         }
         if (removedConditions.length)
-            ChatMessage.create({ content: removedConditions.join("<br>") })
+            await ChatMessage.create({ content: removedConditions.join("<br>") })
     }
 
     static async checkEndTurnConditions(combat) {
@@ -342,7 +342,7 @@ export default class CombatHelpers {
                 <h2>${conditionName}</h2>
                 <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.statusId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>
                 `
-                    ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
+                    await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
 
                 }
             }

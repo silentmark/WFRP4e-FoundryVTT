@@ -602,8 +602,7 @@ export default class TestWFRP {
     if (this.message && game.user.isGM)
       await this.message.update(update)
 
-    else if (this.message)
-    {
+    else if (this.message) {
       this.message.flags.testData = data // hopefully temporary solution. Other processes likely need flag data to be present immediately, and the inner socket function cannot be awaited, so set data locally
       game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: this.message.id, updateData: update} })
     }

@@ -54,7 +54,7 @@ export default function () {
       if (item.type == "critical") {
         let newWounds;
         let appliedWounds = Number.parseInt(item.wounds.value);
-        if(Number.isInteger(appliedWounds)) {
+        if (Number.isInteger(appliedWounds)) {
           newWounds = item.actor.status.wounds.value - appliedWounds;
           if (newWounds < 0) {
             newWounds = 0;
