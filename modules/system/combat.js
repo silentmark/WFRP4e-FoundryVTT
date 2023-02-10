@@ -297,10 +297,8 @@ export default class CombatHelpers {
                         conditionName += ` ${cond.flags.wfrp4e.value}`
                     msgContent = `
               <h2>${conditionName}</h2>
-              <a class="condition-script" data-combatant-id="${turn.id}" data-cond-id="${cond.statusId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>
-              `
-                    await ChatMessage.create({ content: msgContent, speaker: { alias: turn.token.name } })
-
+              <a class="condition-script" data-combatant-id="${turn.id}" data-cond-id="${cond.statusId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
+                    await ChatMessage.create({ content: msgContent, speaker: { alias: turn.token.name } });
                 }
             }
 
@@ -340,10 +338,8 @@ export default class CombatHelpers {
                         conditionName += ` ${cond.flags.wfrp4e.value}`
                     msgContent = `
                 <h2>${conditionName}</h2>
-                <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.statusId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>
-                `
+                <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.statusId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
                     await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
-
                 }
             }
 

@@ -1117,11 +1117,13 @@ export default class WFRP_Utility {
         for (let u of game.users.contents.filter(u => u.active && !u.isGM)) {
           if (actor.ownership.default >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER || actor.ownership[u.id] >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
             ui.notifications.notify(game.i18n.localize("APPLYREQUESTOWNER"))
-            let effectObj = effect instanceof ActiveEffect ? effect.toObject() : effect;
-            game.socket.emit("system.wfrp4e", { type: "applyOneTimeEffect", payload: { userId: u.id, effect: effectObj, actorData: actor.toObject() } })
-            return
           }
         }
+
+        let u = WFRP_Utility.getActorOwner(actor);
+        let effectObj = effect instanceof ActiveEffect ? effect.toObject() : effect;
+        game.socket.emit("system.wfrp4e", { type: "applyOneTimeEffect", payload: { userId: u.id, effect: effectObj, actorData: actor.toObject() } })
+        return
       }
     }
 
@@ -1321,9 +1323,14 @@ export default class WFRP_Utility {
   static getActorOwner(actor) { 
     if (actor.hasPlayerOwner) {
       for (let u of game.users.contents.filter(u => u.active && !u.isGM && u.name != "Stream")) {
-          if (actor.ownership.default >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER || actor.ownership[u.id] >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
-              return u;
-          }
+        if (u.character?.id === actor.id) {
+          return u;
+        }
+      }
+      for (let u of game.users.contents.filter(u => u.active && !u.isGM && u.name != "Stream")) {
+        if (actor.ownership.default >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER || actor.ownership[u.id] >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
+        return u;
+        }
       }
     }
     return game.users.contents.find(u => u.active && u.isGM);

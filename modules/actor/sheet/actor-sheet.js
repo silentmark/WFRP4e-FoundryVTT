@@ -2012,14 +2012,14 @@ export default class ActorSheetWfrp4e extends ActorSheet {
           html += `<div class="action">
           <a class="use-grp-adv" data-index="${i}">${action.name}</a>
           <p>${action.description}</p>
-          <p class="cost"><strong>Cost</strong>: ${action.cost}</p>
+          <p class="cost"><strong>Koszt</strong>: ${action.cost}</p>
           <p class="effect">${action.effect}</p>
           </div><hr>`
         })
       }
       else 
       {
-        html = "No Actions Available"
+        html = "Brak dostępnych Akcji"
       }
       html = await TextEditor.enrichHTML(html, {async: true})
       let el = $(html).hide()
@@ -2043,7 +2043,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
       if (action.cost > this.actor.status.advantage.value)
       {
-        return ui.notifications.error("Not enough Advantage!")
+        return ui.notifications.error("Nie dostateczna ilość Przewag!")
       }
 
       if (action)
@@ -2058,7 +2058,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
         ChatMessage.create({
           content : html,
           speaker : {alias : this.actor.token?.name || this.actor.prototypeToken.name},
-          flavor : "Group Advantage Action"
+          flavor : "Akcje Przewag Drużynowych"
         })
 
         if (action.test)

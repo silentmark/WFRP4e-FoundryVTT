@@ -41,7 +41,7 @@ export default class ChatWFRP {
     {
       let html = `<div class="apply-conditions">`
       conditions.forEach(c => 
-          html += `<a class="chat-button apply-condition" data-cond="${c}">${game.i18n.localize("CHAT.Apply")} ${game.wfrp4e.config.conditions[c]}</a>`
+          html += `<a class="chat-button apply-condition" data-cond="${c}">${game.i18n.localize("CHAT.ApplyNewCondition")} ${game.wfrp4e.config.conditions[c]}</a>`
       )
 
       html += `</div>`

@@ -100,16 +100,6 @@ export default function () {
     const body = $("body");
     body.on("dragstart", "a.condition-chat", WFRP_Utility._onDragConditionLink)
 
-    // if (game.modules.get("about-time") && game.modules.get("about-time").active && game.user.isUniqueGM)
-    //   game.Gametime.doEvery(GM{hours:24}, () => {
-    //     game.actors.contents.filter(a => a.hasPlayerOwner).forEach(a => {
-    //       a.decrementDiseases()
-    //       a.decrementInjuries()
-    //     })
-    //   })
-
-
-
 
     const MIGRATION_VERSION = 6;
     let needMigration = isNewerVersion(MIGRATION_VERSION, game.settings.get("wfrp4e", "systemMigrationVersion"))
