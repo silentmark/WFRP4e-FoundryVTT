@@ -303,6 +303,8 @@
     "ITEM.CargoQuality" : "Quality",
     "ITEM.Origin" : "Origin",
     "ITEM.OptimalRange" : "Optimal Range",
+    "ITEM.Ritual" : "Ritual",
+    "ITEM.RandomVortex" : "Random Vortex",
     "as weapon": "as weapon",
     "half weapon": "half weapon",
     "third weapon": "third weapon",
@@ -1548,6 +1550,7 @@
     "EFFECT.TestsRelatedToSight": "Tests related to sight",
     "EFFECT.ShooterEngaged": "Shooter is engaged in melee - no range modifiers",
     "EFFECT.ShootingAtEngagedTarget": "Target engaged in melee",
+    "EFFECT.Applying": "Applying {name}",
 
     "WFRP4E.MountButtonNotify" : "The left-side actor ({mounter}) has mounted the right-side actor ({mountee})",
     "MountError": "You can only mount creatures of a larger or equal size.",

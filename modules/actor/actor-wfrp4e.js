@@ -1612,12 +1612,17 @@ export default class ActorWfrp4e extends Actor {
       shieldDamage : 0
     }
 
+    let args = {AP}
+    this.runEffectsSync("preAPCalc", args);
+
     this.getItemTypes("armour").filter(a => a.isEquipped).forEach(a => a._addAPLayer(AP))
 
     this.getItemTypes("weapon").filter(i => i.properties.qualities.shield && i.isEquipped).forEach(i => {
       AP.shield += i.properties.qualities.shield.value - Math.max(0, i.damageToItem.shield - Number(i.properties.qualities.durable?.value || 0));
       AP.shieldDamage += i.damageToItem.shield;
     })
+
+    this.runEffectsSync("APCalc", args);
 
     this.status.armour = AP
   }
@@ -1779,6 +1784,7 @@ export default class ActorWfrp4e extends Actor {
     // Start message update string
     let updateMsg = `<b>${game.i18n.localize("CHAT.DamageApplied")}</b><span class = 'hide-option'>: `;
     let messageElements = []
+    let extraMessages = [];
     // if (damageType !=  game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL)
     //   updateMsg += " ("
 
@@ -1810,12 +1816,6 @@ export default class ActorWfrp4e extends Actor {
       totalWoundLoss -= actor.characteristics.t.bonus
       messageElements.push(`${actor.characteristics.t.bonus} ${game.i18n.localize("TBRed")}`)
     }
-
-    // If the actor has the Robust talent, reduce damage by times taken
-    //totalWoundLoss -= actor.flags.robust || 0;
-
-    // if (actor.flags.robust)
-    //   messageElements.push(`${actor.flags.robust} ${game.i18n.localize("Robust")}`)
 
     if (applyAP) {
       AP.ignored = 0;
@@ -2044,6 +2044,10 @@ export default class ActorWfrp4e extends Actor {
         updateMsg += `<br>${game.i18n.format("OPPOSED.WardRoll", { roll: wardRoll })}`
       }
 
+    }
+
+    if (extraMessages.length > 0) {
+      updateMsg += `<p>${extraMessages.join(`</p><p>`)}</p>`
     }
 
     // Update actor wound value

@@ -13882,21 +13882,28 @@ box-shadow: 0 0 84px #000000 inset;
 font-style : normal;
 }
 
+.vortex-table,
 .scatter-table{
   border: 1px solid #000;
-  width: 150px;
+  width: 50%;
+  margin: auto;
 }
 
+.vortex-table tr > td,
 .scatter-table tr > td{
   border: 1px solid #000;
   text-align: center;
-  width: 60px;
-  height: 30px;
+  width: 50px;
+  height: 40px;
 }
 
 .scatter-table .selected-position {
   background-color: maroon;
   color: #CCC
+}
+
+.vortex-table .selected-position {
+  background-color: skyblue;
 }
 
 
