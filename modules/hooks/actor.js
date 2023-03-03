@@ -1,7 +1,7 @@
 export default function() {
 
 
-    Hooks.on("updateActor", (actor) =>{
-        // actor.checkWounds();
+    Hooks.on("updateActor", async (actor) =>{
+        await actor.runEffects("update", {});
     })
 }

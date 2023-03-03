@@ -1,13 +1,20 @@
 
 export default function () {
 
-  Hooks.on("updateItem", (item, update, options) => {
-    if (item.type == "container" && update.data?.location?.value) {
+  Hooks.on("updateItem", async (item, update, options, id) => {
+
+    if (game.user.id != id)
+      return
+
+    if (item.actor) {
+      await item.actor.runEffects("update", {item, context: "update"})
+    }
+
+    if (item.type == "container" && update.system?.location?.value) {
       let allContainers = item.actor.getItemTypes("container")
-      if (formsLoop(item, allContainers))
-      {
+      if (formsLoop(item, allContainers)) {
         ui.notifications.error("Loop formed - Resetting Container Location")
-        return item.update({ "system.location.value": "" })
+        await item.update({ "system.location.value": "" })
       }
     }
 
@@ -40,13 +47,16 @@ export default function () {
    * Criticals - apply wound values
    * 
    */
-  Hooks.on("createItem", (item, actor, userId) => {
+  Hooks.on("createItem", async (item, options, id) => {
 
-    if (game.user.id != userId)
+    if (game.user.id != id)
       return
-    
+
     if (!item.isOwned)
       return
+
+    await item.actor.runEffects("update", {item, context: "create"})
+
     if (item.actor.type == "vehicle")
       return;
     try {
@@ -62,13 +72,14 @@ export default function () {
         } else if (item.wounds.value.toLowerCase() == "death") {
           newWounds = 0;
         }
-        item.actor.update({ "system.status.wounds.value": newWounds });
+        await item.actor.update({ "system.status.wounds.value": newWounds });
         ui.notifications.notify(`${item.wounds.value} ${game.i18n.localize("CHAT.CriticalWoundsApplied")} ${item.actor.name}`)
 
         if (game.combat && game.user.isGM) {
           let minorInfections = game.combat.getFlag("wfrp4e", "minorInfections") || []
           minorInfections.push(item.actor.name)
-          game.combat.setFlag("wfrp4e", "minorInfections", null).then(c => game.combat.setFlag("wfrp4e", "minorInfections", minorInfections))
+          await game.combat.setFlag("wfrp4e", "minorInfections", null);
+          await game.combat.setFlag("wfrp4e", "minorInfections", minorInfections);
         }
       }
     }
@@ -81,20 +92,12 @@ export default function () {
     }
   })
 
-  // Remove items from a container that got deleted
-  Hooks.on("deleteItem", (item) => {
-    if (item.type == "container" && item.isOwned)
-    {
-      let updates = item.item.actor.items
-      .filter(i => i.location?.value == item.id)
-      .map(i => i.toObject())
-      .map(i => {
-        return {
-          _id : i._id,
-          "system.location.value" : ""
-      }
-    })
-    item.item.actor.updateEmbeddedDocuments("Item", updates)
+  Hooks.on("deleteItem", async (item, options, id) => {
+    if (game.user.id != id)
+      return
+
+    if (item.actor) {
+      await item.actor.runEffects("update", {item, context: "delete"});
     }
   })
 
