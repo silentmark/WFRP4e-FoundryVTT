@@ -168,13 +168,13 @@ export default class AbilityTemplate extends MeasuredTemplate {
     await this._finishPlacement(event);
     const destination = canvas.grid.getSnappedPosition(this.document.x, this.document.y, 2);
     this.document.updateSource(destination);
-    console.log(this)
-    let templates = await this.#events.resolve(canvas.scene.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]));
+    let templates = await canvas.scene.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]);
     let test = game.messages.get(templates[0].flags.wfrp4e.messageId)?.getTest();
-    if (test && test.data.context.templates) {
+    if (test?.data.context.templates) {
       test.data.context.templates = test.data.context.templates.concat(templates[0].id);
-      test.renderRollCard();
+      await test.renderRollCard();
     }
+    this.#events.resolve(templates);
   }
 
   /* -------------------------------------------- */
