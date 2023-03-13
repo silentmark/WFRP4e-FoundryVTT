@@ -81,17 +81,19 @@ export default class ItemWfrp4e extends Item {
             conditions.push(e)
         })
 
-        immediateEffects.forEach(effect => {
-          game.wfrp4e.utility.applyOneTimeEffect(effect, this.actor)
+        for(let i = 0; i < immediateEffects.length; i++) {
+          let effect = immediateEffects[i];
+          await game.wfrp4e.utility.applyOneTimeEffect(effect, this.actor)
           this.effects.delete(effect.id)
-        })
-        conditions.forEach(condition => {
-          if (condition.conditionId != "fear")
-          {
-            this.actor.addCondition(condition.conditionId, condition.conditionValue)
+        }
+        
+        for(let i = 0; i < conditions.length; i++) {
+          let condition = conditions[i];
+          if (condition.conditionId != "fear") {
+            await this.actor.addCondition(condition.conditionId, condition.conditionValue)
             this.effects.delete(condition.id)
           }
-        })
+        }
       }
 
       if (this.actor.type == "character" && this.type == "spell" && (this.lore.value == "petty" || this.lore.value == game.i18n.localize("WFRP4E.MagicLores.petty"))) {

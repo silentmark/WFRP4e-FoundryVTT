@@ -2146,15 +2146,20 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       if (effect.flags.wfrp4e?.reduceQuantity)
       {
         if (item.quantity.value > 0)
-          item.update({"system.quantity.value" : item.quantity.value - 1})
+          await item.update({"system.quantity.value" : item.quantity.value - 1})
         else 
           throw ui.notifications.error(game.i18n.localize("EFFECT.QuantityError"))
       }
 
-      if ((item.range && item.range.value.toLowerCase() == game.i18n.localize("You").toLowerCase()) && (item.target && item.target.value.toLowerCase() == game.i18n.localize("You").toLowerCase()))
-        game.wfrp4e.utility.applyEffectToTarget(effect, [{ actor: this.actor }]) // Apply to caster (self) 
+      if ((
+        !effect.flags.wfrp4e?.notSelf 
+        && item.range 
+        && item.range.value.toLowerCase() == game.i18n.localize("You").toLowerCase()) 
+        && item.target 
+        && item.target.value.toLowerCase() == game.i18n.localize("You").toLowerCase())
+        await game.wfrp4e.utility.applyEffectToTarget(effect, [{ actor: this.actor }]) // Apply to caster (self) 
       else
-        game.wfrp4e.utility.applyEffectToTarget(effect)
+        await game.wfrp4e.utility.applyEffectToTarget(effect)
     })
 
     html.on("click", ".invoke-effect", async ev => {

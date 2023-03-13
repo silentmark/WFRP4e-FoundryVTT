@@ -26,7 +26,7 @@ export default class WFRPActiveEffectConfig extends ActiveEffectConfig {
                 delete data.effectApplication.actor
 
                 // When a spell's range and target is "You", it automatically applies to the caster, not the targets. In rare cases, this needs to be bypassed
-                if (this.object.parent.system.target.value == "You" && this.object.parent.system.range.value == "You")
+                if (this.object.parent.system.target.value == game.i18n.localize("You") && this.object.parent.system.range.value == game.i18n.localize("You"))
                     data.notSelfOption = game.i18n.localize("WFRP4E.NotSelf");
             }
             if (this.object.parent.type == "talent" || this.object.parent.type == "trait" || this.object.parent.type == "psychology" || this.object.parent.type == "disease" || this.object.parent.type == "injury" || this.object.parent.type == "critical")
