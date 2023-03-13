@@ -724,6 +724,7 @@
     "CHAT.ScatterThem" : "At their feet",
     "Overcasts" : "Overcasts",
     "CHAT.OvercastReset" : "Overcast Reset",
+    "CHAT.GrimoireMiscast" : "Grimoire Miscast",
     "CHAT.ChooseFrom" : "Choose From",
     "CHAT.MustChoose" : "Must Choose",
     "CHAT.CritCast" : "If the spell causes damage, it inflicts a",
@@ -1554,6 +1555,8 @@
     "EFFECT.ShooterEngaged": "Shooter is engaged in melee - no range modifiers",
     "EFFECT.ShootingAtEngagedTarget": "Target engaged in melee",
     "EFFECT.Applying": "Applying {name}",
+    "EFFECT.NotSelf" : "Don't apply to Self",
+    "EFFECT.DeletingItems" : "Deleting Items: {items}",
 
     "WFRP4E.MountButtonNotify" : "The left-side actor ({mounter}) has mounted the right-side actor ({mountee})",
     "MountError": "You can only mount creatures of a larger or equal size.",
