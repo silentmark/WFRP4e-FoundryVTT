@@ -1992,7 +1992,10 @@ export default class ItemWfrp4e extends Item {
       {
         specification = parseInt(this.specification.value) || 0
         specification += this.actor.characteristics[this.rollable.bonusCharacteristic].bonus;
-
+        if (this.attackType && this.actor)
+        {
+          specification += (this.actor.flags[`${this.attackType}DamageIncrease`] || 0)
+        }
       }
       else
         specification = this.specification.value
