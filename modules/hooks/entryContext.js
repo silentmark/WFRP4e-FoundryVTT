@@ -125,7 +125,7 @@ export default function () {
       //Own the roll
       let message = game.messages.get(li.attr("data-message-id"));
       let test = message.getTest();
-      return game.user.isGM &&  test && test.opposedMessages.length >= 2 && test.opposedMessages.every(m => m.getOppose().resultMessage)
+      return game.user.isGM &&  test && test.opposedMessages.length >= 2 && test.opposedMessages.some(m => m?.getOppose()?.resultMessage)
     };
 
     options.push(
@@ -292,8 +292,10 @@ export default function () {
           let test = message.getTest();
           for(let i = 0; i < test.opposedMessages.length; i++) {
             let message = test.opposedMessages[i];
-            let oppose = message.getOppose();
-            await oppose.resolveUnopposed();
+            if (message) {
+              let oppose = message.getOppose();
+              await oppose.resolveUnopposed();
+            }
           };
         }
       },
@@ -306,13 +308,16 @@ export default function () {
           let test = message.getTest();
           for(let i = 0; i < test.opposedMessages.length; i++) {
             let message = test.opposedMessages[i];
-            let opposedTest = message.getOppose();
+            if(message) {
+              let opposedTest = message.getOppose();
 
-            if (!opposedTest.defenderTest.actor.isOwner)
-              return ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
-
-            let updateMsg = await opposedTest.defender.applyDamage(opposedTest.resultMessage.getOpposedTest(), game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
-            await OpposedWFRP.updateOpposedMessage(updateMsg, message.id);
+              if (!opposedTest.defenderTest.actor.isOwner) {
+                ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
+              } else {
+                let updateMsg = await opposedTest.defender.applyDamage(opposedTest.resultMessage.getOpposedTest(), game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
+                await OpposedWFRP.updateOpposedMessage(updateMsg, message.id);
+              }
+            }
           }
         }
       }

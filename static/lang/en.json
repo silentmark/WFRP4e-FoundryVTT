@@ -1330,6 +1330,7 @@
     "SHEET.Dodge": "Dodge",
     "SHEET.Improvised": "Improvised",
     "SHEET.Stomp": "Stomp",
+    "SHEET.GenerateName" : "Generate Name",
 
     "DISEASE.IncubationFinished" : "{disease} incubation finished. ",
 

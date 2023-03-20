@@ -415,17 +415,6 @@ export default class ActorWfrp4e extends Actor {
     // If the size has been changed since the last known value, update the value 
     this.details.size.value = args.size || "avg"
 
-    if (this.flags.autoCalcSize && game.actors) {
-      let tokenData = this._getTokenSize();
-      if (this.isToken) {
-        this.token.updateSource(tokenData)
-      }
-      else if (canvas) {
-        this.prototypeToken.updateSource(tokenData)
-        this.getActiveTokens().forEach(t => t.document.update(tokenData));
-      }
-    }
-
     this.checkWounds();
 
 
@@ -1689,6 +1678,21 @@ export default class ActorWfrp4e extends Actor {
     }
   }
 
+  // Resize tokens based on size property
+  checkSize()
+  {
+    if (this.flags.autoCalcSize && game.canvas.ready) {
+      let tokenData = this._getTokenSize();
+      if (this.isToken) {
+        this.token.update(tokenData)
+      }
+      else if (canvas) {
+        this.update({prototypeToken : tokenData})
+        this.getActiveTokens().forEach(t => t.document.update(tokenData));
+      }
+    } 
+  }
+
   /**
  * Adds all missing basic skills to the Actor.
  *
@@ -1918,18 +1922,13 @@ export default class ActorWfrp4e extends Actor {
       let shieldAP = 0;
       if (game.settings.get("wfrp4e", "uiaShields")) // UIA shields don't need to be used, just equipped
       {
-        shieldAP = opposedTest.defenderTest.actor.itemCategories.weapon
-        .filter(i => 
-          i.type == "weapon" && 
-          i.isEquipped && 
-          i.properties.qualities.shield)
-        .reduce((total, item) => total += item.properties.qualities.shield.value, 0)
+        shieldAP = this.status.armour.shield
       }
       else // RAW Shields required the shield to be used
       {
         if (opposedTest.defenderTest.weapon) {
           if (opposedTest.defenderTest.weapon.properties.qualities.shield)
-          shieldAP = opposedTest.defenderTest.weapon.properties.qualities.shield.value
+            shieldAP = this.status.armour.shield
         }
       }
         
@@ -2733,7 +2732,7 @@ export default class ActorWfrp4e extends Actor {
       if (item.attackType == "ranged" && target && target.hasCondition("engaged")) {
         modifier -= 20;
         tooltip.push(`${game.i18n.localize("EFFECT.ShootingAtEngagedTarget")} (-20)`);
-        options.engagedModifier = 20;
+        options.engagedModifier = -20;
       }
 
       if (item.type == "weapon") {
@@ -3710,8 +3709,18 @@ export default class ActorWfrp4e extends Actor {
     if (typeof item == "string")
       item = this.items.get(item)
 
-    let effect = effectId == "lore" ? new EffectWfrp4e(game.wfrp4e.config.loreEffects[item.system.lore.value]).toObject() :  item.effects.get(effectId)?.toObject()
-    if (!effect && item.ammo)
+    let effect;
+    if (item)
+    {
+      // If lore, take from config, else take the effect from the item
+      effect = effectId == "lore" ? new EffectWfrp4e(game.wfrp4e.config.loreEffects[item.system.lore.value]).toObject() :  item?.effects.get(effectId)?.toObject()
+    }
+    else 
+    {
+      effect = this.effects.get(effectId);
+    }
+
+    if (!effect && item?.ammo)
       effect = item.ammo.effects.get(effectId)?.toObject();
     if (!effect)
       return ui.notifications.error(game.i18n.localize("ERROR.EffectNotFound"))
@@ -3720,7 +3729,7 @@ export default class ActorWfrp4e extends Actor {
     let duration
     if (test && test.result.overcast && test.result.overcast.usage.duration) {
       duration = test.result.overcast.usage.duration.current;
-    } else if(item.Duration) {
+    } else if(item?.Duration) {
       duration = parseInt(item.Duration);
     }
 
