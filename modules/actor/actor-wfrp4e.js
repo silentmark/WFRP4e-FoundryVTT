@@ -1680,16 +1680,19 @@ export default class ActorWfrp4e extends Actor {
   }
 
   // Resize tokens based on size property
-  checkSize()
+  async checkSize()
   {
     if (this.flags.autoCalcSize && game.canvas.ready) {
       let tokenData = this._getTokenSize();
       if (this.isToken) {
-        this.token.update(tokenData)
+        await this.token.update(tokenData)
       }
       else if (canvas) {
-        this.update({prototypeToken : tokenData})
-        this.getActiveTokens().forEach(t => t.document.update(tokenData));
+        await this.update({prototypeToken : tokenData});
+        const activeTokens = this.getActiveTokens();
+        for(let i = 0; i < activeTokens.length; i++) {
+          await activeTokens[i].document.update(tokenData);
+        }
       }
     } 
   }
