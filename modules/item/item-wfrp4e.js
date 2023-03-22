@@ -283,6 +283,11 @@ export default class ItemWfrp4e extends Item {
   }
 
   prepareSpell() {
+    let lore = foundry.utils.deepClone(game.wfrp4e.config.loreEffects[this.system.lore.value])
+    if (lore)
+    {
+      this.system.lore.effect = new EffectWfrp4e(lore, {parent: this});
+    }
     this._addSpellDescription();
   }
   prepareOwnedSpell() {
@@ -640,7 +645,7 @@ export default class ItemWfrp4e extends Item {
     let properties = [];
 
     if (this.weaponGroup.value)
-      properties.push(game.wfrp4e.config.weaponGroups[this.weaponGroup.value]);
+      properties.push(this.WeaponGroup);
     if (this.range.value)
       properties.push(`${game.i18n.localize("Range")}: ${this.range.value}`);
     if (this.damage.value) {
@@ -1021,7 +1026,7 @@ export default class ItemWfrp4e extends Item {
     ]
 
     if (this.weaponGroup.value)
-      properties.push(`<b>${game.i18n.localize("Group")}</b>: ${game.wfrp4e.config.weaponGroups[this.weaponGroup.value]}`);
+      properties.push(`<b>${game.i18n.localize("Group")}</b>: ${this.WeaponGroup}`);
     if (this.range.value)
       properties.push(`<b>${game.i18n.localize("Range")}</b>: ${this.range.value}`);
     if (this.damage.value)
@@ -1542,8 +1547,8 @@ export default class ItemWfrp4e extends Item {
       return description
 
     // Use lore override if it exists
-    if (this.lore.effect)
-      description += `<p>\n\n <b>${game.i18n.localize("SPELL.Lore")}</b> ${this.lore.effect}<p>`;
+    if (this.lore.effectString)
+      description += `<p>\n\n <b>${game.i18n.localize("SPELL.Lore")}</b> ${this.lore.effectString}<p>`;
     // Otherwise, use config value for lore effect
     else if (game.wfrp4e.config.loreEffectDescriptions && game.wfrp4e.config.loreEffectDescriptions[this.lore.value])
       description += `<p>\n\n <b>${game.i18n.localize("SPELL.Lore")}</b> ${game.wfrp4e.config.loreEffectDescriptions[this.lore.value]}<p>`;
@@ -1626,8 +1631,7 @@ export default class ItemWfrp4e extends Item {
     if (this.type == "weapon") {
       skill = skills.find(x => x.name.toLowerCase() == this.skill.value.toLowerCase())
       if (!skill) {
-        let weaponGroupName = game.wfrp4e.config.weaponGroups[this.weaponGroup.value];
-        skill = skills.find(x => x.name.toLowerCase().includes(`(${weaponGroupName.toLowerCase()})`))
+        skill = skills.find(x => x.name.toLowerCase().includes(`(${this.WeaponGroup.toLowerCase()})`))
       }
     }
     if (this.type == "spell")

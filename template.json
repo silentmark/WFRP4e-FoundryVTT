@@ -868,7 +868,7 @@
         "type": "String",
         "label": "Lore",
         "value": "",
-        "effect": ""
+        "effectString": ""
       },
       "range": {
         "type": "String",

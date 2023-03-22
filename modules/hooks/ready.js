@@ -101,7 +101,7 @@ export default function () {
     body.on("dragstart", "a.condition-chat", WFRP_Utility._onDragConditionLink)
 
 
-    const MIGRATION_VERSION = 6;
+    const MIGRATION_VERSION = 7;
     let needMigration = isNewerVersion(MIGRATION_VERSION, game.settings.get("wfrp4e", "systemMigrationVersion"))
     if (needMigration && game.user.isGM) {
       game.wfrp4e.migration.migrateWorld()
