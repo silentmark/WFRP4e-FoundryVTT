@@ -35,7 +35,7 @@ export default class WomCastTest extends CastTest {
     }
   }
 
-  async _calculateDamage() {
+  async calculateDamage() {
     this.result.additionalDamage = this.preData.additionalDamage || 0
     // Calculate Damage if the this.item has it specified and succeeded in casting
     try {
@@ -202,7 +202,7 @@ export default class WomCastTest extends CastTest {
 
       this.data.result.additionalDamage = this.preData.additionalDamage || 0
       this.data.result.SL = `+${overcastData.originalSL}`
-      await this._calculateDamage()
+      await this.calculateDamage()
       this.renderRollCard()
     }
   }
