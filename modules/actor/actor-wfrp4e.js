@@ -319,6 +319,13 @@ export default class ActorWfrp4e extends Actor {
         game.wfrp4e.utility.log(`The effect ${e.label} threw an error when being prepared. ${error}`, e)
       }
     })
+
+    if (this.flags.wfrp4e?.conditionalEffects?.length)
+    {
+      this.flags.wfrp4e?.conditionalEffects.map(e => new EffectWfrp4e(e, {parent: this})).forEach(e => {
+        actorEffects.set(e.id, e)
+      })
+    }
     return actorEffects;
 
   }
@@ -1988,12 +1995,7 @@ export default class ActorWfrp4e extends Actor {
     Hooks.call("wfrp4e:applyDamage", scriptArgs)
 
     let item = opposedTest.attackerTest.item
-    let ammoEffects = item.ammo?.effects?.filter(e => e.application == "damage" && !e.disabled) || []
-    let itemDamageEffects = item.effects.filter(e => e.application == "damage" && !e.disabled).concat(ammoEffects)
-    if (item.system.lore?.effect?.application == "damage")
-    {
-      itemDamageEffects.push(item.system.lore.effect)
-    }
+    let itemDamageEffects = item.damageEffects
     for (let effect of itemDamageEffects) {      
       await game.wfrp4e.utility.runSingleEffect(effect, actor, item, scriptArgs);
     }
@@ -2793,11 +2795,7 @@ export default class ActorWfrp4e extends Actor {
   rangePrefillModifiers(weapon, options, tooltip = []) {
     let modifier = 0;
 
-    let token
-    if (this.isToken)
-      token = this.token
-    else
-      token = this.getActiveTokens()[0]?.document
+    let token = this.token
 
     if (!game.settings.get("wfrp4e", "rangeAutoCalculation") || !token || !game.user.targets.size == 1 || !weapon.range?.bands)
       return 0
@@ -3012,6 +3010,25 @@ export default class ActorWfrp4e extends Actor {
       }
     }
 
+
+    // These triggers have a special case where they can specify a specific item to run on
+    // If this choice (itemChoice) matches the provided item argument, keep it, otherwise, filter out
+    if (["prepareItem", "prePrepareItem"].includes(trigger))
+    {
+      effects = effects.filter(e => {
+        if (e.getFlag("wfrp4e", "promptItem") && e.getFlag("wfrp4e", "itemChoice"))
+        {
+          // If itemChoice is the same as the provided item argument, include it
+          let choiceId = e.getFlag("wfrp4e", "itemChoice")
+          return args.item.id == choiceId;
+
+        }
+        else // If no itemChoice, just include the effect 
+        {
+          return true
+        }
+      })
+    }
 
     if (trigger == "oneTime") {
       effects = effects.filter(e => e.application != "apply" && e.application != "damage");
@@ -3930,6 +3947,25 @@ export default class ActorWfrp4e extends Actor {
     await this.update({ "flags.-=oppose": null })
   }
 
+  /**
+   * This function stores temporary active effects on an actor
+   * Generally used by effect scripts to add conditional effects
+   * that are removed when the source effect is removed
+   * 
+   * @param {Object} data Active Effect Data
+   */
+  createConditionalEffect(data)
+  {
+    let conditionalEffects = foundry.utils.deepClone(this.flags.wfrp4e?.conditionalEffects || [])
+
+    if (!data.id)
+    {
+      data.id == randomID()
+    }
+
+    conditionalEffects.push(data);
+    setProperty(this, "flags.wfrp4e.conditionalEffects", conditionalEffects);
+  }
 
   // @@@@@@@@ BOOLEAN GETTERS
   get isUniqueOwner() {
@@ -4053,6 +4089,18 @@ export default class ActorWfrp4e extends Actor {
       this.update({ "flags.-=oppose": null })
     }
 
+  }
+
+  get token() 
+  {
+    if (super.token)
+    {
+      return super.token;
+    }
+    else 
+    {
+      return this.getActiveTokens()[0]?.document || this.prototypeToken;
+    }
   }
 
 

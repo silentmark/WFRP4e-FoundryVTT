@@ -2,6 +2,7 @@ import MarketWfrp4e from "../apps/market-wfrp4e.js";
 import WFRP_Tables from "./tables-wfrp4e.js";
 import ItemWfrp4e from "../item/item-wfrp4e.js";
 import ChatWFRP from "./chat-wfrp4e.js";
+import ItemDialog from "../apps/item-dialog.js";
 import TestWFRP from "./rolls/test-wfrp4e.js"
 
 
@@ -1101,7 +1102,16 @@ export default class WFRP_Utility {
       }
       else {
         for(let i = 0; i < targets.length; i++) {
-          let t = targets[i];
+          let t = targets[i];          
+          if (effect.flags.wfrp4e?.promptItem) {
+            let choice = await ItemDialog.createFromFilters((0, eval)(effect.flags.wfrp4e.extra), 1, "Wybierz przedmiot", t.actor.items.contents)
+            if (!choice) {
+              continue // If no item selected, do not add effect to target
+            }
+            else {
+              effect.flags.wfrp4e.itemChoice = choice[0]?.id;
+            }
+          }
           actors.push(t.actor.prototypeToken.name)
           await t.actor.createEmbeddedDocuments("ActiveEffect", [effect])
         }
@@ -1338,6 +1348,11 @@ export default class WFRP_Utility {
         element.src = notPopout;
       }
     })
+  }
+
+  static sleep(ms)
+  {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   static getActorOwner(actor) { 

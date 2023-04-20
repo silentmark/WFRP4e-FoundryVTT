@@ -14901,6 +14901,10 @@ textarea,
   height: 300px;
 }
 
+.active-effect-sheet textarea.extra {
+  height: 100px;
+}
+
 
 button.capture-position {
   color: #CCC;
