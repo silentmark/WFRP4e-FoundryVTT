@@ -55,6 +55,6 @@ async function _runUpdateEffects(effect, context, options, id)
     }
 
     if (effect.parent?.documentName == "Actor") {
-        await effect.parent.runEffects("update", {effect, context});
+        await effect.parent.runEffectsAsync("update", {effect, context});
     }
 }

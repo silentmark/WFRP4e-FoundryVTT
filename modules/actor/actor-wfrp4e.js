@@ -417,7 +417,7 @@ export default class ActorWfrp4e extends Actor {
     }
 
     let args = {size}
-    this.runEffects("calculateSize", args)
+    this.runEffectsSync("calculateSize", args)
 
     // If the size has been changed since the last known value, update the value 
     this.details.size.value = args.size || "avg"
@@ -1845,8 +1845,8 @@ export default class ActorWfrp4e extends Actor {
     let pummel = false
 
     let args = { actor, attacker, opposedTest, damageType, weaponProperties, applyAP, applyTB, totalWoundLoss, AP }
-    await actor.runEffects("preTakeDamage", args)
-    await attacker.runEffects("preApplyDamage", args)
+    await actor.runEffectsAsync("preTakeDamage", args)
+    await attacker.runEffectsAsync("preApplyDamage", args)
     damageType = args.damageType
     applyAP = args.applyAP 
     applyTB = args.applyTB
@@ -1990,8 +1990,8 @@ export default class ActorWfrp4e extends Actor {
     }
 
     let scriptArgs = { actor, opposedTest, totalWoundLoss, AP, damageType, updateMsg, messageElements, attacker }
-    await actor.runEffects("takeDamage", scriptArgs)
-    await attacker.runEffects("applyDamage", scriptArgs)
+    await actor.runEffectsAsync("takeDamage", scriptArgs)
+    await attacker.runEffectsAsync("applyDamage", scriptArgs)
     Hooks.call("wfrp4e:applyDamage", scriptArgs)
 
     let item = opposedTest.attackerTest.item
@@ -2666,10 +2666,10 @@ export default class ActorWfrp4e extends Actor {
       }
 
       let effectModifiers = { modifier, difficulty, slBonus, successBonus }
-      let effects = await this.runEffects("prefillDialog", { prefillModifiers: effectModifiers, type, item, options })
+      let effects = await this.runEffectsAsync("prefillDialog", { prefillModifiers: effectModifiers, type, item, options })
       tooltip = tooltip.concat(effects.map(e => e.tooltip));
       if (game.user.targets.size) {
-        effects = await this.runEffects("targetPrefillDialog", { prefillModifiers: effectModifiers, type, item, options })
+        effects = await this.runEffectsAsync("targetPrefillDialog", { prefillModifiers: effectModifiers, type, item, options })
         tooltip = tooltip.concat(effects.map(e => `${game.i18n.localize("EFFECT.Target")} ${e.tooltip}`));
       }
 
@@ -3000,7 +3000,7 @@ export default class ActorWfrp4e extends Actor {
     return effects;
   }
 
-  async runEffects(trigger, args, options = {}) {
+  async runEffectsAsync(trigger, args, options = {}) {
     // WFRP_Utility.log(`${this.name} > Effect Trigger ${trigger}`)
     let effects = this.actorEffects.filter(e => e.trigger == trigger && (e.script ?? e.flags.wfrp4e.script) && !e.disabled)
 

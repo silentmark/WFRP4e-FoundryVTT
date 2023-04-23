@@ -7,7 +7,7 @@ export default function () {
       return
 
     if (item.actor) {
-      await item.actor.runEffects("update", {item, context: "update"})
+      await item.actor.runEffectsAsync("update", {item, context: "update"})
     }
 
     if (item.type == "container" && update.system?.location?.value) {
@@ -55,7 +55,7 @@ export default function () {
     if (!item.isOwned)
       return
 
-    await item.actor.runEffects("update", {item, context: "create"})
+    await item.actor.runEffectsAsync("update", {item, context: "create"})
 
     if (item.actor.type == "vehicle")
       return;
@@ -97,7 +97,7 @@ export default function () {
       return
 
     if (item.actor) {
-      await item.actor.runEffects("update", {item, context: "delete"});
+      await item.actor.runEffectsAsync("update", {item, context: "delete"});
     }
   })
 

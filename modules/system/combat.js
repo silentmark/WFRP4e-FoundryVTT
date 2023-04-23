@@ -70,7 +70,7 @@ export default class CombatHelpers {
                 canvas.tokens.cycleTokens(1, true);
             }
 
-            await turn.actor.runEffects("startTurn", combat)
+            await turn.actor.runEffectsAsync("startTurn", combat)
 
 
         }
@@ -316,7 +316,7 @@ export default class CombatHelpers {
                     }
                 }
             }
-            await turn.actor.runEffects("endRound", combat, {async: true})
+            await turn.actor.runEffectsAsync("endRound", combat, {async: true})
 
         }
         if (removedConditions.length)
@@ -343,7 +343,7 @@ export default class CombatHelpers {
                 }
             }
 
-            await combatant.actor.runEffects("endTurn", combat)
+            await combatant.actor.runEffectsAsync("endTurn", combat)
         }
     }
 
@@ -373,7 +373,7 @@ export default class CombatHelpers {
 
         for (let turn of combat.turns) {
             await turn.actor.update({ "system.status.advantage.value": 0 }, {skipGroupAdvantage: true})
-            await turn.actor.runEffects("endCombat", combat)
+            await turn.actor.runEffectsAsync("endCombat", combat)
         }
 
     }
