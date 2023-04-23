@@ -62,13 +62,6 @@ export default class ChannelTest extends TestWFRP {
     let SL = this.result.SL;
     this.result.tooltips.miscast = []
 
-    // If malignant influence AND roll has an 8 in the ones digit, miscast
-    if (this.preData.malignantInfluence)
-      if (Number(this.result.roll.toString().split('').pop()) == 8) {
-        miscastCounter++;
-        this.result.tooltips.miscast.push(game.i18n.localize("CHAT.MalignantInfluence"))
-      }
-
     // Witchcraft automatically miscast
     if (this.item.lore.value == "witchcraft") {
       miscastCounter++;
@@ -78,10 +71,12 @@ export default class ChannelTest extends TestWFRP {
 
     // Test itself was failed
     if (this.result.outcome == "failure") {
-
       this.result.description = game.i18n.localize("ROLL.ChannelFailed")
       // Major Miscast on fumble
-      if (this.result.roll % 11 == 0 || this.result.roll % 10 == 0 || this.result.roll == 100) {
+      if (this.result.roll % 11 == 0 ||
+         (this.result.roll % 10 == 0 && !game.settings.get("wfrp4e", "useWoMChannelling")) || // If WoM channelling, 10s don't cause miscasts
+          this.result.roll == 100) {
+
         this.result.color_red = true;
         this.result.tooltips.miscast.push(game.i18n.localize("CHAT.FumbleMiscast"))
         //@HOUSE
@@ -94,7 +89,11 @@ export default class ChannelTest extends TestWFRP {
           }
         //@HOUSE
         } else {
-          miscastCounter += 2;
+          if (game.settings.get("wfrp4e", "useWoMChannelling")){ // Fumble is only minor when using WoM Channelling
+            miscastCounter += 1
+          } else {
+            miscastCounter += 2;
+          }
 
           //@HOUSE
           if (this.result.roll == 100 && game.settings.get("wfrp4e", "mooCatastrophicMiscasts")) {
@@ -119,8 +118,26 @@ export default class ChannelTest extends TestWFRP {
       }
     }
 
+    miscastCounter += this._checkInfluences() || 0
     this._handleMiscasts(miscastCounter)
     this.result.tooltips.miscast = this.result.tooltips.miscast.join("\n")
+  }
+
+  _checkInfluences()
+  {
+    if (!this.preData.malignantInfluence) 
+    {
+      return 0
+    }
+
+    // If malignant influence AND roll has an 8 in the ones digit, miscast
+    if (
+      (Number(this.result.roll.toString().split('').pop()) == 8 && !game.settings.get("wfrp4e", "useWoMInfluences")) || 
+      (this.result.outcome == "failure" && game.settings.get("wfrp4e", "useWoMInfluences"))) 
+    {
+      this.result.tooltips.miscast.push(game.i18n.localize("CHAT.MalignantInfluence"))
+      return 1;
+    }
   }
 
   async postTest() {
@@ -133,10 +150,11 @@ export default class ChannelTest extends TestWFRP {
         await ChatMessage.create({ speaker: this.data.context.speaker, content: game.i18n.localize("ConsumedIngredient") })
       }
     //@/HOUSE
-    } else {
+    } else if (game.settings.get("wfrp4e", "channellingIngredients")){
       // Find ingredient being used, if any
-      if (this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll)
+      if (this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll) {
         await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
+      }
     }
 
     let SL = Number(this.result.SL);
@@ -220,7 +238,15 @@ export default class ChannelTest extends TestWFRP {
   }
 
   get hasIngredient() {
-    return this.item.ingredient && this.item.ingredient.quantity.value > 0
+
+    // If channelling with ingredients isn't allowed, always return false 
+    // HOWEVER: Witchcraft specifies: "channeling or casting spells from this Lore automatically require a roll on the Minor Miscast table unless cast with an ingredient"
+    // This doesn't make any sense. So what I'm doing is if it's a witchcraft spell, and has a valid ingredient assigned, still count it, as it will have to be assumed it's used in the eventual cast?
+    if (!game.settings.get("wfrp4e", "channellingIngredients") && this.item.lore.value != "witchcraft") {
+      return false 
+    } else {
+      return this.item.ingredient && this.item.ingredient.quantity.value > 0
+    }
   }
 
   get spell() {
@@ -246,11 +272,13 @@ export default class ChannelTest extends TestWFRP {
   // WoM channelling updates all items of the lore channelled
   async updateChannelledItems(update)
   {
-    let items = [this.item]
+    let items = [this.item];
     if (game.settings.get("wfrp4e", "useWoMChannelling"))
     {
-      items = this.actor.items.filter(s => s.type == "spell" && s.system.lore.value == this.spell.system.lore.value).map(i => i.toObject())
+      items = this.actor.items.filter(s => s.type == "spell" && s.system.lore.value == this.spell.system.lore.value)
     }
+
+    items = items.map(i => i.toObject());
 
     items.forEach(i => mergeObject(i, update));
     await this.actor.updateEmbeddedDocuments("Item", items)

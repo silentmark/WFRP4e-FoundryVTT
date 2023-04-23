@@ -32,7 +32,7 @@
   </div>
   <div class="talent-selector">
     <label id="talentlist-label" title="{{localize 'DIALOG.BonusTT'}}">{{localize "DIALOG.Bonuses"}}</label>
-    <select class="dialog-bonuses" name="talentBonuses" multiple>
+    <select class="dialog-bonuses" size="10" name="talentBonuses" multiple>
       {{#if talents.length}}
       <optgroup label='{{localize "Talents"}}'>
         {{#select talentBonuses}}

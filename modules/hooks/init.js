@@ -497,7 +497,6 @@ export default function() {
     });
 
       
-    // Register Partial Channelling
     game.settings.register("wfrp4e", "partialChannelling", {
       name: "SETTINGS.PartialChannelling",
       hint: "SETTINGS.PartialChannellingHint",
@@ -508,6 +507,15 @@ export default function() {
       type: Boolean
     });
 
+    game.settings.register("wfrp4e", "channellingIngredients", {
+      name: "SETTINGS.ChannellingIngredients",
+      hint: "SETTINGS.ChannellingIngredientsHint",
+      scope: "world",
+      homebrew: true,
+      config: false,
+      default: false,
+      type: Boolean
+    });
 
     game.settings.register("wfrp4e", "mooCriticalChannelling", {
       name: "SETTINGS.MooCriticalChannelling",
@@ -624,6 +632,15 @@ export default function() {
     game.settings.register("wfrp4e", "useWoMChannelling", {
       name: "SETTINGS.useWoMChannelling",
       hint: "SETTINGS.useWoMChannellingHint",
+      scope: "world",
+      config: true,
+      default: false,
+      type: Boolean
+    });
+
+    game.settings.register("wfrp4e", "useWoMInfluences", {
+      name: "SETTINGS.useWoMInfluences",
+      hint: "SETTINGS.useWoMInfluencesHint",
       scope: "world",
       config: true,
       default: false,
