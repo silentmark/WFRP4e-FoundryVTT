@@ -1738,7 +1738,7 @@ WFRP4E.conditionScripts = {
 
         let damage = effect.conditionValue;
         let args = {msg, damage};
-        await actor.runEfferunEffectsAsynccts("preApplyCondition", {effect, data : args})
+        await actor.runEffectsAsync("preApplyCondition", {effect, data : args})
         msg = args.msg;
         damage = args.damage;
         msg += await actor.applyBasicDamage(damage, {damageType : game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL, suppressMsg : true})
