@@ -26,7 +26,7 @@ export default class CastTest extends TestWFRP {
       if (this.preData.skillSelected.char)
         this.result.target = this.actor.characteristics[this.preData.skillSelected.key].value
 
-      else if (this.preData.skillSelected.name == this.item.skillToUse.name)
+      else if (this.preData.skillSelected.name == this.item?.skillToUse?.name)
         this.result.target = this.item.skillToUse.total.value
 
       else if (typeof this.preData.skillSelected == "string") {
@@ -393,8 +393,10 @@ export default class CastTest extends TestWFRP {
 
   get effects() {
     let effects = super.effects;
-    if (this.item.system.lore.effect?.application == "apply")
+    if (this.item.system.lore.effect?.application == "apply") {
+      this.item.system.lore.effect.origin = this.actor._id;
       effects.push(this.item.system.lore.effect)
+    }
     return effects
   }
 

@@ -1084,8 +1084,10 @@ export default class WFRP_Utility {
 
     let targetsBackup = Array.from(user.targets.map(t=>t.id));
       // Remove targets now so they don't start opposed tests
-    if (canvas.scene)
-      user.updateTokenTargets([])
+    if (canvas.scene) { 
+      user.updateTokenTargets([]);
+      user.broadcastActivity({targets: []});
+    }
 
     if (game.user.isGM) {
       setProperty(effect, "flags.wfrp4e.effectApplication", "")
@@ -1124,6 +1126,7 @@ export default class WFRP_Utility {
       game.socket.emit("system.wfrp4e", { type: "applyEffects", payload: { effect, targets: [...targets].map(t => t.document.toObject()), scene: canvas.scene.id } })
     }
     user.updateTokenTargets(targetsBackup);
+    user.broadcastActivity({targets: targetsBackup});
   }
 
   /** Send effect for owner to apply, unless there isn't one or they aren't active. In that case, do it yourself */

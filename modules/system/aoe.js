@@ -205,6 +205,7 @@ export default class AbilityTemplate extends MeasuredTemplate {
         newTokenTargets.push(t.id)
     })
     game.user.updateTokenTargets(newTokenTargets)
+    game.user.broadcastActivity({targets: newTokenTargets});
   }
 
 }

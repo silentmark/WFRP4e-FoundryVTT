@@ -355,8 +355,10 @@ export default class ChatWFRP {
     let name = $(event.currentTarget).attr("data-name");
 
     let targets = canvas.tokens.controlled.concat(Array.from(game.user.targets))
-    if (canvas.scene) game.user.updateTokenTargets([]);
-
+    if (canvas.scene) { 
+      game.user.updateTokenTargets([]);
+      game.user.broadcastActivity({targets: []});
+    }
 
     if (game.user.isGM) {
       if (!targets.length)
@@ -365,8 +367,9 @@ export default class ChatWFRP {
         let t = targets[i];
         t.actor.applyFear(value, name);
       }
-      if (canvas.scene) {
+      if (canvas.scene) { 
         game.user.updateTokenTargets([]);
+        game.user.broadcastActivity({targets: []});
       }
     }
     else {
@@ -381,7 +384,10 @@ export default class ChatWFRP {
     let name = parseInt($(event.currentTarget).attr("data-name"));
     
     let targets = canvas.tokens.controlled.concat(Array.from(game.user.targets))
-    if (canvas.scene) game.user.updateTokenTargets([]);
+    if (canvas.scene) { 
+      game.user.updateTokenTargets([]);
+      game.user.broadcastActivity({targets: []});
+    }
 
     if (game.user.isGM) {
       if (!targets.length)
@@ -419,7 +425,10 @@ export default class ChatWFRP {
       msg.unsetFlag("wfrp4e", "experienceAwarded").then(m => {
         msg.setFlag("wfrp4e", "experienceAwarded", alreadyAwarded)
       })
-      if (canvas.scene) game.user.updateTokenTargets([]);
+      if (canvas.scene) { 
+        game.user.updateTokenTargets([]);
+        game.user.broadcastActivity({targets: []});
+      }
     }
     else {
       if (!game.user.character)

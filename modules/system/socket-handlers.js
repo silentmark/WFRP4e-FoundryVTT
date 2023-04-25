@@ -86,6 +86,10 @@ export default class SocketHandlers  {
 
         let test;
         if (owner.id == game.user.id) {
+            if (canvas.scene) { 
+                game.user.updateTokenTargets([]);
+                game.user.broadcastActivity({targets: []});
+            }
             if (type == "setupCharacteristic") {
                 let characteristicId = data.payload.characteristicId;
                 test = await actor.setupCharacteristic(characteristicId, options);

@@ -587,7 +587,10 @@ export default class ActorWfrp4e extends Actor {
     }
 
     testData.targets = Array.from(game.user.targets).map(t => t.document.actor.speakerData(t.document))
-    if (canvas.scene) game.user.updateTokenTargets([]);
+    if (canvas.scene) { 
+      game.user.updateTokenTargets([]);
+      game.user.broadcastActivity({targets: []});
+    }
     testData.speaker = this.speakerData();
 
     if (!testData.options.bypass) {
@@ -976,6 +979,9 @@ export default class ActorWfrp4e extends Actor {
     let title = options.title || game.i18n.localize("CastingTest") + " - " + spell.name;
     title += options.appendTitle || "";
 
+    game.user.updateTokenTargets([]);
+    game.user.broadcastActivity({targets: []});
+    
     let socket = this.setupSocket({spell: spell}, "setupCast", options, "Oczekuję na test " + title);
     if(socket) { 
       return socket;
@@ -1004,7 +1010,7 @@ export default class ActorWfrp4e extends Actor {
 
 
     // If the spell does damage, default the hit location to checked
-    if (spell.damage.value)
+    if (spell.damage?.value)
       testData.hitLocation = true;
 
     mergeObject(testData, await this.getPrefillData("cast", spell, options))

@@ -24,6 +24,7 @@ export default function() {
     if (game.combat?.active) { 
       let combatant = game.combat.turns.find(x => x.tokenId == tokenData._id);
       let token = game.canvas.tokens.getDocuments().find(x => x._id == tokenData._id);
+      if(!token || !combatant) return;
       let mask = token.hidden;
       let data = null;
       if (combatant && mask && !combatant.hidden && combatant.name != "???") {
