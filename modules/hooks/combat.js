@@ -6,6 +6,11 @@ export default function() {
   Hooks.on("preUpdateCombat", CombatHelpers.preUpdateCombat)
   Hooks.on("deleteCombat", CombatHelpers.endCombat)
 
+
+  Hooks.on("preCreateCombatant", (combatant, data) => {
+    combatant.updateSource({img : WFRP_Utility.replacePopoutPath(combatant.token.texture.src)})
+  })
+
   Hooks.on("createCombatant", async combatant => {
     if (game.settings.get("wfrp4e", "useGroupAdvantage")) {
       let advantage = game.settings.get("wfrp4e", "groupAdvantageValues")
@@ -59,6 +64,8 @@ export default function() {
   }
 
   Hooks.on("renderCombatTracker", (app, html, options) => {
+    WFRP_Utility.replacePopoutTokens(app.element); // Combat tracker shows tokens, replace popout versions with normal
+
     if (game.settings.get("wfrp4e", "useGroupAdvantage"))
     {
       let advantage = game.settings.get("wfrp4e", "groupAdvantageValues")

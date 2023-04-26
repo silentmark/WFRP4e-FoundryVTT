@@ -808,6 +808,7 @@
     "CHAT.TestModifiers.DefenderMountLarger" : "Penalty for attacking the rider of a larger mount.",
     "CHAT.TestModifiers.SlowDefend" : "Attacker has Slow Weapon",
     "CHAT.TestModifiers.WrapDefend" : "Attacker has Wrap Weapon",
+    "CHAT.TestModifiers.IgnoreDefenderMountLarger" : "Kara za atak jeźdzca pominięta ze względu na zasięg broni (Up in Arms).",
     "CHAT.SpreadPointBlank" : "Point Blank: Damage increased by {damage}",
     "CHAT.SpreadExtreme" : "Extreme: Damage reduced by {damage}",
     "CHAT.CommandLine.Help.Commands" : "Tables,Conditions,Properties,CharacterGeneration,NameGeneration,AvailabilityTest,Pay,Credit,Corruption,Travel,Exp",
@@ -1097,6 +1098,7 @@
     "WFRP4E.applyScope.actor" : "Actor",
     "WFRP4E.applyScope.item" : "Item",
 
+    "WFRP4E.TogglePassengers" : "Toggle Passengers",
 
     "CONDITION.Apply" : "Apply {condition}",
     "CONDITION.ApplyError" : "You cannot apply condition effects to this actor",
@@ -1414,6 +1416,7 @@
     "PROPERTY.Custom": "Custom",
     "PROPERTY.CustomHint": "FORMAT - {type} 1: {type} 1 Description | {type} 2 (Rating) : {type} 2 Description | etc.",
     "PROPERTY.Slash": "Slash",
+    "PROPERTY.SlashAlert": "<b>Cecha Tnący</b>: Wywołuje stan @Condition[Krwawienie] przy zadaniu Rany Krytycznej, można wydać dodatkowe maksymalnie: {value} przewag aby zadać kolejne stany Krawienia .",
     "Simple": "Simple",
     "Momentum": "Momentum",
 

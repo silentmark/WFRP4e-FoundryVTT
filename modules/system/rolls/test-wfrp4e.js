@@ -547,7 +547,8 @@ export default class TestWFRP {
     this.data.result = mergeObject({
       roll: undefined,
       description: "",
-      tooltips: {}
+      tooltips: {},
+      other: []
     }, this.preData)
   }
 
