@@ -3,9 +3,9 @@
   "name": "wfrp4e",
   "title": "Warhammer Fantasy Roleplay 4th Edition",
   "description": "A comprehensive system for running grim and perilous games of Warhammer Fantasy Roleplay in the Foundry VTT environment.",
-  "version": "6.4.0",
+  "version": "6.5.0",
   "author": "Moo Man, CatoThe1stElder",
-  "authors" : [
+  "authors": [
     {
       "name": "Moo Man",
       "email": "russellt@cubicle7games.com",
@@ -16,9 +16,14 @@
       "name": "CatoThe1stElder"
     }
   ],
-  "esmodules" : [],
-  "scripts": ["wfrp4e.js", "./libs/pixi-filters.js"],
-  "styles": ["./css/wfrp4e.css"],
+  "esmodules": [],
+  "scripts": [
+    "wfrp4e.js",
+    "./libs/pixi-filters.js"
+  ],
+  "styles": [
+    "./css/wfrp4e.css"
+  ],
   "packs": [
     {
       "name": "basic",
@@ -42,21 +47,21 @@
     }
   ],
   "initiative": "@characteristics.i.value + @characteristics.ag.value/100",
-  "background" : "systems/wfrp4e/WFRP-Header.jpg",
+  "background": "systems/wfrp4e/WFRP-Header.jpg",
   "gridDistance": 2,
   "gridUnits": "m",
   "primaryTokenAttribute": "status.wounds",
   "secondaryTokenAttribute": "status.advantage",
-  "minimumCoreVersion" : 10,
-  "compatibility" : {
-    "minimum" : 10.279,
-    "verified" : 10,
-    "maximum" : 10    
+  "minimumCoreVersion": 10,
+  "compatibility": {
+    "minimum": 10.279,
+    "verified": 10,
+    "maximum": 10
   },
   "manifestPlusVersion": "1.0.0",
-  "templateVersion":3,
+  "templateVersion": 3,
   "socket": true,
-  "manifest" :  "https://github.com/moo-man/WFRP4e-FoundryVTT/releases/latest/download/system.json",
-  "download" :  "https://github.com/moo-man/WFRP4e-FoundryVTT/releases/download/6.4.0/wfrp4e.zip",
-  "url" : "https://github.com/moo-man/WFRP4e-FoundryVTT"
+  "manifest": "https://github.com/moo-man/WFRP4e-FoundryVTT/releases/latest/download/system.json",
+  "download": "https://github.com/moo-man/WFRP4e-FoundryVTT/releases/download/6.5.0/wfrp4e.zip",
+  "url": "https://github.com/moo-man/WFRP4e-FoundryVTT"
 }
