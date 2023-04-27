@@ -1390,9 +1390,11 @@ export default class WFRP_Utility {
 
   static async createTestRequestMessage(owner, content) {
     let chatData = {
-      user: owner,
       content: "<b><u>" + owner.name + "</u></b>: " + content,
       whisper: ChatMessage.getWhisperRecipients("GM")
+    }
+    if (game.user.isGM) {
+      chatData.user = owner;
     }
     let msg = await ChatMessage.create(chatData);
     return msg;

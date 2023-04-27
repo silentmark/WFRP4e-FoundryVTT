@@ -79,13 +79,16 @@ export default class SocketHandlers  {
     static async setupSocket(data) {
         let actorId = data.payload.actorId; 
         let type = data.payload.type;
-        let options = data.payload.options;
+        let options = data.payload.options || {};
         let messageId = data.payload.messageId;
         let actor = game.actors.get(actorId);
         let owner = game.wfrp4e.utility.getActorOwner(actor);
 
         let test;
         if (owner.id == game.user.id) {
+            if (owner.isGM) {
+                data.payload.options.bypass = true;
+            }
             if (canvas.scene) { 
                 game.user.updateTokenTargets([]);
                 game.user.broadcastActivity({targets: []});
@@ -98,23 +101,26 @@ export default class SocketHandlers  {
                 test = await actor.setupSkill(skillName, options);
             } else if (type == "setupWeapon") {
                 let weapon = data.payload.weapon;
-                test = await actor.setupWeapon(weapon, options = {});
+                test = await actor.setupWeapon(weapon, options);
             } else if (type == "setupCast") {
                 let spell = data.payload.spell;
-                test = await actor.setupCast(spell, options = {});
+                test = await actor.setupCast(spell, options);
             } else if (type == "setupChannell") {
                 let spell = data.payload.spell;
-                test = await actor.setupChannell(spell, options = {});
+                test = await actor.setupChannell(spell, options);
             } else if (type == "setupPrayer") {
                 let prayer = data.payload.prayer;
-                test = await actor.setupPrayer(prayer, options = {});
+                test = await actor.setupPrayer(prayer, options);
             } else if (type == "setupTrait") {
                 let trait = data.payload.trait;
-                test = await actor.setupTrait(trait, options = {});
+                test = await actor.setupTrait(trait, options);
             }
+            if (owner.isGM) {
+                await test.roll();
+            }
+            let message = game.messages.get(messageId);        
+            await message.update({"flags.data.test": test});
         }
-        let message = game.messages.get(messageId);
-        await message.update({"flags.data.test": test});
     }
 
 }
