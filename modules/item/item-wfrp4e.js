@@ -1747,7 +1747,8 @@ export default class ItemWfrp4e extends Item {
     if (this.system.lore?.effect?.application == "damage") {
       itemDamageEffects.push(this.system.lore.effect)
     }
-    if (this.flags.wfrp4e?.conditionalEffects.length) {
+    if (this.flags.wfrp4e?.conditionalEffects?.length)
+    {
       itemDamageEffects = itemDamageEffects.concat(this.flags.wfrp4e?.conditionalEffects.map(e => new EffectWfrp4e(e, {parent: this})))
     }
     return itemDamageEffects;
