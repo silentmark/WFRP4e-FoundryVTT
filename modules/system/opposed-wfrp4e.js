@@ -282,6 +282,10 @@ export default class OpposedWFRP {
       messageId = button.parents('.message').attr("data-message-id"),
       message = game.messages.get(messageId);
 
+    if (game.wfrp4e.oppose && !game.wfrp4e.oppose.attackerMessage) {
+      delete game.wfrp4e.oppose;
+    }
+
     // Opposition already exists - click was defender
     if (game.wfrp4e.oppose) {
       await game.wfrp4e.oppose.setDefender(message);

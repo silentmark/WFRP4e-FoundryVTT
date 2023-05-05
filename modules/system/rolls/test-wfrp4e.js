@@ -477,10 +477,11 @@ export default class TestWFRP {
           let offhandWeapon = oppose.attacker.getItemTypes("weapon").find(w => w.offhand.value);
 
           let userOwner = WFRP_Utility.getActorOwner(oppose.attacker);
-          userOwner.updateTokenTargets([game.canvas.tokens.placeables.find(x=>x.actor.id == oppose.defender.id)]);
-          userOwner.broadcastActivity({targets: [(game.canvas.tokens.placeables.find(x=>x.actor.id == oppose.defender.id)).id]});
+          let targetId = game.canvas.tokens.placeables.find(x => x.actor.id == oppose.defender.id).id;
+          userOwner.updateTokenTargets([targetId]);
+          userOwner.broadcastActivity({targets: [targetId]});
          
-          await new Promise(r => setTimeout(r, 1000));
+          await WFRP_Utility.sleep(1000);
           let offHandReverseRoll;
           if (test.result.roll % 11 == 0 || test.result.roll == 100) {
             offHandReverseRoll = undefined;
@@ -492,7 +493,7 @@ export default class TestWFRP {
               offhandRoll = offhandRoll[1] + offhandRoll[0]
               offHandReverseRoll = Number(offhandRoll);
           }
-          test = await oppose.attacker.setupWeapon(offhandWeapon, { appendTitle: ` (${game.i18n.localize("SHEET.Offhand")})`, offhand: true, offhandReverse: offHandReverseRoll });
+          test = await oppose.attacker.setupWeapon(offhandWeapon, {gmTargets: [targetId], appendTitle: ` (${game.i18n.localize("SHEET.Offhand")})`, offhand: true, offhandReverse: offHandReverseRoll });
           await test.roll();
         }
       }

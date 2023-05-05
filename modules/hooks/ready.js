@@ -4,7 +4,6 @@ import SocketHandlers from "../system/socket-handlers.js";
 import MooHouseRules from "../system/moo-house.js"
 import OpposedWFRP from "../system/opposed-wfrp4e.js";
 import OpposedTest from "../system/opposed-test.js";
-import CharGenWfrp4e from "../apps/chargen/char-gen.js";
 
 export default function () {
   /**
@@ -30,43 +29,6 @@ export default function () {
       if (hasProperty(this, "flags.wfrp4e.opposeTestData"))
         return OpposedTest.recreate(getProperty(this, "flags.wfrp4e.opposeTestData"))
     }
-
-
-    let activeModules = game.settings.get("core", "moduleConfiguration");
-
-    // // Load module tables if the module is active and if the module has tables
-
-      for (let m in activeModules) {
-        if (activeModules[m]) {
-          try {
-            await WFRP_Utility.loadTablesPath(`modules/${m}/tables`)
-          }
-          catch { // Skip module that throws an error
-          }
-        }
-      }
-      try {
-        // Load tables from world if it has a tables folder
-        await WFRP_Utility.loadTablesPath(`worlds/${game.world.id}/tables`)
-      }
-      catch
-      {
-        // Do nothing
-      }
-
-    //   //@HOUSE
-    //     await WFRP_Utility.loadTablesPath(`systems/wfrp4e/moo/tables`)
-    //   //@/HOUSE
-
-    // //   resolve()
-    // // })
-
-    //   await game.settings.set("wfrp4e", "tables", WFRP_Utility._packageTables())
-
-
-    // game.wfrp4e.utility.addTablesToSidebar(ui.sidebar._element.find("#tables"))
-
-    //***** Change cursor styles if the setting is enabled *****
 
     if (game.settings.get('wfrp4e', 'customCursor')) {
       WFRP_Utility.log('Using custom cursor', true)
@@ -100,16 +62,12 @@ export default function () {
     const body = $("body");
     body.on("dragstart", "a.condition-chat", WFRP_Utility._onDragConditionLink)
 
-
     const MIGRATION_VERSION = 7;
     let needMigration = isNewerVersion(MIGRATION_VERSION, game.settings.get("wfrp4e", "systemMigrationVersion"))
     if (needMigration && game.user.isGM) {
       game.wfrp4e.migration.migrateWorld()
     }
     game.settings.set("wfrp4e", "systemMigrationVersion", MIGRATION_VERSION)
-
-
-
 
     // Some entities require other entities to be loaded to prepare correctly (vehicles and mounts)
     for (let e of game.wfrp4e.postReadyPrepare)
@@ -125,7 +83,4 @@ export default function () {
     game.wfrp4e.tags.createTags()
 
   })
-
-
-
 }

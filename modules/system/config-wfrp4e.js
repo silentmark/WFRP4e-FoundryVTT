@@ -1849,6 +1849,24 @@ WFRP4E.conditionScripts = {
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
         return messageData
+    },
+    "broken" : async function(actor) {
+        let effect = actor.hasCondition("broken")
+        let conditionValue = effect.conditionValue;
+        let msg = `<h2>${game.i18n.localize("WFRP4E.ConditionName.Broken")}</h2>`
+        if (actor.isOwner) {
+            let test = await actor.setupSkill(game.i18n.localize("NAME.Cool"), {appendTitle : " - Panika"})
+            await test.roll();
+            if (test.result.outcome == "success") {
+                await actor.removeCondition("broken", Math.min(test.result.SL, conditionValue));
+                msg += "Liczba usuniętych stanów Paniki: " + Math.min(test.result.SL, conditionValue);
+            } else {
+                msg += "Nie udało się usunąć stanu Paniki";
+            }
+        }
+        let messageData = game.wfrp4e.utility.chatDataSetup(msg);
+        messageData.speaker = {alias: actor.prototypeToken.name}
+        return messageData
     }
 }
 

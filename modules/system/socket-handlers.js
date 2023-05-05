@@ -90,8 +90,13 @@ export default class SocketHandlers  {
                 data.payload.options.bypass = true;
             }
             if (canvas.scene) { 
-                game.user.updateTokenTargets([]);
-                game.user.broadcastActivity({targets: []});
+                if (payload.options?.gmTargets) {
+                    game.user.updateTokenTargets(payload.options.gmTargets);
+                    game.user.broadcastActivity({targets: payload.options.gmTargets});
+                } else {
+                    game.user.updateTokenTargets([]);
+                    game.user.broadcastActivity({targets: []});
+                }
             }
             if (type == "setupCharacteristic") {
                 let characteristicId = data.payload.characteristicId;

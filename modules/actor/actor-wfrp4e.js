@@ -3851,8 +3851,10 @@ export default class ActorWfrp4e extends Actor {
   async addSystemEffect(key) {
     let systemEffects = game.wfrp4e.utility.getSystemEffects()
     let effect = systemEffects[key];
-    setProperty(effect, "flags.core.statusId", key);
-    await this.createEmbeddedDocuments("ActiveEffect", [effect])
+    if (effect) {
+      setProperty(effect, "flags.core.statusId", key);
+      await this.createEmbeddedDocuments("ActiveEffect", [effect])
+    }
   }
 
   async removeSystemEffect(key) {
