@@ -79,7 +79,7 @@ export default class CombatHelpers {
 
             if (game.settings.get("wfrp4e", "statusOnTurnStart")) {
                 let nameOverride =  combat.combatant.hidden ? "???" : combatant.name;
-                turn.actor.displayStatus(combat.round, nameOverride);
+                combatant.actor.displayStatus(combat.round, nameOverride);
             }
 
             if (game.settings.get("wfrp4e", "focusOnTurnStart")) {
@@ -87,7 +87,7 @@ export default class CombatHelpers {
                 canvas.tokens.cycleTokens(1, true);
             }
 
-            await turn.actor.runEffectsAsync("startTurn", combat)
+            await combatant.actor.runEffectsAsync("startTurn", combat)
         }
         WFRP_Audio.PlayContextAudio({ item: { type: 'round' }, action: "change" })
     }

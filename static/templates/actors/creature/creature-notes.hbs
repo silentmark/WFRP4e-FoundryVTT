@@ -21,14 +21,15 @@
       </div>
 
       {{#if ../document.isOwner}}
-        <div class="list-controls effect-controls">
+        <div class="list-controls effect-controls" style="display: flex;justify-content: center;align-items: center;height: 37px;">
           {{#each item.effects as |effect e|}}
-            {{#if effect.application == "apply"}}
-              <a class="effect-control effect-target apply-effect" data-item-id="{{item.id}}" data-effect-id="{{effect.id}}" title="Zastosuj do Celu - {{effect.label}}"><i class="fas fa-crosshairs"></i></a>
+            {{#if (eq effect.application "apply")}}
+              <a class="effect-control apply-effect" data-item-id="{{item.id}}" data-effect-id="{{effect.id}}" title="Zastosuj do Celu - {{effect.label}}"><i class="fas fa-crosshairs"></i></a>
             {{/if}}
-            {{#if effect.trigger == "invoke"}} 
-              <a class="effect-control effect-target invoke-effect" data-item-id="{{item.id}}" data-effect-id="{{effect.id}}" title="Wywołaj {{effect.label}}"><i class="fas fa-crosshairs"></i></a>
+            {{#if (eq effect.trigger "invoke")}} 
+              <a class="effect-control invoke-effect" data-item-id="{{item.id}}" data-effect-id="{{effect.id}}" title="Wywołaj {{effect.label}}"><i class="fas fa-crosshairs"></i></a>
             {{/if}}
+          {{/each}}
         </div>
       {{/if}}
 

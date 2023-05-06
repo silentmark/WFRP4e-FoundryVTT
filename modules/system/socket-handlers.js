@@ -90,9 +90,9 @@ export default class SocketHandlers  {
                 data.payload.options.bypass = true;
             }
             if (canvas.scene) { 
-                if (payload.options?.gmTargets) {
-                    game.user.updateTokenTargets(payload.options.gmTargets);
-                    game.user.broadcastActivity({targets: payload.options.gmTargets});
+                if (options.gmTargets) {
+                    game.user.updateTokenTargets(options.gmTargets);
+                    game.user.broadcastActivity({targets: options.gmTargets});
                 } else {
                     game.user.updateTokenTargets([]);
                     game.user.broadcastActivity({targets: []});
