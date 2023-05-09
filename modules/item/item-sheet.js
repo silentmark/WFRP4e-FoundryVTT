@@ -243,12 +243,11 @@ export default class ItemSheetWfrp4e extends ItemSheet {
     for (let lore in game.wfrp4e.config.magicLores) {
       // If lore value matches config, use that (Update the actor with the "key" value)
       if (inputLore == game.wfrp4e.config.magicLores[lore]) {
-        await this.item.update({ 'system.lore.value': lore });
-        return;
+        return this.item.update({ 'system.lore.value': lore });
       }
     }
     // Otherwise, if the input isn't recognized, store user input directly as a custom lore
-    await this.item.update({ 'system.lore.value': inputLore });
+    return this.item.update({ 'system.lore.value': inputLore });
   }
 
 
@@ -363,14 +362,14 @@ export default class ItemSheetWfrp4e extends ItemSheet {
     // Add symptoms from input
     await this.item.createEmbeddedDocuments("ActiveEffect", symptomEffects)
 
-    await this.item.update({ "system.symptoms.value": symptoms.join(", ") })
+    this.item.update({ "system.symptoms.value": symptoms.join(", ") })
   }
 
-  async _onEffectCreate(ev) {
+  _onEffectCreate(ev) {
     if (this.item.isOwned)
       return ui.notifications.warn(game.i18n.localize("ERROR.AddEffect"))
     else
-      await this.item.createEmbeddedDocuments("ActiveEffect", [{ label: this.item.name, icon: this.item.img, transfer: !(this.item.type == "spell" || this.item.type == "prayer") }])
+      this.item.createEmbeddedDocuments("ActiveEffect", [{ label: this.item.name, icon: this.item.img, transfer: !(this.item.type == "spell" || this.item.type == "prayer") }])
   }
 
   _onEffectTitleClick(ev) {
@@ -382,34 +381,34 @@ export default class ItemSheetWfrp4e extends ItemSheet {
     effect.sheet.render(true);
   }
 
-  async _onEffectDelete(ev) {
+  _onEffectDelete(ev) {
     let id = $(ev.currentTarget).parents(".item").attr("data-item-id");
-    await this.item.deleteEmbeddedDocuments("ActiveEffect", [id])
+    this.item.deleteEmbeddedDocuments("ActiveEffect", [id])
   }
 
-  async _onConditionClick(ev) {
+  _onConditionClick(ev) {
     let condKey = $(ev.currentTarget).parents(".sheet-condition").attr("data-cond-id")
     if (ev.button == 0)
-      await this.item.addCondition(condKey)
+      this.item.addCondition(condKey)
     else if (ev.button == 2)
-      await this.item.removeCondition(condKey)
+      this.item.removeCondition(condKey)
   }
 
-  async _onConditionToggle(ev) {
+  _onConditionToggle(ev) {
     let condKey = $(ev.currentTarget).parents(".sheet-condition").attr("data-cond-id")
 
     if (game.wfrp4e.config.statusEffects.find(e => e.id == condKey).flags.wfrp4e.value == null) {
       if (this.item.hasCondition(condKey))
-        await this.item.removeCondition(condKey)
+        this.item.removeCondition(condKey)
       else
-        await this.item.addCondition(condKey)
+        this.item.addCondition(condKey)
       return
     }
 
     if (ev.button == 0)
-      await this.item.addCondition(condKey)
+      this.item.addCondition(condKey)
     else if (ev.button == 2)
-      await this.item.removeCondition(condKey)
+      this.item.removeCondition(condKey)
   }
 
 }

@@ -137,8 +137,7 @@ export default function () {
 
           if (li.find(".dice-roll").length) {
             let amount = li.find('.dice-total').text();
-            for(let i = 0; i < game.user.targets.length; i++) {
-              let t = game.user.targets[i];
+            for(let t of game.user.targets) {
               await t.actor.applyBasicDamage(amount);
             }
           }
@@ -161,8 +160,7 @@ export default function () {
         callback: async li => {
           if (li.find(".dice-roll").length) {
             let amount = li.find('.dice-total').text();
-            for(let i = 0; i < game.user.targets.length; i++) {
-              let t = game.user.targets[i];
+            for(let t of game.user.targets) {
               await t.actor.applyBasicDamage(amount, { damageType: game.wfrp4e.config.DAMAGE_TYPE.IGNORE_AP });
             }
           }
@@ -185,8 +183,7 @@ export default function () {
         callback: async li => {
           if (li.find(".dice-roll").length) {
             let amount = li.find('.dice-total').text();
-            for(let i = 0; i < game.user.targets.length; i++) {
-              let  t = game.user.targets[i];
+            for(let t of game.user.targets) {
               await  t.actor.applyBasicDamage(amount, { damageType: game.wfrp4e.config.DAMAGE_TYPE.IGNORE_TB });
             }
           }
@@ -209,8 +206,7 @@ export default function () {
         callback: async li => {
           if (li.find(".dice-roll").length) {
             let amount = li.find('.dice-total').text();
-            for(let i = 0; i < game.user.targets.length; i++) {
-              let t = game.user.targets[i];
+            for(let t of game.user.targets) {
               await t.actor.applyBasicDamage(amount, { damageType: game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL });
             }
           }
@@ -277,8 +273,7 @@ export default function () {
 
           test.context.targets = test.context.targets.concat(targets)
           targets = targets.map(t => WFRP_Utility.getToken(t));
-          for(let i = 0; i < targets.length; i++) {
-            let t = targets[i];
+          for(let t of targets) {
             await test.createOpposedMessage(t)
           }
         }
@@ -288,10 +283,10 @@ export default function () {
         icon: '<i class="fas fa-angle-double-down"></i>',
         condition: canCompleteUnopposed,
         callback: async li => {
+
           let message = game.messages.get(li.attr("data-message-id"));
           let test = message.getTest();
-          for(let i = 0; i < test.opposedMessages.length; i++) {
-            let message = test.opposedMessages[i];
+          for(let message of test.opposedMessages) {
             if (message) {
               let oppose = message.getOppose();
               await oppose.resolveUnopposed();
@@ -306,17 +301,14 @@ export default function () {
         callback: async li => {
           let message = game.messages.get(li.attr("data-message-id"));
           let test = message.getTest();
-          for(let i = 0; i < test.opposedMessages.length; i++) {
-            let message = test.opposedMessages[i];
-            if(message) {
+          for (let message of test.opposedMessages) {
+            if (message) {
               let opposedTest = message.getOppose();
-
               if (!opposedTest.defenderTest.actor.isOwner) {
                 ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
               } else {
                 let updateMsg = await opposedTest.defender.applyDamage(opposedTest.resultMessage.getOpposedTest(), game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
-                await OpposedWFRP.updateOpposedMessage(updateMsg, message.id);
-              }
+                await OpposedWFRP.updateOpposedMessage(updateMsg, opposedTest.resultMessage.id);
             }
           }
         }

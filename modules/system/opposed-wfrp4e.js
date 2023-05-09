@@ -81,7 +81,7 @@ export default class OpposedWFRP {
   async startOppose(targetToken) {
     this.data.targetSpeakerData = targetToken.actor.speakerData(targetToken)
     await this.renderOpposedStart();
-    this._addOpposeFlagsToDefender(targetToken);
+    await this._addOpposeFlagsToDefender(targetToken);
     return this.message?.id
   }
 
@@ -110,22 +110,22 @@ export default class OpposedWFRP {
     await this.opposedTest.evaluate();
     this.formatOpposedResult();
     await this.renderOpposedResult()
-    this.colorWinnerAndLoser()
+    await this.colorWinnerAndLoser()
   }
 
   async renderOpposedStart() {
-      let attacker = game.canvas.tokens.get(this.attackerTest.context.cardOptions.speaker.token)?.document ?? this.attacker.prototypeToken;
-      let defender
+    let attacker = game.canvas.tokens.get(this.attackerTest.context.cardOptions.speaker.token)?.document ?? this.attacker.prototypeToken;
+    let defender
 
-      // Support opposed start messages when defender is not set yet - allows for manual opposed to use this message
-      if (this.target)
-        defender = this.target
-      else if (this.defenderTest)
-        defender = WFRP_Utility.getToken(this.defenderTest.context.speaker) || this.defender.prototypeToken;
+    // Support opposed start messages when defender is not set yet - allows for manual opposed to use this message
+    if (this.target)
+      defender = this.target
+    else if (this.defenderTest)
+      defender = WFRP_Utility.getToken(this.defenderTest.context.speaker) || this.defender.prototypeToken;
 
-      let defenderImg = defender ? `<a class = "defender"><img src="${defender.texture.src}" width="50" height="50"/></a>` : `<a class = "defender"><img width="50" height="50"/></a>`
+    let defenderImg = defender ? `<a class = "defender"><img src="${defender.texture.src}" width="50" height="50"/></a>` : `<a class = "defender"><img width="50" height="50"/></a>`
 
-      let content =
+    let content =
         `<div class ="opposed-message">
             ${game.i18n.format("ROLL.Targeting", {attacker: ((attacker.hidden) ? "???" : attacker.name), defender: defender ? defender.name : "???"})}
           </div>
@@ -135,45 +135,40 @@ export default class OpposedWFRP {
           </div>
           <div class="unopposed-button" data-target="true" title="${game.i18n.localize("Unopposed")}"><a><i class="fas fa-arrow-down"></i></a></div>`
 
-
-
-      // Ranged weapon opposed tests automatically lose no matter what if the test itself fails
-      if (this.attackerTest.item && this.attackerTest.item.attackType == "ranged" && this.attackerTest.result.outcome == "failure") {
-        await ChatMessage.create({ speaker: this.attackerMessage.speaker, content: game.i18n.localize("OPPOSED.FailedRanged") })
-        //await test.updateMessageFlags({ "context.opposed": false });
-        return;
-      }
-      let chatData = {
+    // Ranged weapon opposed tests automatically lose no matter what if the test itself fails
+    if (this.attackerTest.item && this.attackerTest.item.attackType == "ranged" && this.attackerTest.result.outcome == "failure") {
+      await ChatMessage.create({ speaker: this.attackerMessage.speaker, content: game.i18n.localize("OPPOSED.FailedRanged") })
+      return;
+    }
+    let chatData = {
         user: game.user.id,
         content: content,
         speaker: { alias: game.i18n.localize("CHAT.OpposedTest") },
         whisper: this.options.whisper,
         blind: this.options.blind,
         "flags.wfrp4e.opposeData": this.data
-      }
+    }
 
-      if (this.message) {
+    if (this.message) {
         await this.message.update(chatData);
         return this.data.messageId;
-      }
-      else {
+    }
+    else {
         // Create the Opposed starting message
         let msg = await ChatMessage.create(chatData);
-          // Must wait until message and ID is created before proceeding with opposed process
         this.data.messageId = msg.id;
         await this.updateMessageFlags();
         return msg.id;
-      }
+    }
   }
 
   async updateMessageFlags() {
     let updateData = { "flags.wfrp4e.opposeData": this.data }
-    if (this.message && game.user.isGM)
+    if (this.message && game.user.isGM) {
       await this.message.update(updateData)
-
+    }
     else if (this.message) {
-      this.message.flags.wfrp4e.opposeData = this.data // hopefully temporary solution. Other processes likely need flag data to be present immediately, and the inner socket function cannot be awaited, so set data locally
-      game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: this.message.id, updateData } })
+      await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: this.message.id, updateData }, "Updating message flags");
     }
   }
 
@@ -226,7 +221,7 @@ export default class OpposedWFRP {
     return opposeResult;
   }
 
-  colorWinnerAndLoser() 
+  async colorWinnerAndLoser() 
   {
     try {
       let winner = this.opposedTest.opposeResult.winner
@@ -240,34 +235,28 @@ export default class OpposedWFRP {
       content = content.replace(loser, `${loser} loser`)
 
       if (!game.user.isGM)
-        return game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: this.message.id, updateData: {content} } })
+        await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: this.message.id, updateData: {content} }, "Updating winner/looser color");
       else
-        return this.message.update({content})
+        await this.message.update({content});
     }
-    catch(e)
-    {
+    catch(e) {
       console.error(`Error color coding winner and loser: ${e}`)
     }
   }
 
 
-  _addOpposeFlagsToDefender(target) {
+  async _addOpposeFlagsToDefender(target) {
     if (!game.user.isGM) {
-      game.socket.emit("system.wfrp4e", {
-        type: "target",
-        payload: {
-          target: target.id,
-          scene: canvas.scene.id,
-          opposeFlag: { opposeMessageId: this.data.messageId }
-        }
-      })
+      const payload = {
+        target: target.id,
+        scene: canvas.scene.id,
+        opposeFlag: { opposeMessageId: this.data.messageId }
+      }
+      await WFRP_Utility.awaitSocket(game.user, "target", payload, "setting oppose flag");
     }
     else {
       // Add oppose data flag to the target
-      target.actor.update(
-        {
-          "flags.oppose": { opposeMessageId: this.data.messageId }
-        })
+      await target.actor.update({ "flags.oppose": { opposeMessageId: this.data.messageId } });
     }
   }
 
@@ -308,10 +297,6 @@ export default class OpposedWFRP {
     await this.defender.clearOpposed();
   }
 
-  async _updateOpposedMessage(damageConfirmation) {
-    await OpposedWFRP.updateOpposedMessage(damageConfirmation, this.data.resultMessageId)
-  }
-
   // Update starting message with result
   static async updateOpposedMessage(damageConfirmation, messageId) {
     let resultMessage = game.messages.get(messageId)
@@ -324,8 +309,8 @@ export default class OpposedWFRP {
       content: $(resultMessage.content).append(`<div>${damageConfirmation}</div>`).html()
     }
 
-    if (!game.user.isGM)
-      return game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: messageId, updateData: newCard } })
+    if (!game.user.isGM)  
+      await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: messageId, updateData: newCard }, "updating opposed damage");
     else
       await resultMessage.update(newCard)
   }

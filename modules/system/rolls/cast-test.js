@@ -106,7 +106,8 @@ export default class CastTest extends TestWFRP {
     let slOver = (Number(this.result.SL) - CNtoUse)
 
     // Test itself was failed
-    if (this.result.outcome == "failure") {
+    if (this.result.outcome == "failure") 
+    {
       this.result.castOutcome = "failure"
       this.result.description = game.i18n.localize("ROLL.CastingFailed")
       if (this.preData.itemData.system.cn.SL) {
@@ -326,19 +327,19 @@ export default class CastTest extends TestWFRP {
   }
 
 
-  postTest() {
+  async postTest() {
     //@/HOUSE
     if (this.preData.unofficialGrimoire) {
       game.wfrp4e.utility.logHomebrew("unofficialgrimoire");
       if (this.preData.unofficialGrimoire.ingredientMode != 'none' && this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll) {
-        this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
-        ChatMessage.create({ speaker: this.context.speaker, content: game.i18n.localize("ConsumedIngredient") })
+        await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
+        await ChatMessage.create({ speaker: this.context.speaker, content: game.i18n.localize("ConsumedIngredient") })
       }
     //@/HOUSE
     } else {
       // Find ingredient being used, if any
       if (this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll)
-        this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
+        await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
     }
 
     // Set initial extra overcasting options to SL if checked
@@ -370,11 +371,11 @@ export default class CastTest extends TestWFRP {
         {
           items = this.actor.items.filter(s => s.type == "spell" && s.system.lore.value == this.spell.system.lore.value).map(i => i.toObject())
           items.forEach(i => i.system.cn.SL = 0)
-          this.actor.updateEmbeddedDocuments("Item", items);
+          await this.actor.updateEmbeddedDocuments("Item", items);
         }
         else 
         {
-          this.item.update({ "system.cn.SL": 0 })
+          await this.item.update({ "system.cn.SL": 0 })
         }
       }
 
@@ -393,10 +394,8 @@ export default class CastTest extends TestWFRP {
 
   get effects() {
     let effects = super.effects;
-    if (this.item.system.lore.effect?.application == "apply") {
-      this.item.system.lore.effect.origin = this.actor._id;
+    if (this.item.system.lore.effect?.application == "apply")
       effects.push(this.item.system.lore.effect)
-    }
     return effects
   }
 

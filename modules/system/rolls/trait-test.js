@@ -50,7 +50,7 @@ export default class TraitTest extends AttackTest {
       if (this.item.rollable.damage) {
         this.result.additionalDamage = this.preData.additionalDamage || 0
 
-        super.calculateDamage(this.item.rollable.SL ? Number(this.result.SL) : 0)
+        await super.calculateDamage(this.item.rollable.SL ? Number(this.result.SL) : 0)
 
         if (this.item.rollable.dice && !this.result.additionalDamage) {
           let roll = await new Roll(this.item.rollable.dice).roll()

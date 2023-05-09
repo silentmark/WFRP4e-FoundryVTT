@@ -70,28 +70,37 @@ export default class ChannelTest extends TestWFRP {
     }
 
     // Test itself was failed
-    if (this.result.outcome == "failure") {
+    if (this.result.outcome == "failure") 
+    {
       this.result.description = game.i18n.localize("ROLL.ChannelFailed")
       // Major Miscast on fumble
       if (this.result.roll % 11 == 0 ||
          (this.result.roll % 10 == 0 && !game.settings.get("wfrp4e", "useWoMChannelling")) || // If WoM channelling, 10s don't cause miscasts
-          this.result.roll == 100) {
+          this.result.roll == 100)
+      {
 
         this.result.color_red = true;
         this.result.tooltips.miscast.push(game.i18n.localize("CHAT.FumbleMiscast"))
         //@HOUSE
-        if (this.preData.unofficialGrimoire) {
+        if (this.preData.unofficialGrimoire) 
+        {
           game.wfrp4e.utility.logHomebrew("unofficialgrimoire");
           miscastCounter += 1;
-          if(this.result.roll == 100 || this.result.roll == 99) {
+          if(this.result.roll == 100 || this.result.roll == 99) 
+          {
             SL = this.item.cn.value * (-1)
             miscastCounter += 1;
           }
         //@HOUSE
-        } else {
-          if (game.settings.get("wfrp4e", "useWoMChannelling")){ // Fumble is only minor when using WoM Channelling
+        } 
+        else 
+        {
+          if (game.settings.get("wfrp4e", "useWoMChannelling")) // Fumble is only minor when using WoM Channelling
+          {
             miscastCounter += 1
-          } else {
+          }
+          else 
+          {
             miscastCounter += 2;
           }
 
@@ -142,20 +151,23 @@ export default class ChannelTest extends TestWFRP {
 
   async postTest() {
     //@/HOUSE
-    if (this.preData.unofficialGrimoire) {
-      game.wfrp4e.utility.logHomebrew("unofficialgrimoire");
-      if (this.preData.unofficialGrimoire.ingredientMode != 'none' && this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll) {
-        await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
-        this.result.ingredientConsumed = true;
-        await ChatMessage.create({ speaker: this.data.context.speaker, content: game.i18n.localize("ConsumedIngredient") })
+
+    
+      if (this.preData.unofficialGrimoire) {
+        game.wfrp4e.utility.logHomebrew("unofficialgrimoire");
+        if (this.preData.unofficialGrimoire.ingredientMode != 'none' && this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll) {
+          await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
+          this.result.ingredientConsumed = true;
+          await ChatMessage.create({ speaker: this.data.context.speaker, content: game.i18n.localize("ConsumedIngredient") })
+        }
+        //@/HOUSE
+      } 
+      else if (game.settings.get("wfrp4e", "channellingIngredients"))
+      {
+        // Find ingredient being used, if any
+        if (this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll)
+          await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
       }
-    //@/HOUSE
-    } else if (game.settings.get("wfrp4e", "channellingIngredients")){
-      // Find ingredient being used, if any
-      if (this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll) {
-        await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
-      }
-    }
 
     let SL = Number(this.result.SL);
 
@@ -164,13 +176,14 @@ export default class ChannelTest extends TestWFRP {
       // Optional Rule: If SL in extended test is -/+0, counts as -/+1
       if (Number(SL) == 0 && game.settings.get("wfrp4e", "extendedTests"))
         SL = 1;
-    }
-    else // If outcome == failure 
-    {
-      // Optional Rule: If SL in extended test is -/+0, counts as -/+1
-      if (Number(SL) == 0 && game.settings.get("wfrp4e", "extendedTests"))
+
+      }
+      else // If outcome == failure 
+      {
+        // Optional Rule: If SL in extended test is -/+0, counts as -/+1
+        if (Number(SL) == 0 && game.settings.get("wfrp4e", "extendedTests"))
         SL = -1;
-    }
+      }
 
     //@HOUSE
     if(this.preData.unofficialGrimoire && this.preData.unofficialGrimoire.ingredientMode == 'power' && this.result.ingredientConsumed && this.result.outcome == "success") {
@@ -188,11 +201,13 @@ export default class ChannelTest extends TestWFRP {
     if (Number(SL) < 0 && game.settings.get("wfrp4e", "channelingNegativeSLTests"))
       SL = 0;
 
-    // If channelling test was edited, make sure to adjust the SL accordingly
+    // // If channelling test was edited, make sure to adjust the SL accordingly
     // if (this.context.previousResult?.previousChannellingSL > 0)
     // {
     //   channellDelta = SL - parseInt(this.context.previousResult.SL)
     // }
+
+    
 
     //@HOUSE
     if(this.preData.unofficialGrimoire && (this.item.cn.SL + SL) > this.item.cn.value) {
@@ -249,9 +264,12 @@ export default class ChannelTest extends TestWFRP {
     // If channelling with ingredients isn't allowed, always return false 
     // HOWEVER: Witchcraft specifies: "channeling or casting spells from this Lore automatically require a roll on the Minor Miscast table unless cast with an ingredient"
     // This doesn't make any sense. So what I'm doing is if it's a witchcraft spell, and has a valid ingredient assigned, still count it, as it will have to be assumed it's used in the eventual cast?
-    if (!game.settings.get("wfrp4e", "channellingIngredients") && this.item.lore.value != "witchcraft") {
+    if (!game.settings.get("wfrp4e", "channellingIngredients") && this.item.lore.value != "witchcraft")
+    {
       return false 
-    } else {
+    }
+    else 
+    {
       return this.item.ingredient && this.item.ingredient.quantity.value > 0
     }
   }

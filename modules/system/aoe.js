@@ -168,13 +168,14 @@ export default class AbilityTemplate extends MeasuredTemplate {
     await this._finishPlacement(event);
     const destination = canvas.grid.getSnappedPosition(this.document.x, this.document.y, 2);
     this.document.updateSource(destination);
-    let templates = await canvas.scene.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]);
-    let test = game.messages.get(templates[0].flags.wfrp4e.messageId)?.getTest();
-    if (test?.data.context.templates) {
-      test.data.context.templates = test.data.context.templates.concat(templates[0].id);
-      await test.renderRollCard();
-    }
-    this.#events.resolve(templates);
+    this.#events.resolve(canvas.scene.createEmbeddedDocuments("MeasuredTemplate", [this.document.toObject()]).then(templates => {
+      let test = game.messages.get(templates[0].flags.wfrp4e.messageId)?.getTest();
+      if (test && test.data.context.templates)
+      {
+        test.data.context.templates = test.data.context.templates.concat(templates[0].id);
+        test.renderRollCard();
+      }
+    }));
   }
 
   /* -------------------------------------------- */
@@ -205,7 +206,7 @@ export default class AbilityTemplate extends MeasuredTemplate {
         newTokenTargets.push(t.id)
     })
     game.user.updateTokenTargets(newTokenTargets)
-    game.user.broadcastActivity({targets: newTokenTargets});
+    game.user.broadcastActivity({targets: newTokenTargets})
   }
 
 }

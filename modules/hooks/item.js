@@ -12,7 +12,8 @@ export default function () {
 
     if (item.type == "container" && update.system?.location?.value) {
       let allContainers = item.actor.getItemTypes("container")
-      if (formsLoop(item, allContainers)) {
+      if (formsLoop(item, allContainers))
+      {
         ui.notifications.error("Loop formed - Resetting Container Location")
         await item.update({ "system.location.value": "" })
       }

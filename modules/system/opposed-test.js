@@ -282,7 +282,6 @@ export default class OpposedTest {
       WFRP_Audio.PlayContextAudio(soundContext)
 
       return opposeResult
-
     }
     catch (err) {
       ui.notifications.error(`${game.i18n.localize("ErrorOpposed")}: ` + err)

@@ -126,7 +126,6 @@ export default class TestWFRP {
     this.context.messageId = ""
 
     await this.roll()
-
   }
 
   async addSL(SL) {
@@ -138,7 +137,7 @@ export default class TestWFRP {
     if (this.preData.hitLocation)
       this.preData.hitloc = this.result.hitloc.roll;
 
-    await  this.roll()
+    await this.roll()
   }
 
   /**
@@ -473,7 +472,7 @@ export default class TestWFRP {
       if (test) {
         await oppose.attacker.update({ "flags.wfrp4e.-=offHandData": null });
         test = game.wfrp4e.rolls.TestWFRP.recreate(test.data);
-        if (test.result.outcome == "success") {
+        if (oppose.opposeResult.winner == "attacker") {
           let offhandWeapon = oppose.attacker.getItemTypes("weapon").find(w => w.offhand.value);
 
           let userOwner = WFRP_Utility.getActorOwner(oppose.attacker);
@@ -502,20 +501,19 @@ export default class TestWFRP {
     {
       if (this.opposedMessages.length)
       {
-        for(let message of this.opposedMessages)
-        {
-          let oppose = message.getOppose()
+        const messages = this.opposedMessages.map(m => message.getOppose());
+        for (let i = 0; i < messages.length; i++) {
+          const oppose = messages[i];
           await oppose.setAttacker(this.message); // Make sure the opposed test is using the most recent message from this test
           if (oppose.defenderTest) // If defender has rolled (such as if this test was rerolled or edited after the defender rolled) - recompute opposed test
             await oppose.computeOpposeResult()
         }
       }
       else { // actor is attacking - new test
-
-        // For each target, create opposed test messages, save those message IDs in this test.
-        for(let token of this.context.targets.map(t => WFRP_Utility.getToken(t)))
-        {
-          await this.createOpposedMessage(token)
+        const tokens = this.context.targets.map(t => WFRP_Utility.getToken(t));
+        for (let i = 0; i < tokens.length; i++) {
+          const token = tokens[i];
+          await this.createOpposedMessage(token);
         }
       }
     }
@@ -618,13 +616,12 @@ export default class TestWFRP {
       // }
 
       // Update Message if allowed, otherwise send a request to GM to update
-      if (game.user.isGM || this.message.isAuthor)
-      {
+      if (game.user.isGM || this.message.isAuthor) {
         await this.message.update(chatOptions)
       }
-      else
-        game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: this.message.id, updateData : chatOptions } })
-      
+      else {
+        await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: this.message.id, updateData : chatOptions }, "rendering roll card");
+      }
       await this.updateMessageFlags()
     }
   }
@@ -640,8 +637,7 @@ export default class TestWFRP {
       await this.message.update(update)
 
     else if (this.message) {
-      this.message.flags.testData = data // hopefully temporary solution. Other processes likely need flag data to be present immediately, and the inner socket function cannot be awaited, so set data locally
-      game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: this.message.id, updateData: update} })
+      await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: this.message.id, updateData: update}, "Updating message flags");
     }
   }
 

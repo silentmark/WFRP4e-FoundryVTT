@@ -1255,7 +1255,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
     if (effect.trigger == "apply")
       await game.wfrp4e.utility.applyEffectToTarget(effect)
     else {
-      await game.wfrp4e.utility.runSingleEffect(effect, this.actor, effect.item, {actor : this.actor, effect, item : effect.item});
+      await game.wfrp4e.utility.runSingleEffectAsync(effect, this.actor, effect.item, {actor : this.actor, effect, item : effect.item});
     }
   }
 
@@ -1275,7 +1275,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
           Yes: {
             icon: '<i class="fa fa-check"></i>', label: game.i18n.localize("Yes"), callback: async dlg => {
               await this.actor.deleteEmbeddedDocuments("Item", [itemId]);
-              await this.actor.deleteEffectsFromItem(itemId)
+              await this.actor.deleteEffectsFromItem(itemId);
               li.slideUp(200, () => this.render(false))
             }
           }, cancel: { icon: '<i class="fas fa-times"></i>', label: game.i18n.localize("Cancel") },
@@ -2013,14 +2013,14 @@ export default class ActorSheetWfrp4e extends ActorSheet {
           html += `<div class="action">
           <a class="use-grp-adv" data-index="${i}">${action.name}</a>
           <p>${action.description}</p>
-          <p class="cost"><strong>Koszt</strong>: ${action.cost}</p>
+          <p class="cost"><strong>Cost</strong>: ${action.cost}</p>
           <p class="effect">${action.effect}</p>
           </div><hr>`
         })
       }
       else 
       {
-        html = "Brak dostępnych Akcji"
+        html = "No Actions Available"
       }
       html = await TextEditor.enrichHTML(html, {async: true})
       let el = $(html).hide()
@@ -2141,7 +2141,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       let effectId = ev.target.dataset["effectId"]
       let itemId = ev.target.dataset["itemId"]
 
-      let effect = this.actor.populateEffect(effectId, itemId)
+      let effect =  await this.actor.populateEffect(effectId, itemId)
       let item = this.actor.items.get(itemId)
 
       if (effect.flags.wfrp4e?.reduceQuantity)
@@ -2152,12 +2152,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
           throw ui.notifications.error(game.i18n.localize("EFFECT.QuantityError"))
       }
 
-      if ((
-        !effect.flags.wfrp4e?.notSelf 
-        && item.range 
-        && item.range.value.toLowerCase() == game.i18n.localize("You").toLowerCase()) 
-        && item.target 
-        && item.target.value.toLowerCase() == game.i18n.localize("You").toLowerCase())
+      if ((item.range && item.range.value.toLowerCase() == game.i18n.localize("You").toLowerCase()) && (item.target && item.target.value.toLowerCase() == game.i18n.localize("You").toLowerCase()))
         await game.wfrp4e.utility.applyEffectToTarget(effect, [{ actor: this.actor }]) // Apply to caster (self) 
       else
         await game.wfrp4e.utility.applyEffectToTarget(effect)

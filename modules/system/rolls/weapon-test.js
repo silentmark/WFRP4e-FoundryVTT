@@ -122,7 +122,8 @@ export default class WeaponTest extends AttackTest {
       await this.item.ammo.update({ "system.quantity.value": this.item.ammo.quantity.value - 1 })
     }
     else if (this.preData.ammoId && this.item.consumesAmmo.value && !this.context.edited && !this.context.reroll) {
-      await this.actor.items.get(this.preData.ammoId).update({ "system.quantity.value": this.actor.items.get(this.preData.ammoId).quantity.value - 1 })
+      let ammo = this.actor.items.get(this.preData.ammoId)
+      await ammo.update({ "system.quantity.value": this.actor.items.get(this.preData.ammoId).quantity.value - 1 })
     }
 
 

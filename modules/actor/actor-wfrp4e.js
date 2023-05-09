@@ -205,7 +205,7 @@ export default class ActorWfrp4e extends Actor {
       this.status.encumbrance.max = this.characteristics.t.bonus + this.characteristics.s.bonus;
 
       // I don't really like hardcoding this TODO: put this in Large effect script?
-      if (this.system.details.species?.value?.toLowerCase() == game.i18n.localize("NAME.Ogre").toLowerCase())
+      if (this.system.details.species.value.toLowerCase() == game.i18n.localize("NAME.Ogre").toLowerCase())
       {
         this.status.encumbrance.max *= 2;
       }
@@ -587,9 +587,9 @@ export default class ActorWfrp4e extends Actor {
     }
 
     testData.targets = Array.from(game.user.targets).map(t => t.document.actor.speakerData(t.document))
-    if (canvas.scene) { 
+    if (canvas.scene) {
       game.user.updateTokenTargets([]);
-      game.user.broadcastActivity({targets: []});
+      game.user.broadcastActivity({ targets: [] });
     }
     testData.speaker = this.speakerData();
 
@@ -829,7 +829,7 @@ export default class ActorWfrp4e extends Actor {
    * @param {bool}   event    The event that called this Test, used to determine if attack is melee or ranged.
    */
   async setupWeapon(weapon, options = {}) {
-    
+
     let title = options.title || game.i18n.localize("WeaponTest") + " - " + weapon.name;
     title += options.appendTitle || "";
 
@@ -1105,7 +1105,7 @@ export default class ActorWfrp4e extends Actor {
     if(socket) { 
       return socket;
     }
-   
+
     // channellSkills array holds the available skills/characteristics to  with - Channelling: Willpower
     let channellSkills = [{ char: true, key: "wp", name: game.i18n.localize("CHAR.WP") }]
 
@@ -1220,7 +1220,7 @@ export default class ActorWfrp4e extends Actor {
     if(socket) { 
       return socket;
     }
-   
+
     // ppraySkills array holds the available skills/characteristics to pray with - Prayers: Fellowship
     let praySkills = [{ char: true, key: "fel", name: game.i18n.localize("CHAR.Fel") }]
 
@@ -1851,7 +1851,7 @@ export default class ActorWfrp4e extends Actor {
     // if weapon has pummel - only used for audio
     let pummel = false
 
-    let args = { actor, attacker, opposedTest, damageType, weaponProperties, applyAP, applyTB, totalWoundLoss, AP }
+    let args = { actor, attacker, opposedTest, damageType, weaponProperties, applyAP, applyTB, totalWoundLoss, AP, extraMessages }
     await actor.runEffectsAsync("preTakeDamage", args)
     await attacker.runEffectsAsync("preApplyDamage", args)
     damageType = args.damageType
@@ -1996,7 +1996,7 @@ export default class ActorWfrp4e extends Actor {
       catch (e) { WFRP_Utility.log("Sound Context Error: " + e, true) } // Ignore sound errors
     }
 
-    let scriptArgs = { actor, opposedTest, totalWoundLoss, AP, damageType, updateMsg, messageElements, attacker }
+    let scriptArgs = { actor, opposedTest, totalWoundLoss, AP, damageType, updateMsg, messageElements, attacker, extraMessages }
     await actor.runEffectsAsync("takeDamage", scriptArgs)
     await attacker.runEffectsAsync("applyDamage", scriptArgs)
     Hooks.call("wfrp4e:applyDamage", scriptArgs)
@@ -2004,7 +2004,7 @@ export default class ActorWfrp4e extends Actor {
     let item = opposedTest.attackerTest.item
     let itemDamageEffects = item.damageEffects
     for (let effect of itemDamageEffects) {      
-      await game.wfrp4e.utility.runSingleEffect(effect, actor, item, scriptArgs);
+      await game.wfrp4e.utility.runSingleEffectAsync(effect, actor, item, scriptArgs);
     }
     totalWoundLoss = scriptArgs.totalWoundLoss
 
@@ -2048,8 +2048,7 @@ export default class ActorWfrp4e extends Actor {
 
 
     if (item.properties && item.properties.qualities.slash && updateMsg.includes("critical-roll")) {
-      updateMsg += `<br><b>Cecha Tnący</b>: Wywołuje Krwawienie przy zadaniu Rany Krytycznej, Może wykorzystać ${item.properties.qualities.slash.value} Przewag, aby wywołać dodatkowy poziom krwawienia.`
-    }
+      updateMsg += `<br><b>Cecha Tnący</b>: Wywołuje Krwawienie przy zadaniu Rany Krytycznej, Może wykorzystać ${item.properties.qualities.slash.value} Przewag, aby wywołać dodatkowy poziom krwawienia.` }
 
 
     let daemonicTrait = actor.has(game.i18n.localize("NAME.Daemonic"))
@@ -2157,8 +2156,8 @@ export default class ActorWfrp4e extends Actor {
     }
 
     if (!suppressMsg)
-      return ChatMessage.create({ content: msg })
-    else return msg;
+      await ChatMessage.create({ content: msg })
+    return msg;
   }
 
 
@@ -2175,7 +2174,7 @@ export default class ActorWfrp4e extends Actor {
     for (let t of tokens) {
       canvas.interface.createScrollingText(t.center, change.signedString(), {
         anchor: (change<0) ? CONST.TEXT_ANCHOR_POINTS.BOTTOM: CONST.TEXT_ANCHOR_POINTS.TOP,
-	direction: (change<0) ? 1: 2,
+	      direction: (change<0) ? 1: 2,
         fontSize: 30,
         fill: options.advantage ? "0x6666FF" : change < 0 ? "0xFF0000" : "0x00FF00", // I regret nothing
         stroke: 0x000000,
@@ -3007,13 +3006,12 @@ export default class ActorWfrp4e extends Actor {
 
     if (options.item && options.item.effects)
       effects = effects.concat(options.item.effects.filter(e => e.application == "item" && e.trigger == trigger))
-
-    for (let i = 0; i < effects.length; i++) {
-      let e = effects[i];
+    for (let e of effects) {
       game.wfrp4e.utility.runSingleEffectSync(e, this, e.item, args);
     }
     return effects;
   }
+
 
   async runEffectsAsync(trigger, args, options = {}) {
     // WFRP_Utility.log(`${this.name} > Effect Trigger ${trigger}`)
@@ -3028,7 +3026,6 @@ export default class ActorWfrp4e extends Actor {
         effects.push(loreEffect);
       }
     }
-
 
     // These triggers have a special case where they can specify a specific item to run on
     // If this choice (itemChoice) matches the provided item argument, keep it, otherwise, filter out
@@ -3067,8 +3064,7 @@ export default class ActorWfrp4e extends Actor {
     }
 
     let appliedEffects = [];
-    for(let i = 0; i < effects.length; i++) {
-      let e = effects[i];
+    for (let e of effects) {
       let preArgs = {
         modifier: args?.prefillModifiers?.modifier,
         slBonus: args?.prefillModifiers?.slBonus,
@@ -3076,7 +3072,7 @@ export default class ActorWfrp4e extends Actor {
         difficulty: args?.prefillModifiers?.difficulty
       };
       
-      await game.wfrp4e.utility.runSingleEffect(e, this, e.item, args, options);
+      await game.wfrp4e.utility.runSingleEffectAsync(e, this, e.item, args, options);
 
       if(trigger == "targetPrefillDialog" || trigger == "prefillDialog") {
         this._handleTooltipDiff(e, preArgs, args)
@@ -3569,8 +3565,6 @@ export default class ActorWfrp4e extends Actor {
       ui.notifications.notify(game.i18n.format("ITEM.CreateReloadTest", { weapon: weapon.name }))
       await weapon.update({ "flags.wfrp4e.reloading": item[0].id });
     }
-
-
   }
 
 
@@ -3679,31 +3673,27 @@ export default class ActorWfrp4e extends Actor {
     if (!effect.id)
       return "Conditions require an id field"
 
-    let existing = this.hasCondition(effect.id)
-
-
+    let existing = this.hasCondition(effect.id);
 
     if (existing && !existing.isNumberedCondition) {
       if (effect.id == "unconscious")
-        await this.addCondition("fatigued")
-
-      return existing.delete()
+        await this.addCondition("fatigued");
+      await existing.delete();
+      return;
     }
     else if (existing) {
       await existing.setFlag("wfrp4e", "value", existing.conditionValue - value);
-
       if (existing.conditionValue) // Only display if there's still a condition value (if it's 0, already handled by effect deletion)
-        existing._displayScrollingStatus(false)
-
-      //                                                                                                                     Only add fatigued after stunned if not already fatigued
+        existing._displayScrollingStatus(false);
+      //                                                                                                                   Only add fatigued after stunned if not already fatigued
       if (existing.conditionValue == 0 && (effect.id == "bleeding" || effect.id == "poisoned" || effect.id == "broken" || (effect.id == "stunned" && !this.hasCondition("fatigued")))) {
         if (!game.settings.get("wfrp4e", "mooConditions") || !effect.id == "broken") // Homebrew rule prevents broken from causing fatigue
           await this.addCondition("fatigued")
-
       }
 
       if (existing.conditionValue <= 0)
-        return existing.delete()
+        await existing.delete();
+        return;
     }
   }
 

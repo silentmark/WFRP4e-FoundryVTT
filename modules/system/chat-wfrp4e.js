@@ -350,7 +350,7 @@ export default class ChatWFRP {
     })
   }
 
-  static async _onFearButtonClicked(event) {
+  static _onFearButtonClicked(event) {
     let value = parseInt($(event.currentTarget).attr("data-value"));
     let name = $(event.currentTarget).attr("data-name");
 
@@ -360,47 +360,46 @@ export default class ChatWFRP {
       game.user.broadcastActivity({targets: []});
     }
 
+
     if (game.user.isGM) {
       if (!targets.length)
         return ui.notifications.warn(game.i18n.localize("ErrorTarget"))
-      for (let i = 0; i < targets.length; i++) {
-        let t = targets[i];
-        t.actor.applyFear(value, name);
-      }
-      if (canvas.scene) { 
-        game.user.updateTokenTargets([]);
-        game.user.broadcastActivity({targets: []});
-      }
+      targets.forEach(t => {
+        t.actor.applyFear(value, name)
+        if (canvas.scene) {
+          game.user.updateTokenTargets([]);
+          game.user.broadcastActivity({ targets: [] });
+        }
+      })
     }
     else {
       if (!game.user.character)
         return ui.notifications.warn(game.i18n.localize("ErrorCharAssigned"))
-      await game.user.character.applyFear(value, name)
+      game.user.character.applyFear(value, name)
     }
   }
 
-  static async _onTerrorButtonClicked(event) {
+  static _onTerrorButtonClicked(event) {
     let value = parseInt($(event.currentTarget).attr("data-value"));
     let name = parseInt($(event.currentTarget).attr("data-name"));
     
     let targets = canvas.tokens.controlled.concat(Array.from(game.user.targets))
-    if (canvas.scene) { 
-      game.user.updateTokenTargets([]);
-      game.user.broadcastActivity({targets: []});
+    if (canvas.scene) {
+      game.user.updateTokenTargets([]);      
+      game.user.broadcastActivity({ targets: [] });
     }
 
     if (game.user.isGM) {
       if (!targets.length)
         return ui.notifications.warn(game.i18n.localize("ErrorTarget"))
-      for (let i = 0; i < targets.length; i++) {
-        let t = targets[i];
-        await t.actor.applyTerror(value, name)
-      }
+      targets.forEach(t => {
+        t.actor.applyTerror(value, name)
+      })
     }
     else {
       if (!game.user.character)
         return ui.notifications.warn(game.i18n.localize("ErrorCharAssigned"))
-      await game.user.character.applyTerror(value, name)
+      game.user.character.applyTerror(value, name)
     }
   }
 
@@ -425,9 +424,9 @@ export default class ChatWFRP {
       msg.unsetFlag("wfrp4e", "experienceAwarded").then(m => {
         msg.setFlag("wfrp4e", "experienceAwarded", alreadyAwarded)
       })
-      if (canvas.scene) { 
+      if (canvas.scene){ 
         game.user.updateTokenTargets([]);
-        game.user.broadcastActivity({targets: []});
+        game.user.broadcastActivity({ targets: [] });
       }
     }
     else {
@@ -458,7 +457,7 @@ export default class ChatWFRP {
     if (game.user.isGM)
       await message.update(conditionResult)
     else
-      game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: msgId, updateData: conditionResult } })
+      await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: msgId, updateData: conditionResult }, "executing condition script");
   }
 
   static async _onApplyEffectClick(event) {
@@ -473,7 +472,7 @@ export default class ChatWFRP {
     if (!actor.isOwner)
       return ui.notifications.error("CHAT.ApplyError")
 
-    let effect = actor.populateEffect(effectId, item, test)
+    let effect = await actor.populateEffect(effectId, item, test)
 
           
     if (effect.flags.wfrp4e.effectTrigger == "invoke") {
