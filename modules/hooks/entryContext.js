@@ -1,9 +1,6 @@
 import OpposedWFRP from "../system/opposed-wfrp4e.js";
-import ActorWfrp4e from "../actor/actor-wfrp4e.js";
 import StatBlockParser from "../apps/stat-parser.js";
 import WFRP_Utility from "../system/utility-wfrp4e.js";
-import ItemWfrp4e from "../item/item-wfrp4e.js";
-import OpposedTest from "../system/opposed-test.js";
 
 
 export default function () {
@@ -309,6 +306,7 @@ export default function () {
               } else {
                 let updateMsg = await opposedTest.defender.applyDamage(opposedTest.resultMessage.getOpposedTest(), game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
                 await OpposedWFRP.updateOpposedMessage(updateMsg, opposedTest.resultMessage.id);
+              }
             }
           }
         }
