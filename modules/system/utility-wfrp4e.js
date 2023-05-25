@@ -1149,7 +1149,7 @@ export default class WFRP_Utility {
   }
 
   static async runSingleEffectAsync(effect, actor, item, scriptArgs) {
-    if (effect.isAsync) {
+    if (effect.isAsync || effect.flags?.wfrp4e?.isAsync || effect.flags?.wfrp4e?.script?.indexOf("await ") != -1) {
       try {
         let asyncFunction = Object.getPrototypeOf(async function () { }).constructor
         const func = new asyncFunction("args", effect.flags.wfrp4e.script).bind({ actor, effect, item })
