@@ -164,12 +164,9 @@
         {{/if}}
         {{/if}}
 
-        {{#if showIsAsync}}
+        {{#if canBeAsync}}
         <div class="form-group">
-            <label>{{ localize "EFFECT.IsAsync" }}</label>
-            <div class="form-fields">
-                <input type="checkbox" name="flags.wfrp4e.isAsync" {{checked effect.flags.wfrp4e.isAsync}}/>
-            </div>
+            <label>{{ localize "EFFECT.canBeAsync" }}</label>
         </div>
         {{/if}}
         

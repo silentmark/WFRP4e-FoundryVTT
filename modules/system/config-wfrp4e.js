@@ -1104,7 +1104,6 @@ WFRP4E.PrepareSystemItems = function() {
                     "effectTrigger": "oneTime",
                     "effectApplication": "actor",
                     "terrorValue": 1,
-                    "isAsync": true,
                     "script": `
                         let skillName = game.i18n.localize("NAME.Cool");
                         let setupData = await args.actor.setupSkill(skillName, {terror: true});
@@ -1224,7 +1223,6 @@ WFRP4E.PrepareSystemItems = function() {
                 wfrp4e: {
                     "effectTrigger": "invoke",
                     "effectApplication": "actor",
-                    "isAsync": true,
                     "script": `
                         let tb = this.actor.characteristics.t.bonus
                         let damage = (await new Roll("1d10").roll()).total
@@ -1288,7 +1286,6 @@ WFRP4E.PrepareSystemItems = function() {
                 wfrp4e: {
                     "effectTrigger": "invoke",
                     "effectApplication": "actor",
-                    "isAsync": true,
                     "script": `
                         let tb = this.actor.characteristics.t.bonus
                         let damage = (await new Roll("1d10").roll()).total
@@ -1341,7 +1338,6 @@ WFRP4E.PrepareSystemItems = function() {
                 wfrp4e: {
                     "effectTrigger": "invoke",
                     "effectApplication": "actor",
-                    "isAsync": true,
                     "script": `
                     let tb = this.actor.characteristics.t.bonus
                     let damage = (await new Roll("1d10").roll()).total
@@ -1394,7 +1390,6 @@ WFRP4E.PrepareSystemItems = function() {
                 wfrp4e: {
                     "effectTrigger": "invoke",
                     "effectApplication": "actor",
-                    "isAsync": true,
                     "script": `
                     let tb = this.actor.characteristics.t.bonus
                     let damage = (await new Roll("1d10").roll()).total

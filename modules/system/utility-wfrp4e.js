@@ -1149,7 +1149,7 @@ export default class WFRP_Utility {
   }
 
   static async runSingleEffectAsync(effect, actor, item, scriptArgs) {
-    if (effect.isAsync || effect.flags?.wfrp4e?.isAsync || effect.flags?.wfrp4e?.script?.indexOf("await ") != -1) {
+    if (WFRP_Utility.canBeAsync(effect)) {
       try {
         let asyncFunction = Object.getPrototypeOf(async function () { }).constructor
         const func = new asyncFunction("args", effect.flags.wfrp4e.script).bind({ actor, effect, item })
@@ -1177,6 +1177,10 @@ export default class WFRP_Utility {
       console.error("Error when running effect " + effect.label + " - If this effect comes from an official module, try replacing the actor/item from the one in the compendium. If it still throws this error, please use the Bug Reporter and paste the details below, as well as selecting which module and 'Effect Report' as the label.")
       console.error(`REPORT\n-------------------\nEFFECT:\t${effect.label}\nACTOR:\t${actor.name} - ${actor.id}\nERROR:\t${ex}`)
     }
+  }
+
+  static canBeAsync (effect) {
+    return (game.wfrp4e.config.syncEffectTriggers.indexOf(effect.trigger) === -1)
   }
 
   static async invokeEffect(actor, effectId, itemId) {
@@ -1232,6 +1236,11 @@ export default class WFRP_Utility {
   }
 
   static async toggleMorrslieb() {
+
+    if (game.release.generation == 11) {
+      return ui.notifications.error("Morrslieb is currently not functional in V11")
+    }
+
     let morrsliebActive = canvas.scene.getFlag("wfrp4e", "morrslieb")
     morrsliebActive = !morrsliebActive
     await canvas.scene.setFlag("wfrp4e", "morrslieb", morrsliebActive)
