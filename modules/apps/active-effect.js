@@ -11,8 +11,8 @@ export default class WFRPActiveEffectConfig extends ActiveEffectConfig {
         return options;
     }
 
-    getData() {
-        let data = super.getData()
+    async getData() {
+        let data = await super.getData()
         data.effectTriggers = game.wfrp4e.config.effectTriggers;
         let type = getProperty(data, "effect.flags.wfrp4e.effectTrigger")
         if (type && type != "dialogChoice")
@@ -20,7 +20,7 @@ export default class WFRPActiveEffectConfig extends ActiveEffectConfig {
             data.showEditor = true;
             data.placeholder = game.wfrp4e.config.effectPlaceholder[type] + game.wfrp4e.config.effectPlaceholder.this
             if (game.wfrp4e.config.syncEffectTriggers.indexOf(type) === -1)
-                data.showIsAsync = true;
+                data.showCanBeAsync = true;
         }
 
         if (type == "prepareItem" || type == "prePrepareItem")

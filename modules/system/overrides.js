@@ -74,7 +74,7 @@ export default function () {
 
 
     let args = { initiative: initiativeFormula }
-    actor.runEffectsSync("getInitiativeFormula", args)
+    actor.runEffects("getInitiativeFormula", args)
 
     return args.initiative;
   };

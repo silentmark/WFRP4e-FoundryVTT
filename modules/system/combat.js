@@ -87,7 +87,7 @@ export default class CombatHelpers {
                 canvas.tokens.cycleTokens(1, true);
             }
 
-            await combatant.actor.runEffectsAsync("startTurn", combat)
+            await combatant.actor.runEffects("startTurn", combat)
         }
         WFRP_Audio.PlayContextAudio({ item: { type: 'round' }, action: "change" })
     }
@@ -110,7 +110,7 @@ export default class CombatHelpers {
                     await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
                 }
             }
-            await combatant.actor.runEffectsAsync("endTurn", combat)
+            await combatant.actor.runEffects("endTurn", combat)
         }
     }
 
@@ -352,7 +352,7 @@ export default class CombatHelpers {
                     }
                 }
             }
-            await turn.actor.runEffectsAsync("endRound", combat, {async: true})
+            await turn.actor.runEffects("endRound", combat, {async: true})
 
         }
         if (removedConditions.length)
@@ -385,7 +385,7 @@ export default class CombatHelpers {
 
         for (let turn of combat.turns) {
             await turn.actor.update({ "system.status.advantage.value": 0 }, {skipGroupAdvantage: true})
-            await turn.actor.runEffectsAsync("endCombat", combat)
+            await turn.actor.runEffects("endCombat", combat)
         }
     }
 }

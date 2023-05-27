@@ -3,6 +3,7 @@ import WFRP_Tables from "./tables-wfrp4e.js";
 import ItemWfrp4e from "../item/item-wfrp4e.js";
 import ChatWFRP from "./chat-wfrp4e.js";
 import ItemDialog from "../apps/item-dialog.js";
+import TestWFRP from "../system/rolls/test-wfrp4e.js";
 
 
 /**
@@ -1145,38 +1146,31 @@ export default class WFRP_Utility {
       }
     }
 
-    await WFRP_Utility.runSingleEffectAsync(effect, actor, null, { actor });
+    await WFRP_Utility.runSingleEffect(effect, actor, null, { actor });
   }
-
-  static async runSingleEffectAsync(effect, actor, item, scriptArgs) {
-    if (effect.isAsync) {
+  
+  static async runSingleEffect(effect, actor, item, scriptArgs) {
       try {
-        let asyncFunction = Object.getPrototypeOf(async function () { }).constructor
-        const func = new asyncFunction("args", effect.flags.wfrp4e.script).bind({ actor, effect, item })
-        WFRP_Utility.log(`${this.name} > Running Async ${effect.label}`)
-        await func(scriptArgs);
+        if (WFRP_Utility.effectCanBeAsync(effect)) {
+          let asyncFunction = Object.getPrototypeOf(async function () { }).constructor
+          const func = new asyncFunction("args", effect.flags.wfrp4e.script).bind({ actor, effect, item })
+          WFRP_Utility.log(`${this.name} > Running Async ${effect.label}`)
+          await func(scriptArgs);
+        } else {
+          let func = new Function("args", effect.flags.wfrp4e.script).bind({ actor, effect, item })
+          WFRP_Utility.log(`${this.name} > Running ${effect.label}`)
+          func(scriptArgs);      
+        }
       }
       catch (ex) {
         ui.notifications.error(game.i18n.format("ERROR.EFFECT", { effect: effect.label }))
         console.error("Error when running effect " + effect.label + " - If this effect comes from an official module, try replacing the actor/item from the one in the compendium. If it still throws this error, please use the Bug Reporter and paste the details below, as well as selecting which module and 'Effect Report' as the label.")
         console.error(`REPORT\n-------------------\nEFFECT:\t${effect.label}\nACTOR:\t${actor.name} - ${actor.id}\nERROR:\t${ex}`)
       }
-    } else {
-      WFRP_Utility.runSingleEffectSync(effect, actor, item, scriptArgs);
-    }
   }
-  
-  static runSingleEffectSync(effect, actor, item, scriptArgs) {
-    try {
-      let func = new Function("args", effect.flags.wfrp4e.script).bind({ actor, effect, item })
-      WFRP_Utility.log(`${this.name} > Running ${effect.label}`)
-      func(scriptArgs);      
-    }
-    catch (ex) {
-      ui.notifications.error(game.i18n.format("ERROR.EFFECT", { effect: effect.label }))
-      console.error("Error when running effect " + effect.label + " - If this effect comes from an official module, try replacing the actor/item from the one in the compendium. If it still throws this error, please use the Bug Reporter and paste the details below, as well as selecting which module and 'Effect Report' as the label.")
-      console.error(`REPORT\n-------------------\nEFFECT:\t${effect.label}\nACTOR:\t${actor.name} - ${actor.id}\nERROR:\t${ex}`)
-    }
+
+  static effectCanBeAsync (effect) {
+    return (game.wfrp4e.config.syncEffectTriggers.indexOf(effect.trigger) === -1)
   }
 
   static async invokeEffect(actor, effectId, itemId) {
@@ -1191,7 +1185,7 @@ export default class WFRP_Utility {
     }
      
     await effect.reduceItemQuantity()
-    await WFRP_Utility.runSingleEffectAsync(effect, actor, item, {actor, effect, item});
+    await WFRP_Utility.runSingleEffect(effect, actor, item, {actor, effect, item});
   }
 
   /**

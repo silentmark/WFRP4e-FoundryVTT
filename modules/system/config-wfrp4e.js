@@ -1104,7 +1104,6 @@ WFRP4E.PrepareSystemItems = function() {
                     "effectTrigger": "oneTime",
                     "effectApplication": "actor",
                     "terrorValue": 1,
-                    "isAsync": true,
                     "script": `
                         let skillName = game.i18n.localize("NAME.Cool");
                         let setupData = await args.actor.setupSkill(skillName, {terror: true});
@@ -1224,7 +1223,6 @@ WFRP4E.PrepareSystemItems = function() {
                 wfrp4e: {
                     "effectTrigger": "invoke",
                     "effectApplication": "actor",
-                    "isAsync": true,
                     "script": `
                         let tb = this.actor.characteristics.t.bonus
                         let damage = (await new Roll("1d10").roll()).total
@@ -1288,7 +1286,6 @@ WFRP4E.PrepareSystemItems = function() {
                 wfrp4e: {
                     "effectTrigger": "invoke",
                     "effectApplication": "actor",
-                    "isAsync": true,
                     "script": `
                         let tb = this.actor.characteristics.t.bonus
                         let damage = (await new Roll("1d10").roll()).total
@@ -1341,7 +1338,6 @@ WFRP4E.PrepareSystemItems = function() {
                 wfrp4e: {
                     "effectTrigger": "invoke",
                     "effectApplication": "actor",
-                    "isAsync": true,
                     "script": `
                     let tb = this.actor.characteristics.t.bonus
                     let damage = (await new Roll("1d10").roll()).total
@@ -1394,7 +1390,6 @@ WFRP4E.PrepareSystemItems = function() {
                 wfrp4e: {
                     "effectTrigger": "invoke",
                     "effectApplication": "actor",
-                    "isAsync": true,
                     "script": `
                     let tb = this.actor.characteristics.t.bonus
                     let damage = (await new Roll("1d10").roll()).total
@@ -1766,7 +1761,7 @@ WFRP4E.conditionScripts = {
         let msg = `<h2>${game.i18n.localize("WFRP4E.ConditionName.Ablaze")}</h2><b>${game.i18n.localize("Formula")}</b>: @FORMULA<br><b>${game.i18n.localize("Roll")}</b>: @ROLLTERMS` 
         
         let args = {msg, formula}
-        await actor.runEffectsAsync("preApplyCondition", {effect, data : args});
+        await actor.runEffects("preApplyCondition", {effect, data : args});
         formula = args.formula;
         msg = args.msg;
         let roll = await new Roll(`${formula}`).roll({async: true});
@@ -1779,7 +1774,7 @@ WFRP4E.conditionScripts = {
         msg += damageMsg.join("");
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await actor.runEffectsAsync("applyCondition", {effect, data : {messageData}})
+        await actor.runEffects("applyCondition", {effect, data : {messageData}})
         return messageData
     },
     "poisoned" : async function (actor) {
@@ -1788,13 +1783,13 @@ WFRP4E.conditionScripts = {
 
         let damage = effect.conditionValue;
         let args = {msg, damage};
-        await actor.runEffectsAsync("preApplyCondition", {effect, data : args})
+        await actor.runEffects("preApplyCondition", {effect, data : args})
         msg = args.msg;
         damage = args.damage;
         msg += await actor.applyBasicDamage(damage, {damageType : game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL, suppressMsg : true})
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await actor.runEffectsAsync("applyCondition", {effect, data : {messageData}})
+        await actor.runEffects("applyCondition", {effect, data : {messageData}})
         return messageData
     },
     "bleeding" : async function(actor) {
@@ -1805,7 +1800,7 @@ WFRP4E.conditionScripts = {
 
         let damage = effect.conditionValue;
         let args = {msg, damage};
-        await actor.runEffectsAsync("preApplyCondition", {effect, data : args})
+        await actor.runEffects("preApplyCondition", {effect, data : args})
         msg = args.msg;
         damage = args.damage;
         msg += await actor.applyBasicDamage(damage, {damageType : game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL, minimumOne : false, suppressMsg : true})
@@ -1837,7 +1832,7 @@ WFRP4E.conditionScripts = {
 
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await actor.runEffectsAsync("applyCondition", {effect, data : {messageData, bleedingRoll}})
+        await actor.runEffects("applyCondition", {effect, data : {messageData, bleedingRoll}})
         return messageData
     },
     "stunned" : async function(actor) {
