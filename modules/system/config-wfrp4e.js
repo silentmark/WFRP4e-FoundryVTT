@@ -1637,6 +1637,7 @@ WFRP4E.PrepareSystemItems = function() {
             label: "WFRP4E.ConditionName.Broken",
             flags: {
                 wfrp4e: {
+                    "trigger": "endRound",
                     "effectTrigger": "prefillDialog",
                     "script": "args.prefillModifiers.modifier -= 10 * this.effect.conditionValue",
                     "value": 1
