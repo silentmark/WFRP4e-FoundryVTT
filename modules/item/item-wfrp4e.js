@@ -180,7 +180,7 @@ export default class ItemWfrp4e extends Item {
     if (this[`${functionName}`])
       this[`${functionName}`]()
 
-
+      
   }
 
   prepareOwnedData() {
@@ -275,8 +275,8 @@ export default class ItemWfrp4e extends Item {
 
   prepareSkill() { }
   prepareOwnedSkill() {
-    this.total.value = this.modifier.value + this.advances.value + this.characteristic.value
-    this.advances.indicator = this.advances.force;
+    this.system.total.value = this.system.modifier.value + this.system.advances.value + this.characteristic.value
+    this.system.advances.indicator = this.system.advances.force;
   }
 
   prepareSpell() {
