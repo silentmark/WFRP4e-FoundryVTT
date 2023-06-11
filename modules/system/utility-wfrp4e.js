@@ -1388,7 +1388,8 @@ export default class WFRP_Utility {
       await new Promise(r => setTimeout(r, 1000));
       msg = game.messages.get(msg.id);
     } while(!msg.flags?.data?.test)
-    return TestWFRP.recreate(msg.flags.data.test.data);
+    const test = TestWFRP.recreate(msg.flags.data.test.data);
+    return test;
   }
 
   static async awaitSocket(owner, type, payload, content) {

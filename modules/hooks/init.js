@@ -379,6 +379,13 @@ export default function() {
       type: Object
     });
 
+    game.settings.register("wfrp4e", "isCheatMode", {
+      scope: "world",
+      config: false,
+      default: false,
+      type: Boolean
+    });
+
     game.settings.register("wfrp4e", "mooAdvantage", {
       name: "SETTINGS.MooAdvantage",
       hint: "SETTINGS.MooAdvantageHint",

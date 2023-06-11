@@ -93,6 +93,10 @@
             {{#if test.result.misfire}}
             - <a class ="table-click fumble-roll" data-damage="{{test.result.misfireDamage}}" data-table = "misfire"><i class="fas fa-list"></i> {{test.result.misfire}}</a>
             {{/if}}
+            
+            {{#if test.result.mis}}
+            - <a class ="table-click fumble-roll" title="{{test.result.tooltips.miscast}}" data-modifier="{{test.result.miscastModifier}}" data-table="{{test.result.miscastTable}}"><i class="fas fa-list"></i> {{test.result.mis}}</a>
+            {{/if}}
         </div>
     
         {{#if test.result.hitloc}}

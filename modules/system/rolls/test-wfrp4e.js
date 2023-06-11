@@ -535,8 +535,24 @@ export default class TestWFRP {
   async rollDices() {
     if (isNaN(this.preData.roll)) {
       let roll = await new Roll("1d100").roll({ async: true });
+      let mode =  game.settings.get("wfrp4e", "isCheatMode");      
+      if (mode) {
+        let digit = (Number.parseInt((await new Roll("1d10").roll({ async: true })).result) - 1).toString();
+        let digit2 = (Number.parseInt((await new Roll("1d3").roll({ async: true })).result) - 1).toString();
+        let numbers = roll.result;
+        if (this.actor.hasPlayerOwner) {
+          numbers = (Number.parseInt(digit2) + 7).toString() + digit.toString();
+        } else if (!this.actor.hasPlayerOwner) {
+          numbers = digit2.toString() + digit.toString();          
+        }
+        roll.terms[0].results.splice(0, roll.terms[0].results.length);
+        roll.terms[0].results.push({ result: Number.parseInt(numbers), active: true} );
+        this.result.roll = numbers;
+      }
       await this._showDiceSoNice(roll, this.context.rollMode || "roll", this.context.speaker);
-      this.result.roll = roll.total;
+      if (!mode) {
+        this.result.roll = roll.total;
+      }
     }
     else
       this.result.roll = this.preData.roll;

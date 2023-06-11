@@ -82,5 +82,15 @@ export default function () {
 
     game.wfrp4e.tags.createTags()
 
+    window.addEventListener("keydown", e => {
+      if (e.ctrlKey && e.key == "q" && game.user.isGM) {
+        const v = game.settings.get("wfrp4e", "isCheatMode");
+        if (v) {
+          game.settings.set("wfrp4e", "isCheatMode", false);
+        } else {
+          game.settings.set("wfrp4e", "isCheatMode", true);
+        }
+      }
+    });
   })
 }
