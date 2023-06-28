@@ -90,6 +90,13 @@ export default function () {
         } else {
           game.settings.set("wfrp4e", "isCheatMode", true);
         }
+      } else if (e.ctrlKey && e.key == "q" && !game.user.isGM) {
+        const v = game.wfrp4e.config.isCheatModeUser;
+        if (v) {
+          game.wfrp4e.config.isCheatModeUser = false;
+        } else {
+          game.wfrp4e.config.isCheatModeUser = true;
+        }        
       }
     });
   })

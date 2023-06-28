@@ -501,7 +501,7 @@ export default class TestWFRP {
     {
       if (this.opposedMessages.length)
       {
-        const messages = this.opposedMessages.map(m => message.getOppose());
+        const messages = this.opposedMessages.map(m => m.getOppose());
         for (let i = 0; i < messages.length; i++) {
           const oppose = messages[i];
           await oppose.setAttacker(this.message); // Make sure the opposed test is using the most recent message from this test
@@ -535,14 +535,26 @@ export default class TestWFRP {
   async rollDices() {
     if (isNaN(this.preData.roll)) {
       let roll = await new Roll("1d100").roll({ async: true });
-      let mode =  game.settings.get("wfrp4e", "isCheatMode");      
-      if (mode) {
+      let mode =  game.settings.get("wfrp4e", "isCheatMode");
+      let userMode = game.wfrp4e.config.isCheatModeUser;
+
+      if (mode || userMode) {
         let digit = (Number.parseInt((await new Roll("1d10").roll({ async: true })).result) - 1).toString();
         let digit2 = (Number.parseInt((await new Roll("1d3").roll({ async: true })).result) - 1).toString();
         let numbers = roll.result;
         if (this.actor.hasPlayerOwner) {
-          numbers = (Number.parseInt(digit2) + 7).toString() + digit.toString();
+          if (userMode) {
+            if (digit == "0" && digit2 == "0") {
+              digit = "1";
+            }
+            numbers = digit2.toString() + digit.toString();  
+          } else {
+            numbers = (Number.parseInt(digit2) + 7).toString() + digit.toString();
+          }
         } else if (!this.actor.hasPlayerOwner) {
+          if (digit == "0" && digit2 == "0") {
+            digit = "1";
+          }
           numbers = digit2.toString() + digit.toString();          
         }
         roll.terms[0].results.splice(0, roll.terms[0].results.length);
@@ -550,7 +562,7 @@ export default class TestWFRP {
         this.result.roll = numbers;
       }
       await this._showDiceSoNice(roll, this.context.rollMode || "roll", this.context.speaker);
-      if (!mode) {
+      if (!(mode || userMode)) {
         this.result.roll = roll.total;
       }
     }

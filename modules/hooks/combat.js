@@ -13,7 +13,7 @@ export default function() {
   })
 
   Hooks.on("createCombatant", async combatant => {
-    if (game.settings.get("wfrp4e", "useGroupAdvantage")) {
+    if (game.settings.get("wfrp4e", "useGroupAdvantage") && game.user.isGM) {
       let advantage = game.settings.get("wfrp4e", "groupAdvantageValues")
       await combatant.actor.update({"system.status.advantage.value" : advantage[combatant.actor.advantageGroup]}, {fromGroupAdvantage : true})
     }
@@ -27,7 +27,7 @@ export default function() {
   });
 
   Hooks.on("updateToken", async function(scene, tokenData, diffData, options, userId) {
-    if (game.combat?.active) { 
+    if (game.combat?.active && game.user.isGM) {
       let combatant = game.combat.turns.find(x => x.tokenId == tokenData._id);
       let token = game.canvas.tokens.getDocuments().find(x => x._id == tokenData._id);
       if(!token || !combatant) return;
