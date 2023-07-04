@@ -1403,7 +1403,7 @@ export default class WFRP_Utility {
 
   static async createSocketRequestMessage(owner, content) {
     let chatData = {
-      content: "<b><u>" + owner.name + "</u></b>: " + content,
+      content: `<p class='requestmessage'><b><u>${owner.name}</u></b>: ${content}</p?`,
       whisper: ChatMessage.getWhisperRecipients("GM")
     }
     if (game.user.isGM) {
@@ -1413,6 +1413,7 @@ export default class WFRP_Utility {
     return msg;
   }
 
+  
 
   static mergeCareerReplacements(replacements)
   {

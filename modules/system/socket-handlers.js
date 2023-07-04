@@ -55,9 +55,9 @@ export default class SocketHandlers  {
         if (game.user.id != data.payload.userId)
             return
         
-        let notification = "Received Apply Effect"
+        let notification = "Zaaplikuj efekt"
         if (data.payload.effect.flags?.wfrp4e?.hide !== true) 
-          notification +=  ` for ${data.payload.effect.label}`
+          notification +=  ` o nazwie: ${data.payload.effect.label}`
         ui.notifications.notify(notification)
 
         let actor = new ActorWfrp4e(data.payload.actorData)

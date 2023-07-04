@@ -81,23 +81,5 @@ export default function () {
     canvas.tokens.placeables.forEach(t => t.drawEffects())
 
     game.wfrp4e.tags.createTags()
-
-    window.addEventListener("keydown", e => {
-      if (e.ctrlKey && e.key == "q" && game.user.isGM) {
-        const v = game.settings.get("wfrp4e", "isCheatMode");
-        if (v) {
-          game.settings.set("wfrp4e", "isCheatMode", false);
-        } else {
-          game.settings.set("wfrp4e", "isCheatMode", true);
-        }
-      } else if (e.ctrlKey && e.key == "q" && !game.user.isGM) {
-        const v = game.wfrp4e.config.isCheatModeUser;
-        if (v) {
-          game.wfrp4e.config.isCheatModeUser = false;
-        } else {
-          game.wfrp4e.config.isCheatModeUser = true;
-        }        
-      }
-    });
   })
 }

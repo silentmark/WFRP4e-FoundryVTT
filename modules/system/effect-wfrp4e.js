@@ -63,7 +63,7 @@ export default class EffectWfrp4e extends ActiveEffect {
       }
       const text = `${enabled ? "+" : "-"}(${this.name || this.label})`;
       for ( let t of tokens ) {
-        if ( !t.visible || !t.renderable ) continue;
+        if ( !t || !t.visible || !t.renderable || !canvas.interface) continue;
         canvas.interface.createScrollingText(t.center, text, {
           anchor: CONST.TEXT_ANCHOR_POINTS.CENTER,
           direction: enabled ? CONST.TEXT_ANCHOR_POINTS.TOP : CONST.TEXT_ANCHOR_POINTS.BOTTOM,
