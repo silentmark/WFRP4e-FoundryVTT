@@ -2010,12 +2010,6 @@ WFRP4E.effectPlaceholder = {
     Example: 
     if (args.type == "skill" && args.item.name == "Athletics") args.prefillModifiers.modifier += 10`,
 
-    "prePrepareData" : 
-    `This effect is applied before any actor data is calculated. Cannot be async.
-    args:
-
-    actor : actor who owns the effect
-    `,
     "update" : 
     `This effect runs when an actor or an embedded document is changed. Can be async.
     args:

@@ -24,15 +24,6 @@
   "styles": [
     "./css/wfrp4e.css"
   ],
-  "packs": [
-    {
-      "name": "basic",
-      "label": "Basic Items",
-      "system": "wfrp4e",
-      "path": "./packs/basic.db",
-      "type": "Item"
-    }
-  ],
   "languages": [
     {
       "lang": "en",

@@ -3085,7 +3085,7 @@ export default class ActorWfrp4e extends Actor {
     const modifierDiff = (postArgs.prefillModifiers.modifier - preArgs.modifier);
     const slBonusDiff = (postArgs.prefillModifiers.slBonus - preArgs.slBonus);
     const successBonusDiff = (postArgs.prefillModifiers.successBonus - preArgs.successBonus);
-    const difficultyDiff = postArgs.prefillModifiers.difficulty !== preArgs.difficulty ? preArgs.prefillModifiers.difficulty : "";
+    const difficultyDiff = postArgs.prefillModifiers.difficulty !== preArgs.difficulty ? postArgs.prefillModifiers.difficulty : "";
 
     effect.tooltip = effect.label;
     if (modifierDiff) {
