@@ -13765,7 +13765,10 @@ font-family: var(--actor-input-font-family);
       color: #b9b9b9;
     }
 
-
+  /* ================== 16. ROLL-TABLE CONFIG ============== */
+  .app.window-app.sheet.roll-table-config .editable > .form-group.stacked {
+    background: url(../ui/frames/parchment-texture.webp);
+  }
   
 /******************************************************************/
 /******************************************************************/
