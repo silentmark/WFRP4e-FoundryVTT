@@ -53,7 +53,7 @@ import { ChargenStage } from "./modules/apps/chargen/stage.js";
 Hooks.once("init", async function () {
 
   // #if _ENV === "development"
-  CONFIG.debug.wfrp4e = true;
+  // CONFIG.debug.wfrp4e = true;
   WFRP_Utility.log("Development Mode: Logs on")
   //#endif
 

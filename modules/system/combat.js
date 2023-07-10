@@ -35,12 +35,20 @@ export default class CombatHelpers {
         await CombatHelpers.checkFearTerror(combat);
     }
 
-    static async updateCombat(combat, changes, context) {  
-        const cTurn = combat.current.turn;
-        const pTurn = foundry.utils.getProperty(context, `wfrp4e.previousTR.T`);
-        const cRound = combat.current.round;
-        const pRound = foundry.utils.getProperty(context, `wfrp4e.previousTR.R`);
+    static async updateCombat(combat, changes, context) {
+        if(getProperty(context, "wfrp4e-pl-addons.shouldReroll")) return;
+
+        let cTurn = combat.current.turn;
+        let pTurn = foundry.utils.getProperty(context, `wfrp4e.previousTR.T`);
+        let cRound = combat.current.round;
+        let pRound = foundry.utils.getProperty(context, `wfrp4e.previousTR.R`);
     
+        if (changes?.flags && changes?.flags['wfrp4e-pl-addons'] && changes.flags['wfrp4e-pl-addons'].reroll) {
+            pRound -= 1;
+            changes.turn = cTurn;
+            changes.round = cRound;
+        }
+
         // no change in turns nor rounds.
         if (changes.turn === undefined && changes.round === undefined) return;
         // combat not started or not active.
@@ -53,19 +61,19 @@ export default class CombatHelpers {
         const previousId = foundry.utils.getProperty(context, `wfrp4e.previousCombatant`);
         const wasStarted = foundry.utils.getProperty(context, `wfrp4e.started`);
         const previousCombatant = wasStarted ? combat.combatants.get(previousId) : null;
-    
+
+        if (combat.round != 1 && combat.turns && combat.active) {
+            if (cRound > 1 && combat.current.turn == 0) {
+                await CombatHelpers.checkEndRoundConditions(combat);
+                await CombatHelpers.fearReminders(combat);
+            }
+        }
+        
         if (previousCombatant) {
             CombatHelpers.endTurnChecks(combat, previousCombatant);
         }
         if (currentCombatant) {
             CombatHelpers.startTurnChecks(combat, currentCombatant);
-        }
-
-        if (combat.round != 0 && combat.turns && combat.active) {
-            if (combat.current.turn > -1 && combat.current.turn == combat.turns.length - 1) {
-                await CombatHelpers.checkEndRoundConditions(combat);
-                await CombatHelpers.fearReminders(combat);
-            }
         }
     }
 
