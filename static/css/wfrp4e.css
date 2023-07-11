@@ -1,8 +1,8 @@
 /******************************************************************/
 /*=============== TABLE OF CONTENTS ==============================*/
 /******************************************************************/
-/*   II. GENERAL USER INTERFACE                                   */
 /*   I. LOCAL FONTS                                               */
+/*   II. GENERAL USER INTERFACE                                   */
 /*   III. SIDEBAR                                                 */
 /*   IV. ITEM SHEET                                               */
 /*   V. ACTOR SHEET (CHARACTER)                                   */ 
@@ -8047,11 +8047,29 @@
     }
 
     .app.window-app.sheet.wfrp4e.actor .tab.cargo.active .inventory-list .collapsed-icons .img,
-    .app.window-app.sheet.wfrp4e.actor .tab.inventory.active .inventory-list .collapsed-icons img{
+    .app.window-app.sheet.wfrp4e.actor .tab.inventory.active .inventory-list .collapsed-icons img,
+    .app.window-app.sheet.wfrp4e.actor .tab.cargo.active .inventory-list .collapsed-icons a.item-edit,
+    .app.window-app.sheet.wfrp4e.actor .tab.inventory.active .inventory-list .collapsed-icons a.item-edit{
+      display: block;
       width: 25px;
       height: 25px;
     }
 
+    .app.window-app.sheet.wfrp4e.actor .tab.cargo.active .inventory-list .collapsed-icons.has-toggle .item,
+    .app.window-app.sheet.wfrp4e.actor .tab.inventory.active .inventory-list .collapsed-icons.has-toggle .item {
+      height: 43px;
+      width: 25px;
+    }
+    .app.window-app.sheet.wfrp4e.actor .tab.cargo.active .inventory-list .collapsed-icons.has-toggle div.toggle,
+    .app.window-app.sheet.wfrp4e.actor .tab.inventory.active .inventory-list .collapsed-icons.has-toggle div.toggle {
+      width: 25px;
+      text-align: center;
+      padding-top: 1px;
+    }
+    .app.window-app.sheet.wfrp4e.actor .tab.cargo.active .inventory-list .collapsed-icons .item-toggle,
+    .app.window-app.sheet.wfrp4e.actor .tab.inventory.active .inventory-list .collapsed-icons .item-toggle {
+      font-size: 12px;
+    }
 
     .app.window-app.sheet.wfrp4e.actor .tab.inventory.active .inventory-header.currency-header .name {
       position: relative;
@@ -12250,7 +12268,7 @@ font-family: var(--actor-input-font-family);
 
 
 /******************************************************************/
-/*=============== XIV. MISCELLANEOUS GAME WINDOWS ================*/
+/*=============== XV. MISCELLANEOUS GAME WINDOWS ================*/
 /******************************************************************/
 
 /* ==================== (A) DEFAULT WINDOWS =================== */
@@ -13765,10 +13783,11 @@ font-family: var(--actor-input-font-family);
       color: #b9b9b9;
     }
 
+
   /* ================== 16. ROLL-TABLE CONFIG ============== */
-  .app.window-app.sheet.roll-table-config .editable > .form-group.stacked {
-    background: url(../ui/frames/parchment-texture.webp);
-  }
+    .app.window-app.sheet.roll-table-config .editable > .form-group.stacked {
+      background: url(../ui/frames/parchment-texture.webp);
+    }
   
 /******************************************************************/
 /******************************************************************/
@@ -13778,7 +13797,7 @@ font-family: var(--actor-input-font-family);
 
 
 /******************************************************************/
-/*=============== XV. HOTBAR =====================================*/
+/*=============== XIV. HOTBAR =====================================*/
 /******************************************************************/
 
   /* ==================== (A) WINDOW FRAMEWORK ================== */
@@ -16267,28 +16286,15 @@ input[name="dd-import.importPath"] {
 
 
 /* FX MASTER STYLING */
-.fxmaster .config.collapsible .flexrow strong {
-  font-weight: normal;
-}
-
-#specials-config {
-  max-height: fit-content;
-  min-height: fit-content;
-  height: fit-content !important;
-}
-#specials-config .window-header .close {
-  position: absolute;
-  top: 9px;
-  left: auto;
-  right: 7px;
-}
 #specials-config .window-content {
   max-height: fit-content;
   min-height: fit-content;
   padding: 7px 7px;
 }
   #specials-config .window-content .directory .directory-header {
-    display: none;
+    margin: 5px;
+    background: #352516;
+    border: 1px solid #736953a6;
   }
   #specials-config .window-content .directory-list {
     max-height: fit-content;
@@ -16302,6 +16308,7 @@ input[name="dd-import.importPath"] {
        background: #bb8b4326;
        box-shadow: inset 0px 0px 3px black;
        border: none;
+       font-size: unset;
     }
      #specials-config .window-content .directory-list .directory-item img {
       border-radius: 30px;
@@ -16310,9 +16317,6 @@ input[name="dd-import.importPath"] {
     #specials-config .window-content .directory-list .directory-item:nth-child(odd) {
       background: #69573c47;
     }
-  #specials-config .window-content .directory-footer {
-    display: none;
-  }
 
 /* ======================= */
 
