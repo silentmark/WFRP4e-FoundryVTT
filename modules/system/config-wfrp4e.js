@@ -1896,6 +1896,10 @@ WFRP4E.conditionScripts = {
     }
 }
 
+WFRP4E.customPrefillModifiers = {
+
+};
+
 WFRP4E.effectTextStyle = CONFIG.canvasTextStyle.clone();
 WFRP4E.effectTextStyle.fontSize = "30";
 WFRP4E.effectTextStyle.fontFamily="CaslonAntique"

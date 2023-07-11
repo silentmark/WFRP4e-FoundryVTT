@@ -2688,8 +2688,14 @@ export default class ActorWfrp4e extends Actor {
       slBonus = effectModifiers.slBonus;
       successBonus = effectModifiers.successBonus;
 
+      let customModifiers = { modifier, difficulty, slBonus, successBonus };
+      await this.customPrefillModifiers(item, type, options, tooltip, customModifiers);
 
-
+      modifier = customModifiers.modifier;
+      difficulty = customModifiers.difficulty;
+      slBonus = customModifiers.slBonus;
+      successBonus = customModifiers.successBonus;
+      
       if (options.absolute) {
         modifier = options.absolute.modifier || modifier
         difficulty = options.absolute.difficulty || difficulty
@@ -2952,6 +2958,23 @@ export default class ActorWfrp4e extends Actor {
       sizeModifier: modifier,
       sizeSuccessBonus: successBonus,
       sizeSLBonus: slBonus
+    }
+  }
+
+  /**
+   * Construct custom modifiers that doesn't fit to effects.
+   *
+   * For each armor, compile penalties and concatenate them into one string.
+   * Does not stack armor *type* penalties.
+   * 
+   * @param {Array} armorList array of processed armor items 
+   * @return {string} Penalty string
+   */
+  async customPrefillModifiers(item, type, options, tooltip = [], currentModifiers) {
+    const obj = game.wfrp4e.config.customPrefillModifiers
+    const functions = Object.getOwnPropertyNames(obj).filter(function (p) { return typeof obj[p] === 'function' });
+    for (let func of functions) {
+      await game.wfrp4e.config.customPrefillModifiers[func].call(this, item, type, options, tooltip, currentModifiers);
     }
   }
 
