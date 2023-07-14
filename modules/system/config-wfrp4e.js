@@ -1128,8 +1128,8 @@ WFRP4E.PrepareSystemItems = function() {
                     "terrorValue": 1,
                     "script": `
                         let skillName = game.i18n.localize("NAME.Cool");
-                        let setupData = await args.actor.setupSkill(skillName, {terror: true});
-                        let test = await args.actor.basicTest(setupData);
+                        let test = await args.actor.setupSkill(skillName, {terror: true, appendTitle : " - Terror"});
+                        await test.roll();
                         let terror = this.effect.flags.wfrp4e.terrorValue;  
                         if (test.result.outcome == "failure") {            
                             if (test.result.SL < 0)

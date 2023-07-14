@@ -3728,7 +3728,7 @@ export default class ActorWfrp4e extends Actor {
       fear.effects[0].flags.wfrp4e.fearName = name
 
     let items = await this.createEmbeddedDocuments("Item", [fear]);
-    await this.setupExtendedTest(items[0]);
+    await this.setupExtendedTest(items[0], {appendTitle : ` - ${items[0].name}`});
   }
 
 
