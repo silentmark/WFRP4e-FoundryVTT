@@ -173,7 +173,7 @@ export default class AbilityTemplate extends MeasuredTemplate {
       if (test && test.data.context.templates)
       {
         test.data.context.templates = test.data.context.templates.concat(templates[0].id);
-        test.renderRollCard();
+        test.updateMessageFlags();
       }
     }));
   }
