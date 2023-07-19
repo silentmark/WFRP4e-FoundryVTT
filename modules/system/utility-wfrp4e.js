@@ -1091,6 +1091,9 @@ export default class WFRP_Utility {
     }
 
     if (game.user.isGM) {
+      if (effect.messageId) {
+        setProperty(effect, "flags.wfrp4e.messageId", effect.messageId);
+      }
       setProperty(effect, "flags.wfrp4e.effectApplication", "")
       setProperty(effect, "flags.core.statusId", (effect.label || effect.name).toLowerCase()) // V11 shim
       let msg = `${game.i18n.format("EFFECT.Applied", {name: (effect.label || effect.name)})} ` // V11 shim
@@ -1188,7 +1191,7 @@ export default class WFRP_Utility {
        effect = actor.actorEffects.get(effectId)
        item = effect.item
     }
-     
+
     await effect.reduceItemQuantity()
     await WFRP_Utility.runSingleEffect(effect, actor, item, {actor, effect, item});
   }

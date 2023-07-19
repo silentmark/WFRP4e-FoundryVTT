@@ -876,6 +876,31 @@ WFRP4E.overCastTable = {
     {cost: 8, value: 7}]
 }
 
+WFRP4E.dharOverCastTable = {
+    range: [
+      {cost: 1, value: 2},
+      {cost: 2, value: 3},
+      {cost: 8, value: 4}],
+    target: [
+      {cost: 1, value: 1},
+      {cost: 2, value: 2},
+      {cost: 8, value: 3}],
+    AoE: [
+      {cost: 2, value: 2},
+      {cost: 9, value: 3}],
+    duration: [
+      {cost: 1, value: 2},
+      {cost: 3, value: 3}],
+    damage: [
+      {cost: 1, value: 1},
+      {cost: 1, value: 2},
+      {cost: 1, value: 3},
+      {cost: 1, value: 4},
+      {cost: 1, value: 5},
+      {cost: 2, value: 6},
+      {cost: 4, value: 7}]
+  }
+
 WFRP4E.species = {};
 WFRP4E.subspecies = {};
 WFRP4E.speciesCharacteristics = {}
