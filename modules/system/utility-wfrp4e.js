@@ -1091,9 +1091,6 @@ export default class WFRP_Utility {
     }
 
     if (game.user.isGM) {
-      if (effect.messageId) {
-        setProperty(effect, "flags.wfrp4e.messageId", effect.messageId);
-      }
       setProperty(effect, "flags.wfrp4e.effectApplication", "")
       setProperty(effect, "flags.core.statusId", (effect.label || effect.name).toLowerCase()) // V11 shim
       let msg = `${game.i18n.format("EFFECT.Applied", {name: (effect.label || effect.name)})} ` // V11 shim
@@ -1134,7 +1131,7 @@ export default class WFRP_Utility {
 
   /** Send effect for owner to apply, unless there isn't one or they aren't active. In that case, do it yourself */
   static async applyOneTimeEffect(effect, actor) {
-    if (game.user.isGM) {
+    if (!game.user.isGM) {
       if (actor.hasPlayerOwner) {
         for (let u of game.users.contents.filter(u => u.active && !u.isGM)) {
           if (actor.ownership.default >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER || actor.ownership[u.id] >= CONST.DOCUMENT_OWNERSHIP_LEVELS.OWNER) {
