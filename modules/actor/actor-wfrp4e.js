@@ -20,6 +20,7 @@ import EffectWfrp4e from "../system/effect-wfrp4e.js"
  */
 export default class ActorWfrp4e extends Actor {
 
+  static LOG_V10_COMPATIBILITY_WARNINGS = false;
   // constructor(source, options)
   // {
   //   super(source, options);

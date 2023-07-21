@@ -265,63 +265,62 @@ export default class CastTest extends TestWFRP {
       let diagonalDelta = straightDelta / Math.sqrt(2);
       tableRoll.result = tableRoll.result.replace("[[2d10]]", dist);
 
-      if (tableRoll)
+      let {x, y} = template || {};
+      ChatMessage.create({content : tableRoll.result, speaker : {alias : this.item.name}});
+      if (tableRoll.roll == 1)
       {
-        let {x, y} = template || {};
-        ChatMessage.create({content : tableRoll.result, speaker : {alias : this.item.name}});
-        if (tableRoll.roll == 1)
-        {
-          await template?.delete();
-          this.context.templates = this.context.templates.filter(i => i != id);
-          await this.updateMessageFlags();
-          continue;
-        }
-        else if (tableRoll.roll == 2)
-        {
-          y -= straightDelta
-        }
-        else if (tableRoll.roll == 3)
-        {
-          y -= diagonalDelta;
-          x += diagonalDelta;
-        }
-        else if (tableRoll.roll == 4)
-        {
-          x += straightDelta;
-        }
-        else if (tableRoll.roll == 5)
-        {
+        await template?.delete();
+        this.context.templates = this.context.templates.filter(i => i != id);
+        await this.updateMessageFlags();
+        AbilityTemplate.applyMeasuredTemplateEffects(id, []);
+        continue;
+      }
+      else if (tableRoll.roll == 2)
+      {
+        y -= straightDelta
+      }
+      else if (tableRoll.roll == 3)
+      {
+        y -= diagonalDelta;
+        x += diagonalDelta;
+      }
+      else if (tableRoll.roll == 4)
+      {
+        x += straightDelta;
+      }
+      else if (tableRoll.roll == 5)
+      {
 
-        }
-        else if (tableRoll.roll == 6)
-        {
-          y += diagonalDelta;
-          x += diagonalDelta
-        }
-        else if (tableRoll.roll == 7)
-        {
-          y += straightDelta;
-        }
-        else if (tableRoll.roll == 8)
-        {
-          y += diagonalDelta;
-          x -= diagonalDelta;
-        }
-        else if (tableRoll.roll == 9)
-        {
-          x -= straightDelta;
-        }
-        else if (tableRoll.roll == 10)
-        {
-          y -= diagonalDelta;
-          x -= diagonalDelta;
-        }
-        if (template)
-        {
-          template.update({x, y}).then(template => {
-            AbilityTemplate.updateAOETargets(template);
-          });
-        }
+      }
+      else if (tableRoll.roll == 6)
+      {
+        y += diagonalDelta;
+        x += diagonalDelta
+      }
+      else if (tableRoll.roll == 7)
+      {
+        y += straightDelta;
+      }
+      else if (tableRoll.roll == 8)
+      {
+        y += diagonalDelta;
+        x -= diagonalDelta;
+      }
+      else if (tableRoll.roll == 9)
+      {
+        x -= straightDelta;
+      }
+      else if (tableRoll.roll == 10)
+      {
+        y -= diagonalDelta;
+        x -= diagonalDelta;
+      }
+      if (template)
+      {
+        template.update({x, y}).then(template => {
+          const targetIds = AbilityTemplate.updateAOETargets(template);
+          AbilityTemplate.applyMeasuredTemplateEffects(id, targetIds);
+        });
       }
     }
   }

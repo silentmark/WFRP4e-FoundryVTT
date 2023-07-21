@@ -1,4 +1,5 @@
 import WFRP_Utility from "../system/utility-wfrp4e.js";
+import AbilityTemplate from "../system/aoe.js";
 import passengerRender from "../system/passengerRender.js"
 
 export default function() {
@@ -84,8 +85,46 @@ export default function() {
       passengerRender(token);
   })
 
+  Hooks.on('updateToken', async (tokenDocument, data, options) => {
+    if (!game.user.isGM) return;
+    if (!game.combat || !game.combat.active) return;
+    if (canvas.scene.templates.size === 0) return;
+    
+    if (data.x > 0 || data.y > 0) {
+      const targetToken = canvas.tokens.placeables.find(t => t.id == tokenDocument.id);
+      const tokenRect = new PIXI.Rectangle(tokenDocument.x, tokenDocument.y, tokenDocument.w, tokenDocument.h).normalize();
+      if (!targetToken || targetToken.isDefeated) return;
 
-
+      for (let templateDocument of canvas.scene.templates) {
+        const messageId = templateDocument.flags?.wfrp4e?.messageId;
+        const message = game.messages.get(messageId);
+        if (!message) continue;
+        test = message.getTest();
+        if (!test) continue;
+ 
+        let template =  game.canvas.templates.get(templateDocument.id);            
+        const cells = template._getGridHighlightPositions();
+        let affected = false;
+        for (const cell of cells) {
+          if (cell.x <= tokenRect.right && cell.x >= tokenRect.left && cell.y <= tokenRect.bottom && cell.y >= tokenRect.top) {
+            affected = true; 
+            break;
+          }
+        }
+        if (affected) {
+          effects = test.effects.filter(x => x.flags.wfrp4e.areaEffect);
+          duration = AbilityTemplate.getTemplateDuration(templateDocument, test);
+          const caster = game.actors.get(parseUuid(templateDocument.flags.wfrp4e.itemuuid).documentId);
+      
+          for (let effect of effects) {
+            await AbilityTemplate.ensureEffectOnToken(targetToken, effect, caster, messageId, duration);
+          }
+        } else {
+          AbilityTemplate.deleteEffectsFromToken(targetToken, messageId);
+        }
+      }
+    }
+  });
   
   function _addMountButton(hud, html)
   {

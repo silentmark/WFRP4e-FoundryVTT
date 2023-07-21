@@ -3,6 +3,8 @@ import WFRP_Utility from "../system/utility-wfrp4e.js";
 
 
 export default class ItemWfrp4e extends Item {
+  
+  static LOG_V10_COMPATIBILITY_WARNINGS = false;
 
   // constructor(source, options)
   // {

@@ -49,7 +49,8 @@ export default class AbilityTemplate extends MeasuredTemplate {
         flags: {
           wfrp4e: {
             itemuuid: `Actor.${actorId}.Item.${itemId}`,
-            messageId: messageId
+            messageId: messageId,
+            round: game.combat?.round ?? -1
           }
         }
       };
@@ -189,7 +190,7 @@ export default class AbilityTemplate extends MeasuredTemplate {
     this.#events.reject();
   }
 
-  static updateAOETargets(templateData)
+  static updateAOETargets(templateData, onlyReturn = false)
   {
     let grid = canvas.scene.grid;
     let templateGridSize = templateData.distance/grid.distance * grid.size
@@ -205,9 +206,73 @@ export default class AbilityTemplate extends MeasuredTemplate {
       if ((t.x + (t.width / 2)) < maxx && (t.x + (t.width / 2)) > minx && (t.y + (t.height / 2)) < maxy && (t.y + (t.height / 2)) > miny)
         newTokenTargets.push(t.id)
     })
-    game.user.updateTokenTargets(newTokenTargets)
-    game.user.broadcastActivity({targets: newTokenTargets})
+    if (!onlyReturn) {
+      game.user.updateTokenTargets(newTokenTargets)
+      game.user.broadcastActivity({targets: newTokenTargets})
+    }
+    return newTokenTargets;
   }
 
+  static async deleteEffectsFromToken(token, messageId, tokenIds = []) {
+    let existingAoEEffects = token.actor.actorEffects.filter(x=>x.flags?.wfrp4e?.areaEffect && x.flags?.wfrp4e?.messageId == messageId);
+    if (!tokenIds.find(x=>x == token.id)) {
+      await token.actor.deleteEmbeddedDocuments("ActiveEffect", existingAoEEffects.map(x=>x.id));
+      let itemsToRemove = token.actor.items.filter(x => x.flags.wfrp4e?.effectMessageId == messageId);
+      if (itemsToRemove.length > 0) {
+        token.actor.deleteEmbeddedDocuments("Item", itemsToRemove.map(e => e.id))
+      }
+    }
+  }
+
+  static async ensureEffectOnToken(targetToken, effect, caster, messageId, duration) {
+    let existingEffect = targetToken.actor.actorEffects.find(x => x.name == effect.name && x.flags?.wfrp4e?.messageId == messageId);
+    if (!existingEffect) {
+      let effectToApply = await caster.populateEffect(effect.id, test.item, test);    
+      mergeObject(effectToApply, { flags: {wfrp4e: { messageId: messageId } } });
+      if (duration != -1) {
+        effectToApply.duration.rounds = duration;
+      }
+      await game.wfrp4e.utility.applyEffectToTarget(effectToApply, [targetToken]);
+    }
+  }
+
+  static getTemplateDuration(templateDocument, test) {
+    let duration = -1;
+    const templatePlacementRound = templateDocument.flags.wfrp4e.round;
+    if (test.data.result?.overcast?.usage?.duration?.current && 
+      test.data.result?.overcast?.usage?.duration?.unit?.toLowerCase() == game.i18n.localize("Rounds") &&
+      game.combat?.active && 
+      templatePlacementRound != -1) {
+        duration = test.data.result.overcast.usage.duration.current - (game.combat.round - templatePlacementRound);
+    }
+    return duration;
+  }
+
+  static async applyMeasuredTemplateEffects(templateId, tokenIds) {
+    const templateDocument = canvas.scene.templates.get(templateId);
+    let effects = [];
+    let duration = -1;
+    let test;
+    if (templateDocument) {
+      const messageId = templateDocument.flags.wfrp4e.messageId;
+      const message = game.messages.get(messageId);
+      if (message) {
+        test = message.getTest();
+        effects = test.effects.filter(x => x.flags.wfrp4e.areaEffect);
+        duration = this.constructor.getTemplateDuration(templateDocument, test);
+      }
+    }
+    for (let token of canvas.tokens.placeables) {
+      await this.constructor.deleteEffectsFromToken(token, messageId, tokenIds);
+    }
+    for (let effect of effects) {
+      const caster = game.actors.get(parseUuid(templateDocument.flags.wfrp4e.itemuuid).documentId);
+      
+      for (let tokenId of tokenIds) {
+        let targetToken = canvas.tokens.placeables.get(tokenId);
+        await this.constructor.ensureEffectOnToken(targetToken, effect, caster, messageId, duration);
+      }
+    }
+  }
 }
 

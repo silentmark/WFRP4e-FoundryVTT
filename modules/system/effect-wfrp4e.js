@@ -2,6 +2,8 @@ import WFRP_Utility from "./utility-wfrp4e.js";
 
 
 export default class EffectWfrp4e extends ActiveEffect {
+  
+  static LOG_V10_COMPATIBILITY_WARNINGS = false;
  
   constructor(data, context)
   {
@@ -162,6 +164,10 @@ export default class EffectWfrp4e extends ActiveEffect {
 
   get reduceQuantity() {
     return this.parent?.type == "trapping" && getProperty(this, "flags.wfrp4e.reduceQuantity")
+  }
+
+  get isAreaEffect() {
+    return getProperty(this, "flags.wfrp4e.areaEffect")
   }
 
 

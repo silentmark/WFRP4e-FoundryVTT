@@ -248,6 +248,13 @@
         {{/if}}
 
         <div class="form-group">
+            <label>{{ localize "EFFECT.IsAreaEffect" }}</label>
+            <div class="form-fields">
+                <input type="checkbox" name="flags.wfrp4e.areaEffect" {{checked effect.flags.wfrp4e.areaEffect}}/>
+            </div>
+        </div>
+
+        <div class="form-group">
             <label>{{ localize "EFFECT.HideEffect" }}</label>
             <div class="form-fields">
                 <input type="checkbox" name="flags.wfrp4e.hide" {{checked effect.flags.wfrp4e.hide}}/>
