@@ -123,31 +123,6 @@ export default class ActorWfrp4e extends Actor {
   async _preUpdate(updateData, options, user) {
     await super._preUpdate(updateData, options, user)
 
-    if (!options.skipGroupAdvantage && hasProperty(updateData, "system.status.advantage.value") && game.settings.get("wfrp4e", "useGroupAdvantage"))
-    {
-      let combatant = game.combat?.getCombatantByActor(game.release.generation == 11 ? this : this.id);
-
-      if (!combatant)
-      {
-        ui.notifications.notify(game.i18n.localize("GroupAdvantageNoCombatant"))
-      }
-      else if (!options.fromGroupAdvantage) // Don't send groupAdvantage updates if this update is from group advantage
-      {
-        await WFRP_Utility.updateGroupAdvantage({[`${this.advantageGroup}`] : updateData.system.status.advantage.value})
-
-        if (game.release.generation == 10)
-        {
-          // If this update was not from group advantage, don't actually send the update (prevents duplicate scrolling texts)
-          // Instead, update when called from the groupAdvantage setting hook (which sets this option property)
-          // The GM guard is so that the players can see the scrolling text when they update their own token
-          if (game.user.isGM)
-          delete updateData.system.status
-        }
-      }
-    }
-
-    this.handleScrollingText(updateData)
-
     // Treat the custom default token as a true default token
     // If you change the actor image from the default token, it will automatically set the same image to be the token image
     if (this.prototypeToken?.texture?.src == "systems/wfrp4e/tokens/unknown.png" && updateData.img) {
@@ -189,11 +164,11 @@ export default class ActorWfrp4e extends Actor {
     }
   }
 
-  handleScrollingText(data) {
+  async handleScrollingText(data) {
     if (hasProperty(data, "system.status.wounds.value"))
-      this._displayScrollingChange(getProperty(data, "system.status.wounds.value") - this.status.wounds.value);
+      await this._displayScrollingChange(getProperty(data, "system.status.wounds.value") - this.status.wounds.value);
     if (hasProperty(data, "system.status.advantage.value"))
-      this._displayScrollingChange(getProperty(data, "system.status.advantage.value") - this.status.advantage.value, { advantage: true });
+      await this._displayScrollingChange(getProperty(data, "system.status.advantage.value") - this.status.advantage.value, { advantage: true });
   }
 
   prepareBaseData() {
@@ -391,16 +366,11 @@ export default class ActorWfrp4e extends Actor {
         this.status.advantage.max = this.characteristics.i.bonus
         this.status.advantage.value = Math.clamped(this.status.advantage.value, 0, this.status.advantage.max)
       }
-      else
-      this.status.advantage.max = 10;
+      else 
+      {
+        this.status.advantage.max = 10;
+      }
     }
-
-
-    // if (game.settings.get("wfrp4e", "useGroupAdvantage"))
-    // {
-    //   let advantage = game.settings.get("wfrp4e", "groupAdvantageValues")
-    //   this.status.advantage.value =  advantage[this.advantageGroup]
-    // }
 
     if (!hasProperty(this, "flags.autoCalcSize"))
       this.flags.autoCalcSize = true;
@@ -1694,7 +1664,7 @@ export default class ActorWfrp4e extends Actor {
           this.status.wounds.max = wounds;
           this.status.wounds.value = wounds;
         }
-        else if (this.isOwner)
+        else if (this.isOwner && new Date(this._stats.modifiedTime).getSeconds() != new Date().getSeconds())
           this.update({ "system.status.wounds.max": wounds, "system.status.wounds.value": wounds });
       }
     }
@@ -2174,13 +2144,13 @@ export default class ActorWfrp4e extends Actor {
  * @param {number} damage
  * @private
  */
-  _displayScrollingChange(change, options = {}) {
+  async _displayScrollingChange(change, options = {}) {
     if (!change) return;
     change = Number(change);
     const tokens = this.isToken ? [this.token?.object] : this.getActiveTokens(true);
     for (let t of tokens) {
       if ( !t || !t.visible || !t.renderable || !canvas.interface) continue;
-      canvas.interface?.createScrollingText(t.center, change.signedString(), {
+      await canvas.interface?.createScrollingText(t.center, change.signedString(), {
         anchor: (change<0) ? CONST.TEXT_ANCHOR_POINTS.BOTTOM: CONST.TEXT_ANCHOR_POINTS.TOP,
 	      direction: (change<0) ? 1: 2,
         fontSize: 30,
@@ -3582,16 +3552,19 @@ export default class ActorWfrp4e extends Actor {
 
 
   setAdvantage(val) {
-    let advantage = duplicate(this.status.advantage);
-    if (game.settings.get("wfrp4e", "capAdvantageIB"))
-      advantage.max = this.characteristics.i.bonus;
-    else
-      advantage.max = 10;
+    if(!game.settings.get("wfrp4e","useGroupAdvantage")) {
+      let advantage = duplicate(this.status.advantage);
+      if (game.settings.get("wfrp4e", "capAdvantageIB"))
+        advantage.max = this.characteristics.i.bonus;
+      else
+        advantage.max = 10;
 
-    advantage.value = Math.clamped(val, 0, advantage.max)
+      advantage.value = Math.clamped(val, 0, advantage.max)
 
-    this.update({ "system.status.advantage": advantage })
+      this.update({ "system.status.advantage": advantage })
+    }
   }
+
   modifyAdvantage(val) {
     this.setAdvantage(this.status.advantage.value + val)
   }
@@ -3602,6 +3575,7 @@ export default class ActorWfrp4e extends Actor {
     wounds.value = Math.clamped(val, 0, wounds.max)
     return this.update({ "system.status.wounds": wounds })
   }
+  
   modifyWounds(val) {
     return this.setWounds(this.status.wounds.value + val)
   }
@@ -3655,8 +3629,9 @@ export default class ActorWfrp4e extends Actor {
     if (existing && !existing.isNumberedCondition)
       return existing
     else if (existing) {
-      existing._displayScrollingStatus(true)
-      return existing.setFlag("wfrp4e", "value", existing.conditionValue + value)
+      await existing._displayScrollingStatus(true)
+      await existing.setFlag("wfrp4e", "value", existing.conditionValue + value)
+      return existing;
     }
     else if (!existing) {
       if (game.combat && (effect.id == "blinded" || effect.id == "deafened"))
@@ -3674,7 +3649,7 @@ export default class ActorWfrp4e extends Actor {
         await this.addCondition("prone")
 
       delete effect.id
-      return this.createEmbeddedDocuments("ActiveEffect", [effect])
+      await this.createEmbeddedDocuments("ActiveEffect", [effect])
     }
   }
 
@@ -3698,7 +3673,7 @@ export default class ActorWfrp4e extends Actor {
     else if (existing) {
       await existing.setFlag("wfrp4e", "value", existing.conditionValue - value);
       if (existing.conditionValue) // Only display if there's still a condition value (if it's 0, already handled by effect deletion)
-        existing._displayScrollingStatus(false);
+        await existing._displayScrollingStatus(false);
       //                                                                                                                   Only add fatigued after stunned if not already fatigued
       if (existing.conditionValue == 0 && (effect.id == "bleeding" || effect.id == "poisoned" || effect.id == "broken" || (effect.id == "stunned" && !this.hasCondition("fatigued")))) {
         if (!game.settings.get("wfrp4e", "mooConditions") || !effect.id == "broken") // Homebrew rule prevents broken from causing fatigue

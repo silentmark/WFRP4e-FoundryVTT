@@ -1135,7 +1135,7 @@ export default class WFRP_Utility {
 
   /** Send effect for owner to apply, unless there isn't one or they aren't active. In that case, do it yourself */
   static async applyOneTimeEffect(effect, actor) {
-    if (game.user.isGM) {
+    if (!game.user.isGM) {
       if (actor.hasPlayerOwner) {
         let u = WFRP_Utility.getActorOwner(actor);
         if (u.id != game.user.id) {
@@ -1143,12 +1143,11 @@ export default class WFRP_Utility {
           let effectObj = effect instanceof ActiveEffect ? effect.toObject() : effect;
           const payload = { userId: u.id, effect: effectObj, actorData: actor.toObject() };
           await WFRP_Utility.awaitSocket(game.user, "applyOneTimeEffect", payload, "invoking effect");
-          return
         }
       }
+    } else {
+      await WFRP_Utility.runSingleEffect(effect, actor, null, { actor });
     }
-
-    await WFRP_Utility.runSingleEffect(effect, actor, null, { actor });
   }
   
   static async runSingleEffect(effect, actor, item, scriptArgs) {

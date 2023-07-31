@@ -44,7 +44,7 @@ export default class EffectWfrp4e extends ActiveEffect {
      * Don't understand why Foundry made this function private in V11 so I need to redefine it here.
      * Adds backwards compatibility for V10
      */
-    _displayScrollingStatus(enabled) {
+    async _displayScrollingStatus(enabled) {
       if (game.release.generation == 11)
       {
         if ( !(this.statuses.size || this.changes.length) ) return;
@@ -66,7 +66,7 @@ export default class EffectWfrp4e extends ActiveEffect {
       const text = `${enabled ? "+" : "-"}(${this.name || this.label})`;
       for ( let t of tokens ) {
         if ( !t || !t.visible || !t.renderable || !canvas.interface) continue;
-        canvas.interface.createScrollingText(t.center, text, {
+        await canvas.interface?.createScrollingText(t.center, text, {
           anchor: CONST.TEXT_ANCHOR_POINTS.CENTER,
           direction: enabled ? CONST.TEXT_ANCHOR_POINTS.TOP : CONST.TEXT_ANCHOR_POINTS.BOTTOM,
           distance: (2 * t.h),

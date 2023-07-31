@@ -1743,29 +1743,29 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     // Inventory Tab - Containers - Detected when you drop something onto a container, otherwise, move on to other drop types
     if ($(ev.target).parents(".item").attr("inventory-type") == "container")
-      this._onDropIntoContainer(ev)
+      await this._onDropIntoContainer(ev)
 
     // Dropping an item from chat
     else if (dragData.type == "postedItem")
-      this.actor.createEmbeddedDocuments("Item", [dragData.payload]);
+      await this.actor.createEmbeddedDocuments("Item", [dragData.payload]);
 
     else if (dragData.type == "generation")
-      this._onDropCharGen(dragData)
+      await this._onDropCharGen(dragData)
 
     else if (dragData.type == "lookup")
-      this._onDropLookupItem(dragData)
+      await this._onDropLookupItem(dragData)
 
     else if (dragData.type == "experience")
-      this._onDropExperience(dragData)
+      await this._onDropExperience(dragData)
 
     else if (dragData.type == "money")
-      this._onDropMoney(dragData)
+      await this._onDropMoney(dragData)
 
     else if (dragData.type == "wounds")
-      this.modifyWounds(`+${dragData.payload}`)
+      await this.modifyWounds(`+${dragData.payload}`)
 
     else if (dragData.type == "condition")
-      this.actor.addCondition(`${dragData.payload}`)
+      await this.actor.addCondition(`${dragData.payload}`)
 
     else // If none of the above, just process whatever was dropped upstream
       super._onDrop(ev)
@@ -1788,11 +1788,11 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       item.system.worn = false;
 
 
-    return this.actor.updateEmbeddedDocuments("Item", [item]);
+    await this.actor.updateEmbeddedDocuments("Item", [item]);
   }
 
   // Dropping a character creation result
-  _onDropCharGen(dragData) {
+  async _onDropCharGen(dragData) {
     let data = duplicate(this.actor._source.system);
     if (dragData.generationType == "attributes") // Characteristsics, movement, metacurrency, etc.
     {
@@ -1812,7 +1812,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       for (let c in game.wfrp4e.config.characteristics) {
         data.characteristics[c].initial = dragData.payload.characteristics[c].value
       }
-      return this.actor.update({ "data": data })
+      await this.actor.update({ "data": data })
     }
     else if (dragData.generationType === "details") // hair, name, eyes
     {
@@ -1821,7 +1821,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       data.details.age.value = dragData.payload.age;
       data.details.height.value = dragData.payload.height;
       let name = dragData.payload.name
-      return this.actor.update({ "name": name, "data": data, "token.name": name.split(" ")[0] })
+      await this.actor.update({ "name": name, "data": data, "token.name": name.split(" ")[0] })
     }
   }
 
@@ -1842,19 +1842,19 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       item = await WFRP_Utility.findItem(dragData.payload.name, dragData.payload.lookupType)
     }
     if (item)
-      this.actor.createEmbeddedDocuments("Item", [item.toObject()]);
+      await this.actor.createEmbeddedDocuments("Item", [item.toObject()]);
   }
 
   // From character creation - exp drag values
-  _onDropExperience(dragData) {
+  async _onDropExperience(dragData) {
     let system = duplicate(this.actor._source.system);
     system.details.experience.total += dragData.payload;
     system.details.experience.log = this.actor._addToExpLog(dragData.payload, "Character Creation", undefined, system.details.experience.total);
-    this.actor.update({ "system": system })
+    await this.actor.update({ "system": system })
   }
 
   // From Income results - drag money value over to add
-  _onDropMoney(dragData) {
+  async _onDropMoney(dragData) {
     // Money string is in the format of <amt><type>, so 12b, 5g, 1.5g
     let moneyString = dragData.payload;
     let type = moneyString.slice(-1);
@@ -1900,10 +1900,10 @@ export default class ActorSheetWfrp4e extends ActorSheet {
     if (halfG)
       money.find(i => i.name === game.i18n.localize("NAME.SS")).system.quantity.value += 10;
 
-    this.actor.updateEmbeddedDocuments("Item", money);
+    await this.actor.updateEmbeddedDocuments("Item", money);
   }
 
-  _onConvertCurrencyClick(ev) {
+  async _onConvertCurrencyClick(ev) {
     let type = ev.currentTarget.dataset.type
     let money = this.actor.getItemTypes("money").map(m => m.toObject());
 
@@ -1916,10 +1916,11 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       {
         currentGC.system.quantity.value -= 1;
         currentSS.system.quantity.value += 20
-        return this.actor.updateEmbeddedDocuments("Item", [currentGC, currentSS])
+        await this.actor.updateEmbeddedDocuments("Item", [currentGC, currentSS])
       }
       else
-        return ui.notifications.error(game.i18n.localize("ErrorMoneyConvert"))
+        ui.notifications.error(game.i18n.localize("ErrorMoneyConvert"))
+        return;
     }
     
     if (type == "ss")
@@ -1931,10 +1932,11 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       {
         currentSS.system.quantity.value -= 1;
         currentBP.system.quantity.value += 12
-        return this.actor.updateEmbeddedDocuments("Item", [currentBP, currentSS])
+        await this.actor.updateEmbeddedDocuments("Item", [currentBP, currentSS])
       }
       else
-        return ui.notifications.error(game.i18n.localize("ErrorMoneyConvert"))
+        ui.notifications.error(game.i18n.localize("ErrorMoneyConvert"))
+        return;
     }
 
   }
@@ -2043,15 +2045,10 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
       let action = game.wfrp4e.config.groupAdvantageActions[index];
 
-      if (action.cost > this.actor.status.advantage.value)
-      {
-        return ui.notifications.error("Nie dostateczna ilość Przewag!")
-      }
-
       if (action)
       {
         let html = await TextEditor.enrichHTML(`
-        <p><strong>${action.name}</strong>: ${action.description}</p>
+        <p><strong>${action.name} (${acti.cost})</strong>: ${action.description}</p>
         <p>${action.effect}</p>
         `)
 
@@ -2065,8 +2062,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
         if (action.test)
         {
-          if (action.test.type == "characteristic")
-          {
+          if (action.test.type == "characteristic") {
             this.actor.setupCharacteristic(action.test.value).then(test => test.roll())
           }
         }

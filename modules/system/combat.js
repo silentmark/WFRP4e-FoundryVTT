@@ -392,7 +392,9 @@ export default class CombatHelpers {
         } 
 
         for (let turn of combat.turns) {
-            await turn.actor.update({ "system.status.advantage.value": 0 }, {skipGroupAdvantage: true})
+            if (!game.settings.get("wfrp4e","useGroupAdvantage")) {
+                await turn.actor.update({ "system.status.advantage.value": 0 }, {skipGroupAdvantage: true})
+            }
             await turn.actor.runEffects("endCombat", combat)
         }
     }

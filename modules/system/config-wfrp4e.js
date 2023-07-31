@@ -691,6 +691,7 @@ WFRP4E.conditions = {
     "grappling": "WFRP4E.ConditionName.Grappling",
     "fear": "WFRP4E.ConditionName.Fear",
     "engaged": "WFRP4E.ConditionName.Engaged",
+    "covered": "Zasłona przed Strzałem",
     "defeated": "WFRP4E.ConditionName.Defeated"
 }
 
@@ -1630,6 +1631,23 @@ WFRP4E.PrepareSystemItems = function() {
                     "secondaryEffect" :{
                         "effectTrigger": "targetPrefillDialog",
                         "script": "if (args.item && args.item.attackType=='melee') args.prefillModifiers.slBonus += 1",
+                    }
+                }
+            }
+        },
+        {
+            icon: "systems/wfrp4e/icons/conditions/cover.png", 
+            id: "covered", 
+            label: "WFRP4E.ConditionName.Covered", 
+            flags: {
+                wfrp4e: {
+                    "trigger": "endRound",
+                    "effectTrigger": "prefillDialog",
+                    "script": "if (args.item && args.item.attackType=='ranged') args.prefillModifiers.modifier -= (this.effect.conditionValue * 10)",
+                    "value": 1,
+                    "secondaryEffect" :{
+                        "effectTrigger": "targetPrefillDialog",
+                        "script": "if (args.item && args.item.attackType=='ranged') args.prefillModifiers.modifier -= (this.effect.conditionValue * 10)",
                     }
                 }
             }

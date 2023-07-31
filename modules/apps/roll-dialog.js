@@ -75,9 +75,11 @@ export default class RollDialog extends Dialog {
 
 
     changeAdvantage(advantage) {
-        this.data.actor.update({ "system.status.advantage.value": advantage })
-        ui.notifications.notify(game.i18n.localize("DIALOG.AdvantageUpdate"))
-        this.advantage = advantage
+        if(!game.settings.get("wfrp4e","useGroupAdvantage")) {
+            this.data.actor.update({ "system.status.advantage.value": advantage })
+            ui.notifications.notify(game.i18n.localize("DIALOG.AdvantageUpdate"))
+            this.advantage = advantage
+        }
     }
 
     activateListeners(html) {

@@ -13,10 +13,6 @@ export default function() {
   })
 
   Hooks.on("createCombatant", async combatant => {
-    if (game.settings.get("wfrp4e", "useGroupAdvantage") && game.user.isGM) {
-      let advantage = game.settings.get("wfrp4e", "groupAdvantageValues")
-      await combatant.actor.update({"system.status.advantage.value" : advantage[combatant.actor.advantageGroup]}, {fromGroupAdvantage : true})
-    }
     let mask = combatant.token.hidden
     if (mask) {
       let data = {};

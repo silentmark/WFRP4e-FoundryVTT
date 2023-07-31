@@ -8,15 +8,7 @@ export default function() {
         if (setting.key == "wfrp4e.groupAdvantageValues")
         {
             ui.notifications.notify(game.i18n.format("GroupAdvantageUpdated", {players : setting.value.players, enemies : setting.value.enemies}))
-
-            if (game.user.isGM && game.combat)
-            {
-                // This sorta sucks because there isn't a way to update both actors and synthetic actors in one call
-                game.combat.combatants.forEach(c => {
-                    if (c.actor.status.advantage.value != setting.value[c.actor.advantageGroup])
-                        c.actor.update({"system.status.advantage.value" : setting.value[c.actor.advantageGroup]}, {fromGroupAdvantage : true})
-                })
-            }
+            
             // Update counter values, can't just use ui.combat because there might be popped out combat trackers
             [ui.combat].concat(Object.values(ui.windows).filter(w => w instanceof CombatTracker)).forEach(tracker => {
                 tracker.element.find(".advantage-group input").each((index, input) => {

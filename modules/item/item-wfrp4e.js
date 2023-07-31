@@ -316,7 +316,7 @@ export default class ItemWfrp4e extends Item {
     if (game.settings.get("wfrp4e", "mooQualities")) {
       game.wfrp4e.utility.logHomebrew("mooQualities")
       let momentum = this.qualities.value.find(q => q.name == "momentum" && q.value)
-      if (momentum?.value && this.actor.status.advantage.value > 0) {
+      if (momentum?.value) {
         let qualityString = momentum.value
         this._addProperties({ qualities: game.wfrp4e.utility.propertyStringToObject(qualityString, game.wfrp4e.utility.allProperties()), flaws: {} })
         this.qualities.value.splice(this.qualities.value.findIndex(q => q.name == "momentum"), 1)

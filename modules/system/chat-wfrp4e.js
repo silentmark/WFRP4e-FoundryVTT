@@ -522,8 +522,8 @@ export default class ChatWFRP {
 
   }
 
-  static _onApplyCondition(event) {
-    let actors = canvas.tokens.controlled.concat(Array.from(game.user.targets).filter(i => !canvas.tokens.controlled.includes(i)))
+  static async _onApplyCondition(event) {
+    let actors = canvas.tokens.controlled;
 
     if (actors.length == 0)
     {
@@ -531,9 +531,13 @@ export default class ChatWFRP {
       ui.notifications.notify(`${game.i18n.format("EFFECT.Applied", {name: game.wfrp4e.config.conditions[event.currentTarget.dataset.cond]})} ${game.user.character.name}`)
     }
 
-    actors.forEach(a => {
-      a.addCondition(event.currentTarget.dataset.cond)
-    })
+    for (let a of actors) {
+      if (a.addCondition) {
+        await a.addCondition(event.currentTarget.dataset.cond)
+      } else {
+        await a.actor.addCondition(event.currentTarget.dataset.cond)
+      }
+    }
   }
 
 }
