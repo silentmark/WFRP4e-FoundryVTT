@@ -3629,8 +3629,8 @@ export default class ActorWfrp4e extends Actor {
     if (existing && !existing.isNumberedCondition)
       return existing
     else if (existing) {
-      await existing._displayScrollingStatus(true)
       await existing.setFlag("wfrp4e", "value", existing.conditionValue + value)
+      existing._displayScrollingStatus(true)
       return existing;
     }
     else if (!existing) {
@@ -3671,18 +3671,20 @@ export default class ActorWfrp4e extends Actor {
       return;
     }
     else if (existing) {
-      await existing.setFlag("wfrp4e", "value", existing.conditionValue - value);
-      if (existing.conditionValue) // Only display if there's still a condition value (if it's 0, already handled by effect deletion)
-        await existing._displayScrollingStatus(false);
+      let conditionValue = existing.conditionValue - value;
+      if (conditionValue <= 0) {
+        await existing.delete();
+      } else {
+        await existing.setFlag("wfrp4e", "value", conditionValue);
+      }
       //                                                                                                                   Only add fatigued after stunned if not already fatigued
-      if (existing.conditionValue == 0 && (effect.id == "bleeding" || effect.id == "poisoned" || effect.id == "broken" || (effect.id == "stunned" && !this.hasCondition("fatigued")))) {
+      if (conditionValue == 0 && (effect.id == "bleeding" || effect.id == "poisoned" || effect.id == "broken" || (effect.id == "stunned" && !this.hasCondition("fatigued")))) {
         if (!game.settings.get("wfrp4e", "mooConditions") || !effect.id == "broken") // Homebrew rule prevents broken from causing fatigue
           await this.addCondition("fatigued")
       }
 
-      if (existing.conditionValue <= 0)
-        await existing.delete();
-        return;
+      if (conditionValue > 0) // Only display if there's still a condition value (if it's 0, already handled by effect deletion)
+        existing._displayScrollingStatus(false);
     }
   }
 

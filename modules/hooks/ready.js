@@ -17,19 +17,6 @@ export default function () {
       get: function () { return game.user.id == game.users.find(u => u.active && u.isGM)?.id }
     })
 
-    CONFIG.ChatMessage.documentClass.prototype.getTest = function () {
-      if (hasProperty(this, "flags.testData"))
-        return game.wfrp4e.rolls.TestWFRP.recreate(this.flags.testData)   
-    }
-    CONFIG.ChatMessage.documentClass.prototype.getOppose = function () {
-      if (hasProperty(this, "flags.wfrp4e.opposeData"))
-        return new OpposedWFRP(getProperty(this, "flags.wfrp4e.opposeData"))
-    }
-
-    CONFIG.ChatMessage.documentClass.prototype.getOpposedTest = function () {
-      if (hasProperty(this, "flags.wfrp4e.opposeTestData"))
-        return OpposedTest.recreate(getProperty(this, "flags.wfrp4e.opposeTestData"))
-    }
 
     if (game.settings.get('wfrp4e', 'customCursor')) {
       WFRP_Utility.log('Using custom cursor', true)

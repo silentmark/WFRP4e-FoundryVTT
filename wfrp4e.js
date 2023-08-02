@@ -50,7 +50,7 @@ import { ChargenStage } from "./modules/apps/chargen/stage.js";
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
 
-Hooks.once("init", async function () {
+Hooks.once("init", function () {
 
   // #if _ENV === "development"
   // CONFIG.debug.wfrp4e = true;
@@ -123,7 +123,22 @@ Hooks.once("init", async function () {
   // Assign the actor class to the CONFIG
   CONFIG.Actor.documentClass = ActorWfrp4e;
   CONFIG.Item.documentClass = ItemWfrp4e;
-  CONFIG.ActiveEffect.documentClass = ActiveEffectWfrp4e
+  CONFIG.ActiveEffect.documentClass = ActiveEffectWfrp4e;
+
+  
+  CONFIG.ChatMessage.documentClass.prototype.getTest = function () {
+    if (hasProperty(this, "flags.testData"))
+      return game.wfrp4e.rolls.TestWFRP.recreate(this.flags.testData)   
+  }
+  CONFIG.ChatMessage.documentClass.prototype.getOppose = function () {
+    if (hasProperty(this, "flags.wfrp4e.opposeData"))
+      return new OpposedWFRP(getProperty(this, "flags.wfrp4e.opposeData"))
+  }
+
+  CONFIG.ChatMessage.documentClass.prototype.getOpposedTest = function () {
+    if (hasProperty(this, "flags.wfrp4e.opposeTestData"))
+      return OpposedTest.recreate(getProperty(this, "flags.wfrp4e.opposeTestData"))
+  }
 });
 
 registerHooks()

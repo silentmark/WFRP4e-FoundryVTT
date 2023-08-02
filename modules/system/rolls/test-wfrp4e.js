@@ -631,6 +631,14 @@ export default class TestWFRP {
   // Update message data without rerendering the message content
   async updateMessageFlags(updateData = {}) {
     let data = mergeObject(this.data, updateData, { overwrite: true })
+    if (data.result?.options?.weapon?.effects) {
+      data.result.options.weapon = data.result.options.weapon.toObject();
+      delete data.result.options.weapon.effects;
+    }
+    if (data.preData?.options?.weapon?.effects) {
+      data.preData.options.weapon = data.preData.options.weapon.toObject();
+      delete data.preData.options.weapon.effects;
+    }
     let update = { "flags.testData": data }
     
     if (this.message && game.user.isGM)
