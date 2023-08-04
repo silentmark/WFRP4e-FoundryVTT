@@ -18,6 +18,7 @@ import WFRP_Audio from "./modules/system/audio-wfrp4e.js";
 import WFRP4E from "./modules/system/config-wfrp4e.js"
 import ChatWFRP from "./modules/system/chat-wfrp4e.js";
 import OpposedWFRP from "./modules/system/opposed-wfrp4e.js";
+import OpposedTest from "./modules/system/opposed-test.js";
 import WFRP_Tables from "./modules/system/tables-wfrp4e.js";
 import WFRP_Utility from "./modules/system/utility-wfrp4e.js";
 import AOETemplate from "./modules/system/aoe.js"
@@ -113,6 +114,7 @@ Hooks.once("init", function () {
     market: MarketWfrp4e,
     audio: WFRP_Audio,
     opposed: OpposedWFRP,
+    opposedTest: OpposedTest,
     names: NameGenWfrp,
     combat: CombatHelpers,
     aoe: AOETemplate,
@@ -137,7 +139,7 @@ Hooks.once("init", function () {
 
   CONFIG.ChatMessage.documentClass.prototype.getOpposedTest = function () {
     if (hasProperty(this, "flags.wfrp4e.opposeTestData"))
-      return OpposedTest.recreate(getProperty(this, "flags.wfrp4e.opposeTestData"))
+      return game.wfrp4e.opposedTest.recreate(getProperty(this, "flags.wfrp4e.opposeTestData"))
   }
 });
 
