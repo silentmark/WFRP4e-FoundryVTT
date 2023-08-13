@@ -16,13 +16,9 @@
       "name": "CatoThe1stElder"
     }
   ],
-  "esmodules": [],
-  "scripts": [
-    "wfrp4e.js",
-    "./libs/pixi-filters.js"
-  ],
-  "styles": [
-    "./css/wfrp4e.css"
+  "esmodules" : [],
+  "scripts": ["wfrp4e.js", "./libs/pixi-filters.js"],
+  "styles": ["./css/wfrp4e.css"]
   ],
   "languages": [
     {

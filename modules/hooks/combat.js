@@ -14,7 +14,7 @@ export default function() {
 
   Hooks.on("createCombatant", async combatant => {
     let mask = combatant.token.hidden
-    if (mask) {
+    if (mask && game.user.isGM) {
       let data = {};
       data.img = "systems/wfrp4e/tokens/unknown.png"
       data.name = "???"

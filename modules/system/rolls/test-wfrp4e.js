@@ -501,19 +501,17 @@ export default class TestWFRP {
     {
       if (this.opposedMessages.length)
       {
-        const messages = this.opposedMessages.map(m => m.getOppose());
-        for (let i = 0; i < messages.length; i++) {
-          const oppose = messages[i];
+        for (let message of this.opposedMessages) {
+          let oppose = message.getOppose();
           await oppose.setAttacker(this.message); // Make sure the opposed test is using the most recent message from this test
           if (oppose.defenderTest) // If defender has rolled (such as if this test was rerolled or edited after the defender rolled) - recompute opposed test
             await oppose.computeOpposeResult()
         }
       }
       else { // actor is attacking - new test
-        const tokens = this.context.targets.map(t => WFRP_Utility.getToken(t));
-        for (let i = 0; i < tokens.length; i++) {
-          const token = tokens[i];
-          await this.createOpposedMessage(token);
+        // For each target, create opposed test messages, save those message IDs in this test.
+        for (let token of this.context.targets.map(t => WFRP_Utility.getToken(t))) {
+          await this.createOpposedMessage(token)
         }
       }
     }

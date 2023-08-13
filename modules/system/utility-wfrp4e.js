@@ -1109,7 +1109,7 @@ export default class WFRP_Utility {
       else {
         for(let t of targets) {
           if (effect.flags.wfrp4e?.promptItem) {
-            let choice = await ItemDialog.createFromFilters((0, eval)(effect.flags.wfrp4e.extra), 1, "Wybierz przedmiot", t.actor.items.contents)
+            let choice = await ItemDialog.createFromFilters((0, eval)(effect.flags.wfrp4e.extra), 1, "Choose an Item", t.actor.items.contents)
             if (!choice) {
               continue // If no item selected, do not add effect to target
             }
@@ -1171,11 +1171,7 @@ export default class WFRP_Utility {
   }
 
   static effectCanBeAsync (effect) {
-    return (game.wfrp4e.config.syncEffectTriggers.indexOf(effect.trigger) === -1)
-  }
-
-  static canBeAsync (effect) {
-    return (game.wfrp4e.config.syncEffectTriggers.indexOf(effect.trigger) === -1)
+    return !game.wfrp4e.config.syncEffectTriggers.includes(effect.trigger)
   }
 
   static async invokeEffect(actor, effectId, itemId) {
@@ -1188,7 +1184,7 @@ export default class WFRP_Utility {
        effect = actor.actorEffects.get(effectId)
        item = effect.item
     }
-
+     
     await effect.reduceItemQuantity()
     await WFRP_Utility.runSingleEffect(effect, actor, item, {actor, effect, item});
   }
@@ -1413,8 +1409,6 @@ export default class WFRP_Utility {
     let msg = await ChatMessage.create(chatData);
     return msg;
   }
-
-  
 
   static mergeCareerReplacements(replacements)
   {

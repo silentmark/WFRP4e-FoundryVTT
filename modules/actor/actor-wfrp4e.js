@@ -3934,7 +3934,7 @@ export default class ActorWfrp4e extends Actor {
   }
 
   async clearOpposed() {
-    await this.update({ "flags.-=oppose": null })
+    return (await this.update({ "flags.-=oppose": null }));
   }
 
   /**
@@ -4104,21 +4104,4 @@ export default class ActorWfrp4e extends Actor {
 
   // @@@@@@@@@@ DERIVED DATA GETTERS
   get armour() { return this.status.armour }
-
-
-
-  /**
-   * Transform the Document data to be stored in a Compendium pack.
-   * Remove any features of the data which are world-specific.
-   * This function is asynchronous in case any complex operations are required prior to exporting.
-   * @param {CompendiumCollection} [pack]   A specific pack being exported to
-   * @return {object}                       A data object of cleaned data suitable for compendium import
-   * @memberof ClientDocumentMixin#
-   * @override - Retain ID
-   */
-  toCompendium(pack) {
-    let data = super.toCompendium(pack)
-    data._id = this.id; // Replace deleted ID so it is preserved
-    return data;
-  }
 }
