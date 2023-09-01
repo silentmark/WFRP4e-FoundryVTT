@@ -18,8 +18,7 @@
   ],
   "esmodules" : [],
   "scripts": ["wfrp4e.js", "./libs/pixi-filters.js"],
-  "styles": ["./css/wfrp4e.css"]
-  ],
+  "styles": ["./css/wfrp4e.css"],
   "languages": [
     {
       "lang": "en",
