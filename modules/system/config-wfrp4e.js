@@ -49,7 +49,8 @@ WFRP4E.toTranslate = [
 "flawDescriptions",
 "loreEffectDescriptions",
 "conditionDescriptions",
-"symptomDescriptions"
+"symptomDescriptions",
+"classTrappings"
 ]
 
 // "Trappings" are more than "trapping" type items
@@ -1801,7 +1802,7 @@ WFRP4E.PrepareSystemItems = function() {
                     "value": null,
                     "secondaryEffect" :{
                         "effectTrigger": "targetPrefillDialog",
-                        "script": "if (args.type == 'weapon' && args.item.attackType=='melee') args.prefillModifiers.modifier += 20",
+                        "script": "if (args.item?.attackType=='melee') args.prefillModifiers.modifier += 20",
                     }
                 }
             }
@@ -2101,6 +2102,8 @@ WFRP4E.syncEffectTriggers = [
     "preWoundCalc",
     "woundCalc",
     "calculateSize",
+    "targetPrefillDialog",
+    "prefillDialog",
     "preAPCalc",
     "APCalc",
     "prePrepareItem",

@@ -10,8 +10,5 @@ export default function () {
                     }
                 }
         }
-            
-        game.wfrp4e.config.PrepareSystemItems();
-        CONFIG.statusEffects = game.wfrp4e.config.statusEffects;
     })
 }

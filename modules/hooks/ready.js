@@ -2,19 +2,32 @@ import WFRP_Utility from "../system/utility-wfrp4e.js";
 import FoundryOverrides from "../system/overrides.js";
 import SocketHandlers from "../system/socket-handlers.js";
 import MooHouseRules from "../system/moo-house.js"
+import OpposedWFRP from "../system/opposed-wfrp4e.js";
+import OpposedTest from "../system/opposed-test.js";
 
 export default function () {
-  /**
-   * Ready hook loads tables, and override's foundry's entity link functions to provide extension to pseudo entities
-   */
   Hooks.on("ready", async () => {
 
-    globalThis.CONFIG.compatibility.mode = 0;
 
     Object.defineProperty(game.user, "isUniqueGM", {
       get: function () { return game.user.id == game.users.find(u => u.active && u.isGM)?.id }
     })
 
+    CONFIG.ChatMessage.documentClass.prototype.getTest = function () {
+      if (hasProperty(this, "flags.testData"))
+        return game.wfrp4e.rolls.TestWFRP.recreate(this.flags.testData)   
+    }
+    CONFIG.ChatMessage.documentClass.prototype.getOppose = function () {
+      if (hasProperty(this, "flags.wfrp4e.opposeData"))
+        return new OpposedWFRP(getProperty(this, "flags.wfrp4e.opposeData"))
+    }
+
+    CONFIG.ChatMessage.documentClass.prototype.getOpposedTest = function () {
+      if (hasProperty(this, "flags.wfrp4e.opposeTestData"))
+        return OpposedTest.recreate(getProperty(this, "flags.wfrp4e.opposeTestData"))
+    }
+
+    //***** Change cursor styles if the setting is enabled *****
 
     if (game.settings.get('wfrp4e', 'customCursor')) {
       WFRP_Utility.log('Using custom cursor', true)
@@ -69,6 +82,9 @@ export default function () {
     // Some entities require other entities to be loaded to prepare correctly (vehicles and mounts)
     for (let e of game.wfrp4e.postReadyPrepare)
       e.prepareData();
+
+    game.wfrp4e.config.PrepareSystemItems();
+    CONFIG.statusEffects = game.wfrp4e.config.statusEffects;
 
     FoundryOverrides();
     MooHouseRules();
