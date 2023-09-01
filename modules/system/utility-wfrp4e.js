@@ -1300,6 +1300,8 @@ export default class WFRP_Utility {
     return game.users.contents.find(u => u.active && u.isGM);
   }
 
+  static CtrlKeyPressed = false;
+
   static async setupSocket(owner, payload, content) {
     let msg = await WFRP_Utility.createTestRequestMessage(owner, content);
     payload.messageId = msg.id;
@@ -1329,6 +1331,25 @@ export default class WFRP_Utility {
     } while(!msg.flags?.data?.test)
     const test = TestWFRP.recreate(msg.flags.data.test.data);
     return test;
+  }
+
+  static _setSocketTests(event) {
+    WFRP_Utility.CtrlKeyPressed = true;
+  }
+
+  static _resetSocketTests(event) {
+    WFRP_Utility.CtrlKeyPressed = false;
+  }
+
+  static IsSocketTest() {
+    const useSocketTests = game.settings.get("wfrp4e","useSocketTests");
+    if (useSocketTests && !WFRP_Utility.CtrlKeyPressed) {
+      return true;
+    }
+    if (!useSocketTests && WFRP_Utility.CtrlKeyPressed) {
+      return true;
+    }
+    return false;
   }
 
   static async awaitSocket(owner, type, payload, content) {

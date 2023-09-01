@@ -128,7 +128,7 @@ export default class TestWFRP {
     await this.roll()
   }
 
-  async addSL(SL) {
+  addSL(SL) {
     this.context.previousResult = duplicate(this.result)
     this.preData.SL = Math.trunc(this.result.SL) + SL;
     this.preData.slBonus = 0;
@@ -137,7 +137,7 @@ export default class TestWFRP {
     if (this.preData.hitLocation)
       this.preData.hitloc = this.result.hitloc.roll;
 
-    await this.roll()
+    this.roll()
   }
 
   /**
@@ -469,7 +469,7 @@ export default class TestWFRP {
       await oppose.computeOpposeResult();
       await this.actor.clearOpposed();
       await this.updateMessageFlags();
-
+      
       let test = oppose.attacker.getFlag("wfrp4e", "offHandData");
       if (test) {
         await oppose.attacker.update({ "flags.wfrp4e.-=offHandData": null });
@@ -532,7 +532,7 @@ export default class TestWFRP {
    * Used by the rollTest method and its overrides
    * @param {Object} testData
    */
-   async rollDices() {
+  async rollDices() {
     if (isNaN(this.preData.roll)) {
       let roll = await new Roll("1d100").roll({ async: true });
       await this._showDiceSoNice(roll, this.context.rollMode || "roll", this.context.speaker);

@@ -588,8 +588,9 @@ export default class ActorWfrp4e extends Actor {
 
 
   setupSocket(payload, type, options, content) {
+    const isSocketTest = WFRP_Utility.IsSocketTest();
     let owner = game.wfrp4e.utility.getActorOwner(this);
-    if (owner.id != game.user.id && !options.disableSocket) {
+    if (owner.id != game.user.id && isSocketTest) {
       payload.options = options;
       payload.actorId = this.id;
       payload.userId = game.user.id;
@@ -610,7 +611,7 @@ export default class ActorWfrp4e extends Actor {
    *
    */
   async setupCharacteristic(characteristicId, options = {}) {
-    let socket = this.setupSocket({characteristicId: characteristicId}, "setupCharacteristic", options, "Oczekuję na test cechy " + characteristicId);
+    let socket = this.setupSocket({characteristicId: characteristicId}, "setupCharacteristic", options, "Oczekuję na test cechy: " + characteristicId);
     if(socket) { 
       return socket;
     }
@@ -684,7 +685,7 @@ export default class ActorWfrp4e extends Actor {
     if(typeof(skill) !== "string") {
       skillName = skill.name;
     }
-    let socket = this.setupSocket({skillName: skillName}, "setupSkill", options, "Oczekuję na test umiejętności " + skillName);
+    let socket = this.setupSocket({skillName: skillName}, "setupSkill", options, "Oczekuję na test umiejętności: " + skillName);
     if(socket) { 
       return socket;
     }
@@ -790,7 +791,7 @@ export default class ActorWfrp4e extends Actor {
     let title = options.title || game.i18n.localize("WeaponTest") + " - " + weapon.name;
     title += options.appendTitle || "";
 
-    let socket = this.setupSocket({weapon: weapon}, "setupWeapon", options, "Oczekuję na test " + title);
+    let socket = this.setupSocket({weapon: weapon}, "setupWeapon", options, "Oczekuję na test: " + title);
     if(socket) { 
       return socket;
     }
@@ -939,8 +940,8 @@ export default class ActorWfrp4e extends Actor {
 
     game.user.updateTokenTargets([]);
     game.user.broadcastActivity({targets: []});
-    
-    let socket = this.setupSocket({spell: spell}, "setupCast", options, "Oczekuję na test " + title);
+
+    let socket = this.setupSocket({spell: spell}, "setupCast", options, "Oczekuję na test: " + title);
     if(socket) { 
       return socket;
     }
@@ -1058,7 +1059,7 @@ export default class ActorWfrp4e extends Actor {
     let title = options.title || game.i18n.localize("ChannellingTest") + " - " + spell.name;
     title += options.appendTitle || "";
 
-    let socket = this.setupSocket({spell: spell}, "setupChannell", options, "Oczekuję na test " + title);
+    let socket = this.setupSocket({spell: spell}, "setupChannell", options, "Oczekuję na test: " + title);
     if(socket) { 
       return socket;
     }
@@ -1173,7 +1174,7 @@ export default class ActorWfrp4e extends Actor {
     let title = options.title || game.i18n.localize("PrayerTest") + " - " + prayer.name;
     title += options.appendTitle || "";
 
-    let socket = this.setupSocket({prayer: prayer}, "setupPrayer", options, "Oczekuję na test " + title);
+    let socket = this.setupSocket({prayer: prayer}, "setupPrayer", options, "Oczekuję na test: " + title);
     if(socket) { 
       return socket;
     }
@@ -1270,7 +1271,7 @@ export default class ActorWfrp4e extends Actor {
     let title = options.title || game.wfrp4e.config.characteristics[trait.rollable.rollCharacteristic] + ` ${game.i18n.localize("Test")} - ` + trait.name;
     title += options.appendTitle || "";
     
-    let socket = this.setupSocket({trait: trait}, "setupTrait", options, "Oczekuję na test " + title);
+    let socket = this.setupSocket({trait: trait}, "setupTrait", options, "Oczekuję na test: " + title);
     if(socket) { 
       return socket;
     }
@@ -1651,14 +1652,14 @@ export default class ActorWfrp4e extends Actor {
           this.status.wounds.max = wounds;
           this.status.wounds.value = wounds;
         }
-        else if (this.isOwner && new Date(this._stats.modifiedTime).getSeconds() != new Date().getSeconds())
+        else if (this.isOwner)
           this.update({ "system.status.wounds.max": wounds, "system.status.wounds.value": wounds });
       }
     }
   }
 
   // Resize tokens based on size property
-  async checkSize()
+  checkSize()
   {
     if (game.user.id != WFRP_Utility.getActorOwner(this)?.id)
     {
@@ -1667,14 +1668,12 @@ export default class ActorWfrp4e extends Actor {
     if (this.flags.autoCalcSize && game.canvas.ready) {
       let tokenData = this._getTokenSize();
       if (this.isToken) {
-        await this.token.update(tokenData)
+        return this.token.update(tokenData)
       }
       else if (canvas) {
-        await this.update({prototypeToken : tokenData});
-        const activeTokens = this.getActiveTokens();
-        for(let i = 0; i < activeTokens.length; i++) {
-          await activeTokens[i].document.update(tokenData);
-        }
+        return this.update({prototypeToken : tokenData}).then(() => {
+          this.getActiveTokens().forEach(t => t.document.update(tokenData));
+        })
       }
     } 
   }
@@ -2016,7 +2015,8 @@ export default class ActorWfrp4e extends Actor {
 
 
     if (item.properties && item.properties.qualities.slash && updateMsg.includes("critical-roll")) {
-      updateMsg += `<br><b>Cecha Tnący</b>: Wywołuje Krwawienie przy zadaniu Rany Krytycznej, Może wykorzystać ${item.properties.qualities.slash.value} Przewag, aby wywołać dodatkowy poziom krwawienia.` }
+        updateMsg += `<br><b>Cecha Tnący</b>: Wywołuje Krwawienie przy zadaniu Rany Krytycznej, Może wykorzystać ${item.properties.qualities.slash.value} Przewag, aby wywołać dodatkowy poziom krwawienia.` 
+    }
 
 
     let daemonicTrait = actor.has(game.i18n.localize("NAME.Daemonic"))
@@ -2062,10 +2062,10 @@ export default class ActorWfrp4e extends Actor {
     // Update actor wound value
     await actor.update({ "system.status.wounds.value": newWounds })
     if (newWounds == 0) {
-      await actor.addCondition("prone");
+      // await actor.addCondition("prone");
     }
     if (item.type == "weapon" && item.properties.qualities.slash && updateMsg.includes("critical-roll")) {
-      await actor.addCondition("bleeding", item.properties.qualities.slash.value);
+      // await actor.addCondition("bleeding", item.properties.qualities.slash.value);
     }
 
     return updateMsg;
@@ -2120,7 +2120,7 @@ export default class ActorWfrp4e extends Actor {
       newWounds = 0;
     await this.update({ "system.status.wounds.value": newWounds })
     if (newWounds == 0) {
-      await this.addCondition("prone");
+      // await this.addCondition("prone");
     }
 
     if (!suppressMsg)
@@ -2135,7 +2135,7 @@ export default class ActorWfrp4e extends Actor {
  * @param {number} damage
  * @private
  */
-  async _displayScrollingChange(change, options = {}) {
+   async _displayScrollingChange(change, options = {}) {
     if (!change) return;
     change = Number(change);
     const tokens = this.isToken ? [this.token?.object] : this.getActiveTokens(true);
@@ -2926,7 +2926,7 @@ export default class ActorWfrp4e extends Actor {
     }
   }
 
-  /**
+    /**
    * Construct custom modifiers that doesn't fit to effects.
    *
    * For each armor, compile penalties and concatenate them into one string.
@@ -2935,14 +2935,14 @@ export default class ActorWfrp4e extends Actor {
    * @param {Array} armorList array of processed armor items 
    * @return {string} Penalty string
    */
-  async customPrefillModifiers(item, type, options, tooltip = [], currentModifiers) {
-    const obj = game.wfrp4e.config.customPrefillModifiers
-    const functions = Object.getOwnPropertyNames(obj).filter(function (p) { return typeof obj[p] === 'function' });
-    for (let func of functions) {
-      await game.wfrp4e.config.customPrefillModifiers[func].call(this, item, type, options, tooltip, currentModifiers);
+     async customPrefillModifiers(item, type, options, tooltip = [], currentModifiers) {
+      const obj = game.wfrp4e.config.customPrefillModifiers
+      const functions = Object.getOwnPropertyNames(obj).filter(function (p) { return typeof obj[p] === 'function' });
+      for (let func of functions) {
+        await game.wfrp4e.config.customPrefillModifiers[func].call(this, item, type, options, tooltip, currentModifiers);
+      }
     }
-  }
-
+  
   /**
    * Construct armor penalty string based on armors equipped.
    *
@@ -3434,14 +3434,14 @@ export default class ActorWfrp4e extends Actor {
 
   }
 
-  async deleteEffectsFromItem(itemId) {
+  deleteEffectsFromItem(itemId) {
     let removeEffects = this.effects.filter(e => {
       if (!e.origin)
         return false
       return e.origin.includes(itemId)
     }).map(e => e.id).filter(id => this.actorEffects.has(id))
 
-    await this.deleteEmbeddedDocuments("ActiveEffect", removeEffects)
+    return this.deleteEmbeddedDocuments("ActiveEffect", removeEffects)
 
   }
 
@@ -3572,7 +3572,7 @@ export default class ActorWfrp4e extends Actor {
     wounds.value = Math.clamped(val, 0, wounds.max)
     return this.update({ "system.status.wounds": wounds })
   }
-  
+
   modifyWounds(val) {
     return this.setWounds(this.status.wounds.value + val)
   }
@@ -3656,7 +3656,7 @@ export default class ActorWfrp4e extends Actor {
       return "No Effect Found"
 
     if (!effect.id)
-      return "Conditions require an id field"
+    return "Conditions require an id field"
 
     let existing = this.hasCondition(effect.id);
 

@@ -57,6 +57,9 @@ export default function () {
       SocketHandlers[data.type](data)
     })
 
+    const doc = $(document);
+    doc.on("onkeydown", WFRP_Utility._setSocketTests)
+    doc.on("onkeyup", WFRP_Utility._resetSocketTests);
 
     const body = $("body");
     body.on("dragstart", "a.condition-chat", WFRP_Utility._onDragConditionLink)
@@ -79,6 +82,9 @@ export default function () {
     }
     game.settings.set("wfrp4e", "systemMigrationVersion", MIGRATION_VERSION)
 
+
+
+
     // Some entities require other entities to be loaded to prepare correctly (vehicles and mounts)
     for (let e of game.wfrp4e.postReadyPrepare)
       e.prepareData();
@@ -91,5 +97,9 @@ export default function () {
     canvas.tokens.placeables.forEach(t => t.drawEffects())
 
     game.wfrp4e.tags.createTags()
+
   })
+
+
+
 }

@@ -743,8 +743,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
   _onCharClick(ev) {
     ev.preventDefault();
     let characteristic = ev.currentTarget.attributes["data-char"].value;
-    let options = {disableSocket: ev.ctrlKey}
-    this.actor.setupCharacteristic(characteristic, options).then(setupData => {
+    this.actor.setupCharacteristic(characteristic).then(setupData => {
       this.actor.basicTest(setupData)
     })
   }
@@ -755,8 +754,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     if (ev.button == 0) {
       skill = this.actor.items.get(itemId);
-      let options = {disableSocket: ev.ctrlKey}
-      this.actor.setupSkill(skill, options).then(setupData => {
+      this.actor.setupSkill(skill).then(setupData => {
         this.actor.basicTest(setupData)
       })
     }
@@ -768,41 +766,34 @@ export default class ActorSheetWfrp4e extends ActorSheet {
   _onExtendedTestSelect(ev) {
     let itemId = this._getItemId(ev)
     let item = this.actor.items.get(itemId)
-    let options = {disableSocket: ev.ctrlKey };
-    this.actor.setupExtendedTest(item, options)
+    this.actor.setupExtendedTest(item)
   }
 
   _onWeaponNameClick(ev) {
     ev.preventDefault();
     let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let weapon = this.actor.items.get(itemId)
-    if (weapon) {      
-      let options = {disableSocket: ev.ctrlKey}
-      this.actor.setupWeapon(weapon, options).then(setupData => {
-        if (!setupData.abort)
-          this.actor.weaponTest(setupData)
-      })
-    }
+    if (weapon) this.actor.setupWeapon(weapon).then(setupData => {
+      if (!setupData.abort)
+        this.actor.weaponTest(setupData)
+    })
   }
   async _onUnarmedClick(ev) {
     ev.preventDefault();
     let unarmed = game.wfrp4e.config.systemItems.unarmed
-    let options = {disableSocket: ev.ctrlKey}
-    this.actor.setupWeapon(unarmed, options).then(setupData => {
+    this.actor.setupWeapon(unarmed).then(setupData => {
       this.actor.weaponTest(setupData)
     })
   }
   async _onDodgeClick(ev) {
-    let options = {disableSocket: ev.ctrlKey}
-    this.actor.setupSkill(game.i18n.localize("NAME.Dodge"), options).then(setupData => {
+      this.actor.setupSkill(game.i18n.localize("NAME.Dodge")).then(setupData => {
         this.actor.basicTest(setupData)
-    });
+      });
   }
   async _onImprovisedClick(ev) {
     ev.preventDefault();
     let improv = game.wfrp4e.config.systemItems.improv;
-    let options = {disableSocket: ev.ctrlKey}
-    this.actor.setupWeapon(improv, options).then(setupData => {
+    this.actor.setupWeapon(improv).then(setupData => {
       this.actor.weaponTest(setupData)
     })
   }
@@ -810,14 +801,13 @@ export default class ActorSheetWfrp4e extends ActorSheet {
   async _onStompClick(ev) {
     ev.preventDefault();
     let stomp = game.wfrp4e.config.systemItems.stomp;
-    let options = {disableSocket: ev.ctrlKey };
-    this.actor.setupTrait(stomp, options).then(setupData => {
+    this.actor.setupTrait(stomp).then(setupData => {
       this.actor.traitTest(setupData)
     })
   }
   async _onRestClick(ev) {
     let skill = this.actor.getItemTypes("skill").find(s => s.name == game.i18n.localize("NAME.Endurance"));
-    let options = {disableSocket: ev.ctrlKey, rest: true, tb: this.actor.characteristics.t.bonus}
+    let options = {rest: true, tb: this.actor.characteristics.t.bonus}
     if (skill)
       this.actor.setupSkill(skill, options).then(setupData => {
         this.actor.basicTest(setupData)
@@ -835,8 +825,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let trait = this.actor.items.get(itemId)
-    let options = {disableSocket: ev.ctrlKey };
-    this.actor.setupTrait(trait, options).then(setupData => {
+    this.actor.setupTrait(trait).then(setupData => {
       this.actor.traitTest(setupData)
     })
   }
@@ -847,8 +836,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let spell = this.actor.items.get(itemId)
-    let options = {disableSocket: ev.ctrlKey };
-    this.spellDialog(spell, options)
+    this.spellDialog(spell)
   }
 
   _onPrayerRoll(ev) {
@@ -858,8 +846,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let prayer = this.actor.items.get(itemId)
-    let options = {disableSocket: ev.ctrlKey };
-    this.actor.setupPrayer(prayer, options).then(setupData => {
+    this.actor.setupPrayer(prayer).then(setupData => {
       this.actor.prayerTest(setupData)
     })
   }
@@ -1249,14 +1236,14 @@ export default class ActorSheetWfrp4e extends ActorSheet {
   }
 
 
-  async _onEffectTarget(ev) {
+  _onEffectTarget(ev) {
     let id = $(ev.currentTarget).parents(".item").attr("data-item-id");
     
-    let effect = await this.actor.populateEffect(id);
+    let effect = this.actor.populateEffect(id);
     if (effect.trigger == "apply")
-      await game.wfrp4e.utility.applyEffectToTarget(effect)
+      game.wfrp4e.utility.applyEffectToTarget(effect)
     else {
-      await game.wfrp4e.utility.runSingleEffects(effect, this.actor, effect.item, {actor : this.actor, effect, item : effect.item});
+      game.wfrp4e.utility.runSingleEffect(effect, this.actor, effect.item, {actor : this.actor, effect, item : effect.item});
     }
   }
 
@@ -1743,29 +1730,29 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
     // Inventory Tab - Containers - Detected when you drop something onto a container, otherwise, move on to other drop types
     if ($(ev.target).parents(".item").attr("inventory-type") == "container")
-      await this._onDropIntoContainer(ev)
+      this._onDropIntoContainer(ev)
 
     // Dropping an item from chat
     else if (dragData.type == "postedItem")
-      await this.actor.createEmbeddedDocuments("Item", [dragData.payload]);
+      this.actor.createEmbeddedDocuments("Item", [dragData.payload]);
 
     else if (dragData.type == "generation")
-      await this._onDropCharGen(dragData)
+      this._onDropCharGen(dragData)
 
     else if (dragData.type == "lookup")
-      await this._onDropLookupItem(dragData)
+      this._onDropLookupItem(dragData)
 
     else if (dragData.type == "experience")
-      await this._onDropExperience(dragData)
+      this._onDropExperience(dragData)
 
     else if (dragData.type == "money")
-      await this._onDropMoney(dragData)
+      this._onDropMoney(dragData)
 
     else if (dragData.type == "wounds")
-      await this.modifyWounds(`+${dragData.payload}`)
+      this.modifyWounds(`+${dragData.payload}`)
 
     else if (dragData.type == "condition")
-      await this.actor.addCondition(`${dragData.payload}`)
+      this.actor.addCondition(`${dragData.payload}`)
 
     else // If none of the above, just process whatever was dropped upstream
       super._onDrop(ev)
@@ -1788,11 +1775,11 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       item.system.worn = false;
 
 
-    await this.actor.updateEmbeddedDocuments("Item", [item]);
+    return this.actor.updateEmbeddedDocuments("Item", [item]);
   }
 
   // Dropping a character creation result
-  async _onDropCharGen(dragData) {
+  _onDropCharGen(dragData) {
     let data = duplicate(this.actor._source.system);
     if (dragData.generationType == "attributes") // Characteristsics, movement, metacurrency, etc.
     {
@@ -1812,7 +1799,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       for (let c in game.wfrp4e.config.characteristics) {
         data.characteristics[c].initial = dragData.payload.characteristics[c].value
       }
-      await this.actor.update({ "data": data })
+      return this.actor.update({ "data": data })
     }
     else if (dragData.generationType === "details") // hair, name, eyes
     {
@@ -1821,7 +1808,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       data.details.age.value = dragData.payload.age;
       data.details.height.value = dragData.payload.height;
       let name = dragData.payload.name
-      await this.actor.update({ "name": name, "data": data, "token.name": name.split(" ")[0] })
+      return this.actor.update({ "name": name, "data": data, "token.name": name.split(" ")[0] })
     }
   }
 
@@ -1842,19 +1829,19 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       item = await WFRP_Utility.findItem(dragData.payload.name, dragData.payload.lookupType)
     }
     if (item)
-      await this.actor.createEmbeddedDocuments("Item", [item.toObject()]);
+      this.actor.createEmbeddedDocuments("Item", [item.toObject()]);
   }
 
   // From character creation - exp drag values
-  async _onDropExperience(dragData) {
+  _onDropExperience(dragData) {
     let system = duplicate(this.actor._source.system);
     system.details.experience.total += dragData.payload;
     system.details.experience.log = this.actor._addToExpLog(dragData.payload, "Character Creation", undefined, system.details.experience.total);
-    await this.actor.update({ "system": system })
+    this.actor.update({ "system": system })
   }
 
   // From Income results - drag money value over to add
-  async _onDropMoney(dragData) {
+  _onDropMoney(dragData) {
     // Money string is in the format of <amt><type>, so 12b, 5g, 1.5g
     let moneyString = dragData.payload;
     let type = moneyString.slice(-1);
@@ -1900,10 +1887,10 @@ export default class ActorSheetWfrp4e extends ActorSheet {
     if (halfG)
       money.find(i => i.name === game.i18n.localize("NAME.SS")).system.quantity.value += 10;
 
-    await this.actor.updateEmbeddedDocuments("Item", money);
+    this.actor.updateEmbeddedDocuments("Item", money);
   }
 
-  async _onConvertCurrencyClick(ev) {
+  _onConvertCurrencyClick(ev) {
     let type = ev.currentTarget.dataset.type
     let money = this.actor.getItemTypes("money").map(m => m.toObject());
 
@@ -1916,11 +1903,10 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       {
         currentGC.system.quantity.value -= 1;
         currentSS.system.quantity.value += 20
-        await this.actor.updateEmbeddedDocuments("Item", [currentGC, currentSS])
+        return this.actor.updateEmbeddedDocuments("Item", [currentGC, currentSS])
       }
       else
-        ui.notifications.error(game.i18n.localize("ErrorMoneyConvert"))
-        return;
+        return ui.notifications.error(game.i18n.localize("ErrorMoneyConvert"))
     }
     
     if (type == "ss")
@@ -1932,11 +1918,10 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       {
         currentSS.system.quantity.value -= 1;
         currentBP.system.quantity.value += 12
-        await this.actor.updateEmbeddedDocuments("Item", [currentBP, currentSS])
+        return this.actor.updateEmbeddedDocuments("Item", [currentBP, currentSS])
       }
       else
-        ui.notifications.error(game.i18n.localize("ErrorMoneyConvert"))
-        return;
+        return ui.notifications.error(game.i18n.localize("ErrorMoneyConvert"))
     }
 
   }
@@ -2045,10 +2030,15 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
       let action = game.wfrp4e.config.groupAdvantageActions[index];
 
+      if (action.cost > this.actor.status.advantage.value)
+      {
+        return ui.notifications.error("Not enough Advantage!")
+      }
+
       if (action)
       {
         let html = await TextEditor.enrichHTML(`
-        <p><strong>${action.name} (${acti.cost})</strong>: ${action.description}</p>
+        <p><strong>${action.name}</strong>: ${action.description}</p>
         <p>${action.effect}</p>
         `)
 
@@ -2057,12 +2047,13 @@ export default class ActorSheetWfrp4e extends ActorSheet {
         ChatMessage.create({
           content : html,
           speaker : {alias : this.actor.token?.name || this.actor.prototypeToken.name},
-          flavor : "Akcje Przewag Drużynowych"
+          flavor : "Group Advantage Action"
         })
 
         if (action.test)
         {
-          if (action.test.type == "characteristic") {
+          if (action.test.type == "characteristic")
+          {
             this.actor.setupCharacteristic(action.test.value).then(test => test.roll())
           }
         }
@@ -2123,7 +2114,6 @@ export default class ActorSheetWfrp4e extends ActorSheet {
         return;
       }
       let options = {
-        disableSocket: ev.ctrlKey,
         title: `${skill.name} - ${game.i18n.localize("Income")}`, 
         income: this.actor.details.status, 
         career: career.toObject()
@@ -2138,7 +2128,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       let effectId = ev.target.dataset["effectId"]
       let itemId = ev.target.dataset["itemId"]
 
-      let effect =  await this.actor.populateEffect(effectId, itemId)
+      let effect = this.actor.populateEffect(effectId, itemId)
       let item = this.actor.items.get(itemId)
 
       if (effect.flags.wfrp4e?.reduceQuantity && game.user.targets.size > 0) // Check targets as we don't want to decrease when we know it won't get applied
@@ -2150,9 +2140,9 @@ export default class ActorSheetWfrp4e extends ActorSheet {
       }
 
       if ((item.range && item.range.value.toLowerCase() == game.i18n.localize("You").toLowerCase()) && (item.target && item.target.value.toLowerCase() == game.i18n.localize("You").toLowerCase()))
-        await game.wfrp4e.utility.applyEffectToTarget(effect, [{ actor: this.actor }]) // Apply to caster (self) 
+        game.wfrp4e.utility.applyEffectToTarget(effect, [{ actor: this.actor }]) // Apply to caster (self) 
       else
-        await game.wfrp4e.utility.applyEffectToTarget(effect)
+        game.wfrp4e.utility.applyEffectToTarget(effect)
     })
 
     html.on("click", ".invoke-effect", async ev => {
@@ -2338,7 +2328,7 @@ export default class ActorSheetWfrp4e extends ActorSheet {
 
         let weapon = item
         if (weapon) {
-          let options = {disableSocket: ev.ctrlKey, modify: { modifier } };
+          let options = {modify: { modifier } };
           this.actor.setupWeapon(weapon, options).then(setupData => {
             this.actor.weaponTest(setupData)
           });

@@ -3,8 +3,6 @@ import WFRP_Utility from "../system/utility-wfrp4e.js";
 
 
 export default class ItemWfrp4e extends Item {
-  
-  static LOG_V10_COMPATIBILITY_WARNINGS = false;
 
   // constructor(source, options)
   // {
@@ -1366,12 +1364,12 @@ export default class ItemWfrp4e extends Item {
     let rangeBands = {}
 
     rangeBands[`${game.i18n.localize("Point Blank")}`] = {
-      range: [0, Math.min(Math.ceil(range / 10), 4)],
+      range: [0, 4],
       modifier: game.wfrp4e.config.difficultyModifiers[game.wfrp4e.config.rangeModifiers["Point Blank"]],
       difficulty: game.wfrp4e.config.rangeModifiers["Point Blank"]
     }
     rangeBands[`${game.i18n.localize("Short Range")}`] = {
-      range: [Math.min(Math.ceil(range / 10), 4) + 1, Math.ceil(range / 2)],
+      range: [4 + 1, Math.ceil(range / 2)],
       modifier: game.wfrp4e.config.difficultyModifiers[game.wfrp4e.config.rangeModifiers["Short Range"]],
       difficulty: game.wfrp4e.config.rangeModifiers["Short Range"]
     }
@@ -1570,16 +1568,14 @@ export default class ItemWfrp4e extends Item {
     else if (existing) {
       existing = duplicate(existing)
       existing.flags.wfrp4e.value += value;
-      await this.updateEmbeddedDocuments("ActiveEffect", [existing])
-      return;
+      return this.updateEmbeddedDocuments("ActiveEffect", [existing])
     }
     else if (!existing) {
       effect.name = game.i18n.localize(effect.name);
       if (Number.isNumeric(effect.flags.wfrp4e.value))
         effect.flags.wfrp4e.value = value;
       delete effect.id
-      await this.createEmbeddedDocuments("ActiveEffect", [effect])
-      return;
+      return this.createEmbeddedDocuments("ActiveEffect", [effect])
     }
   }
 
@@ -1595,16 +1591,15 @@ export default class ItemWfrp4e extends Item {
     let existing = this.hasCondition(effect.id)
     
     if (existing && existing.flags.wfrp4e.value == null) {
-      await this.deleteEmbeddedDocuments("ActiveEffect", [existing._id])
-      return;
+      return this.deleteEmbeddedDocuments("ActiveEffect", [existing._id])
     }
     else if (existing) {
       await existing.setFlag("wfrp4e", "value", existing.conditionValue - value);
 
       if (existing.flags.wfrp4e.value <= 0)
-        await this.deleteEmbeddedDocuments("ActiveEffect", [existing._id])
+        return this.deleteEmbeddedDocuments("ActiveEffect", [existing._id])
       else
-        await this.updateEmbeddedDocuments("ActiveEffect", [existing])
+        return this.updateEmbeddedDocuments("ActiveEffect", [existing])
     }
   }
 
@@ -1742,12 +1737,10 @@ export default class ItemWfrp4e extends Item {
 
   get damageEffects()
   {
-    let ammoEffects = this.ammo?.damageEffects
-    let itemDamageEffects = this.effects.filter(e => e.application == "damage" && !e.disabled);
-    if (ammoEffects) {
-      itemDamageEffects = itemDamageEffects.concat(ammoEffects)
-    }
-    if (this.system.lore?.effect?.application == "damage") {
+    let ammoEffects = this.ammo?.damageEffects || []
+    let itemDamageEffects = this.effects.filter(e => e.application == "damage" && !e.disabled).concat(ammoEffects)
+    if (this.system.lore?.effect?.application == "damage")
+    {
       itemDamageEffects.push(this.system.lore.effect)
     }
     if (this.flags.wfrp4e?.conditionalEffects?.length) {

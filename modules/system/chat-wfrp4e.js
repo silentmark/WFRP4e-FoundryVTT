@@ -470,12 +470,12 @@ export default class ChatWFRP {
       return ui.notifications.error(game.i18n.localize("CONDITION.ApplyError"))
 
     if (game.user.isGM)
-      await message.update(conditionResult)
+      message.update(conditionResult)
     else
-      await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: msgId, updateData: conditionResult }, "executing condition script");
+      WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: msgId, updateData: conditionResult }, "executing condition script");
   }
 
-  static async _onApplyEffectClick(event) {
+  static _onApplyEffectClick(event) {
 
     let effectId = event.target.dataset.effectId || (event.target.dataset.lore ? "lore" : "")
     let messageId = $(event.currentTarget).parents('.message').attr("data-message-id");
@@ -487,12 +487,12 @@ export default class ChatWFRP {
     if (!actor.isOwner)
       return ui.notifications.error("CHAT.ApplyError")
 
-    let effect = await actor.populateEffect(effectId, item, test);    
+    let effect = actor.populateEffect(effectId, item, test);
     mergeObject(effect, { flags: {wfrp4e: { messageId: messageId } } });
 
           
     if (effect.flags.wfrp4e.effectTrigger == "invoke") {
-      await game.wfrp4e.utility.invokeEffect(actor, effectId, item.id)
+      game.wfrp4e.utility.invokeEffect(actor, effectId, item.id)
       return
     }
     
@@ -503,9 +503,9 @@ export default class ChatWFRP {
       item.range.value.toLowerCase() == game.i18n.localize("You").toLowerCase() && 
       item.target && 
       item.target.value.toLowerCase() == game.i18n.localize("You").toLowerCase())
-      await game.wfrp4e.utility.applyEffectToTarget(effect, [{ actor }]) 
+      game.wfrp4e.utility.applyEffectToTarget(effect, [{ actor }]) 
     else
-      await game.wfrp4e.utility.applyEffectToTarget(effect, null)
+      game.wfrp4e.utility.applyEffectToTarget(effect, null)
   }
 
   static _onOpposedImgClick(event) {
@@ -522,7 +522,7 @@ export default class ChatWFRP {
 
   }
 
-  static async _onApplyCondition(event) {
+  static _onApplyCondition(event) {
     let actors = canvas.tokens.controlled.concat(Array.from(game.user.targets).filter(i => !canvas.tokens.controlled.includes(i))).map(a => a.actor);
 
     if (actors.length == 0)
@@ -531,9 +531,9 @@ export default class ChatWFRP {
       ui.notifications.notify(`${game.i18n.format("EFFECT.Applied", {name: game.wfrp4e.config.conditions[event.currentTarget.dataset.cond]})} ${game.user.character.name}`)
     }
 
-    for (let a of actors) {
-      await a.addCondition(event.currentTarget.dataset.cond)
-    }
+    actors.forEach(a => {
+      a.addCondition(event.currentTarget.dataset.cond)
+    })
   }
 
 }

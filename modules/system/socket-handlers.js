@@ -57,7 +57,7 @@ export default class SocketHandlers  {
         
         let notification = "Zaaplikuj efekt"
         if (data.payload.effect.flags?.wfrp4e?.hide !== true) 
-          notification +=  ` o nazwie: ${data.payload.effect.name}`
+            notification +=  ` o nazwie: ${data.payload.effect.name}`
         ui.notifications.notify(notification)
 
         let actor = new ActorWfrp4e(data.payload.actorData)
@@ -107,9 +107,6 @@ export default class SocketHandlers  {
 
         let test;
         if (owner.id == game.user.id) {
-            if (owner.isGM) {
-                data.payload.options.bypass = true;
-            }
             if (canvas.scene) { 
                 if (options.gmTargets) {
                     game.user.updateTokenTargets(options.gmTargets);

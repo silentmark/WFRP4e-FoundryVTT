@@ -21,6 +21,8 @@ export default function() {
     msg.updateSource({"content" : ChatWFRP.addEffectButtons(msg.content)})
   })
 
+
+
   /**
    * Primary use of this hook is to intercept chat commands.
    * /char  - Begin character generation

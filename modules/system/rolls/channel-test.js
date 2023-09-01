@@ -158,7 +158,7 @@ export default class ChannelTest extends TestWFRP {
         if (this.preData.unofficialGrimoire.ingredientMode != 'none' && this.hasIngredient && this.item.ingredient.quantity.value > 0 && !this.context.edited && !this.context.reroll) {
           await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
           this.result.ingredientConsumed = true;
-          await ChatMessage.create({ speaker: this.data.context.speaker, content: game.i18n.localize("ConsumedIngredient") })
+          ChatMessage.create({ speaker: this.data.context.speaker, content: game.i18n.localize("ConsumedIngredient") })
         }
         //@/HOUSE
       } 
@@ -242,7 +242,7 @@ export default class ChannelTest extends TestWFRP {
       this.result.SL = SL.toString()
     }
 
-    let newSL = await this.updateChannelledItems(SLdelta)   
+    let newSL = this.updateChannelledItems(SLdelta)   
     this.result.channelledDisplay = newSL.toString();
     if (!game.settings.get("wfrp4e", "useWoMChannelling"))
     {
@@ -295,7 +295,7 @@ export default class ChannelTest extends TestWFRP {
   }
 
   // WoM channelling updates all items of the lore channelled
-  async updateChannelledItems(slDelta)
+  updateChannelledItems(slDelta)
   {
     let items = [this.item];
     if (game.settings.get("wfrp4e", "useWoMChannelling"))
@@ -322,7 +322,7 @@ export default class ChannelTest extends TestWFRP {
       i.system.cn.SL = Math.max(0, i.system.cn.SL) 
     });
 
-    await this.actor.updateEmbeddedDocuments("Item", items)
+    this.actor.updateEmbeddedDocuments("Item", items)
     return items[0].system.cn.SL
   }
 

@@ -238,8 +238,7 @@ export default class ActorSheetWfrp4eCreature extends ActorSheetWfrp4e {
     }
 
     // Otherwise, prompt to roll
-    let options = {disableSocket: event.ctrlKey };
-    this.actor.setupTrait(trait, options).then(testData => {
+    this.actor.setupTrait(trait).then(testData => {
       this.actor.traitTest(testData)
     }).finally(() => {
       this.dialogOpen = false 
