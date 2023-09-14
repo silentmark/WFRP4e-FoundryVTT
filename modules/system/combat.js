@@ -95,6 +95,20 @@ export default class CombatHelpers {
                 canvas.tokens.cycleTokens(1, true);
             }
 
+            let msgContent = ""
+            let startTurnConditions = combatant.actor.actorEffects.filter(e => e.conditionTrigger == "startTurn")
+            for (let cond of startTurnConditions) {
+                if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
+                    let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
+                    if (Number.isNumeric(cond.flags.wfrp4e.value))
+                        conditionName += ` ${cond.flags.wfrp4e.value}`
+                    msgContent = `
+                <h2>${conditionName}</h2>
+                <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
+                    await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
+                }
+            }
+
             await combatant.actor.runEffects("startTurn", combat)
         }
         WFRP_Audio.PlayContextAudio({ item: { type: 'round' }, action: "change" })

@@ -1729,7 +1729,7 @@ WFRP4E.PrepareSystemItems = function() {
             name: "WFRP4E.ConditionName.Entangled",
             flags: {
                 wfrp4e: {
-                    "trigger": "endRound",
+                    "trigger": "startTurn",
                     "effectTrigger": "dialogChoice",
                     "effectData" : {
                         "description" : game.i18n.localize("EFFECT.TestsRelatedToMovementOfAnyKind"),
@@ -2016,6 +2016,36 @@ WFRP4E.conditionScripts = {
                 msg += "Liczba usuniętych stanów Paniki: " + Math.min(test.result.SL, conditionValue);
             } else {
                 msg += "Nie udało się usunąć stanu Paniki";
+            }
+        }
+        let messageData = game.wfrp4e.utility.chatDataSetup(msg);
+        messageData.speaker = {alias: actor.prototypeToken.name}
+        return messageData
+    },
+    "entangled" : async function(actor) {
+        let effect = actor.hasCondition("entangled")
+        let conditionValue = effect.conditionValue;
+        let conditionStrength = effect.flags.wfrp4e.extra;
+        let test = await actor.setupCharacteristic("s", {appendTitle : " - Pochwycenie vs " + conditionStrength})
+        await test.roll();
+        let msg = `<h2>Pochwycenie</h2>`
+        if (conditionStrength) {
+            const roll = await new Roll("1d100").roll();
+            await game.dice3d.showForRoll(roll, game.user, true, null, false);
+            const opponentSl = Math.floor(Number.parseInt(conditionStrength) / 10) - Math.floor(roll.total/ 10);
+            if (test.result.SL - opponentSl > 0) {
+                await actor.removeCondition("entangled", Math.min(test.result.SL - opponentSl, conditionValue));
+                msg += `Test Przeciwstawny: ${opponentSl} (${roll.total} vs ${conditionStrength})<br/>`;
+                msg += "Liczba usuniętych stanów Pochwycenie: " + Math.min(test.result.SL - opponentSl, conditionValue);
+            } else {
+                msg += "Nie udało się usunąć stanu Pochwycenie";
+            }
+        } else {
+            if (test.result.outcome == "success") {
+                await actor.removeCondition("entangled", Math.min(test.result.SL, conditionValue));
+                msg += "Liczba usuniętych stanów Pochwycenie: " + Math.min(test.result.SL, conditionValue);
+            } else {
+                msg += "Nie udało się usunąć stanu Pochwycenie";
             }
         }
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);

@@ -2018,6 +2018,10 @@ export default class ActorWfrp4e extends Actor {
         updateMsg += `<br><b>Cecha Tnący</b>: Wywołuje Krwawienie przy zadaniu Rany Krytycznej, Może wykorzystać ${item.properties.qualities.slash.value} Przewag, aby wywołać dodatkowy poziom krwawienia.` 
     }
 
+    if (item.properties && item.properties.qualities.entangle) {
+        actor.addCondition("entangled", 1, attacker.characteristics.s.value);
+    }
+
 
     let daemonicTrait = actor.has(game.i18n.localize("NAME.Daemonic"))
     let wardTrait = actor.has(game.i18n.localize("NAME.Ward"))
@@ -3611,7 +3615,7 @@ export default class ActorWfrp4e extends Actor {
   }
 
 
-  async addCondition(effect, value = 1) {
+  async addCondition(effect, value = 1, flags = undefined) {
     if (typeof (effect) === "string")
       effect = duplicate(game.wfrp4e.config.statusEffects.find(e => e.id == effect))
     if (!effect)
@@ -3620,14 +3624,16 @@ export default class ActorWfrp4e extends Actor {
     if (!effect.id)
       return "Conditions require an id field"
 
-
     let existing = this.hasCondition(effect.id)
 
     if (existing && !existing.isNumberedCondition)
       return existing
     else if (existing) {
       await existing.setFlag("wfrp4e", "value", existing.conditionValue + value)
-      existing._displayScrollingStatus(true)
+      existing._displayScrollingStatus(true);
+      if (flags) {
+        await existing.setFlag("wfrp4e", "extra", flags);
+      }
       return existing;
     }
     else if (!existing) {
@@ -3635,15 +3641,20 @@ export default class ActorWfrp4e extends Actor {
         effect.flags.wfrp4e.roundReceived = game.combat.round
       effect.name = game.i18n.localize(effect.name);
 
-      if (Number.isNumeric(effect.flags.wfrp4e.value))
+      if (Number.isNumeric(effect.flags.wfrp4e.value)) {
         effect.flags.wfrp4e.value = value;
-        
+      }
+      if (flags) {
+        effect.flags.wfrp4e.extra = flags;
+      }
+      
       effect["statuses"] = [effect.id];
-      if (effect.id == "dead")
+      if (effect.id == "dead") {
         effect["flags.core.overlay"] = true;
-      if (effect.id == "unconscious")
+      }
+      if (effect.id == "unconscious") {
         await this.addCondition("prone")
-
+      }
       delete effect.id
       await this.createEmbeddedDocuments("ActiveEffect", [effect])
     }
