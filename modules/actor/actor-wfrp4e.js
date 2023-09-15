@@ -250,7 +250,7 @@ export default class ActorWfrp4e extends Actor {
               remove = true
           }
           else if (item.type == "spell" || item.type == "prayer") {
-            remove = true
+          //  remove = true
           }
 
           else if (item.type == "trait" && this.type == "creature" && !item.included) {

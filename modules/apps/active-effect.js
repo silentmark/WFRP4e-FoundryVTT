@@ -45,7 +45,6 @@ export default class WFRPActiveEffectConfig extends ActiveEffectConfig {
             if (this.object.parent.type == "spell" || this.object.parent.type == "prayer")
             {
                 delete data.effectApplication.equipped
-                delete data.effectApplication.actor
 
                 // When a spell's range and target is "You", it automatically applies to the caster, not the targets. In rare cases, this needs to be bypassed
                 if (this.object.parent.system.target.value == game.i18n.localize("You") && this.object.parent.system.range.value == game.i18n.localize("You"))
