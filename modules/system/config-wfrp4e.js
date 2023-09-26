@@ -701,7 +701,6 @@ WFRP4E.conditions = {
     "grappling": "WFRP4E.ConditionName.Grappling",
     "fear": "WFRP4E.ConditionName.Fear",
     "engaged": "WFRP4E.ConditionName.Engaged",
-    "covered": "Zasłona przed Strzałem",
     "defeated": "WFRP4E.ConditionName.Defeated"
 }
 
@@ -1708,24 +1707,6 @@ WFRP4E.PrepareSystemItems = function() {
             }
         },
         {
-            icon: "systems/wfrp4e/icons/conditions/cover.png", 
-            id: "covered", 
-            statuses: ["covered"],
-            name: "WFRP4E.ConditionName.Covered", 
-            flags: {
-                wfrp4e: {
-                    "trigger": "endRound",
-                    "effectTrigger": "prefillDialog",
-                    "script": "if (args.item && args.item.attackType=='ranged') args.prefillModifiers.modifier -= (this.effect.conditionValue * 10)",
-                    "value": 1,
-                    "secondaryEffect" :{
-                        "effectTrigger": "targetPrefillDialog",
-                        "script": "if (args.item && args.item.attackType=='ranged') args.prefillModifiers.modifier -= (this.effect.conditionValue * 10)",
-                    }
-                }
-            }
-        },
-        {
             icon: "systems/wfrp4e/icons/conditions/entangled.png",
             id: "entangled",
             statuses: ["entangled"],
@@ -1941,6 +1922,16 @@ WFRP4E.conditionScripts = {
         msg = args.msg;
         damage = args.damage;
         msg += await actor.applyBasicDamage(damage, {damageType : game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL, suppressMsg : true})
+        if (actor.isOwner) {
+            let test = await actor.setupSkill(game.i18n.localize("NAME.Endurance"), {appendTitle : " - Zatrucie"})
+            await test.roll();
+            if (test.result.outcome == "success") {
+                await actor.removeCondition("poisoned", Math.min(test.result.SL, conditionValue));
+                msg += "Liczba usuniętych stanów Zatrucia: " + Math.min(test.result.SL, conditionValue);
+            } else {
+                msg += "Nie udało się usunąć stanu Zatrucia";
+            }
+        }
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
         await actor.runEffects("applyCondition", {effect, data : {messageData}})
