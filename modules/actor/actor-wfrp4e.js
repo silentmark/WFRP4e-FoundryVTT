@@ -2673,7 +2673,8 @@ export default class ActorWfrp4e extends Actor {
       }
     }
     catch (e) {
-      ui.notifications.error("Something went wrong with applying general modifiers: " + e)
+      ui.notifications.error("Something went wrong with applying general modifiers: " + e);
+      console.error("Something went wrong with applying general modifiers" + e);
       slBonus = 0;
       successBonus = 0;
       modifier = 0;
