@@ -1078,7 +1078,15 @@ export default class WFRP_Utility {
     }
     else {
       ui.notifications.notify(game.i18n.localize("APPLYREQUESTGM"))
-      const payload = { effect, targets: [...targets].map(t => t.document.toObject()), scene: canvas.scene.id };
+      const payLoadTargets = [];
+      for(let t of targets) {
+        if (t._id) {
+          payLoadTargets.push({tokenId: t._id});
+        } else {
+          payLoadTargets.push({actorId: t.actor._id});
+        }
+      }
+      const payload = { effect, targets: payLoadTargets, scene: canvas.scene.id };
       await WFRP_Utility.awaitSocket(game.user, "applyEffects", payload, "invoking effect");
     }
     user.updateTokenTargets(targetsBackup);

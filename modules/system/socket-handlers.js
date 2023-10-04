@@ -46,7 +46,21 @@ export default class SocketHandlers  {
     static applyEffects(data) {
         if (!game.user.isUniqueGM)
             return
-        const targets = data.payload.targets.map(t => new TokenDocument(t, {parent: game.scenes.get(data.payload.scene)}));
+        const targets = [];
+        for(let t of data.payload.targets) {
+            if (t.tokenId) {
+                const scene = game.scenes.get(data.payload.scene);
+                const token = scene.tokens.get(t.tokenId);
+                if (token) {
+                    targets.push(token);
+                }
+            } else if (t.actorId) {
+                const actor = game.actors.get(t.actorId);
+                if (actor) {
+                    targets.push({ actor: actor });
+                }
+            }
+        }
         game.wfrp4e.utility.applyEffectToTarget(data.payload.effect, targets)
             .then(() => { SocketHandlers.updateSocketMessageFlag(data) });
     }
