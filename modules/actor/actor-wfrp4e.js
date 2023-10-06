@@ -3790,7 +3790,6 @@ export default class ActorWfrp4e extends Actor {
         effect.duration.rounds = duration;
     }
 
-
     let script = getProperty(effect, "flags.wfrp4e.script")
     if (test && script) {
       let regex = /{{(.+?)}}/g

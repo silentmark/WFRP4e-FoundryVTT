@@ -1105,6 +1105,7 @@
     "WFRP4E.effectApplication.equipped" : "When Item equipped",
     "WFRP4E.effectApplication.apply" : "Apply with targeting",
     "WFRP4E.effectApplication.damage" : "Apply when Item applies damage",
+    "WFRP4E.effectApplication.area" : "Aplikuj gdy Znacznik znajdzie się w zasięgu",
 
     "WFRP4E.applyScope.actor" : "Actor",
     "WFRP4E.applyScope.item" : "Item",

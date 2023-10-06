@@ -2063,6 +2063,7 @@ WFRP4E.effectApplication = {
     "apply" : "WFRP4E.effectApplication.apply",
     "damage" : "WFRP4E.effectApplication.damage",
     "item" : "WFRP4E.effectApplication.item",
+    "area" : "WFRP4E.effectApplication.area"
 }
 
 WFRP4E.applyScope = {

@@ -272,7 +272,6 @@ export default class CastTest extends TestWFRP {
         await template?.delete();
         this.context.templates = this.context.templates.filter(i => i != id);
         await this.updateMessageFlags();
-        AbilityTemplate.applyMeasuredTemplateEffects(id, []);
         continue;
       }
       else if (tableRoll.roll == 2)
@@ -317,10 +316,7 @@ export default class CastTest extends TestWFRP {
       }
       if (template)
       {
-        template.update({x, y}).then(template => {
-          const targetIds = AbilityTemplate.updateAOETargets(template);
-          AbilityTemplate.applyMeasuredTemplateEffects(id, targetIds);
-        });
+        template.update({x, y});
       }
     }
   }

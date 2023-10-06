@@ -102,11 +102,6 @@ export default class EffectWfrp4e extends ActiveEffect {
     return this.parent?.type == "trapping" && getProperty(this, "flags.wfrp4e.reduceQuantity")
   }
 
-  get isAreaEffect() {
-    return getProperty(this, "flags.wfrp4e.areaEffect")
-  }
-
-
   async reduceItemQuantity() {
     if (this.reduceQuantity && this.item)
     {
