@@ -2008,9 +2008,38 @@ export default class ActorWfrp4e extends Actor {
       else
         updateMsg += `<br><a class ="table-click critical-roll" data-table = "crit${opposedTest.result.hitloc.value}" ><i class='fas fa-list'></i> ${game.i18n.localize("Critical")}</a>`
     }
-    if (hack)
-      updateMsg += `<br>${game.i18n.localize("CHAT.DamageAP")} ${game.wfrp4e.config.locations[opposedTest.result.hitloc.value]}`
+    if (hack) {
 
+      let APlocation = opposedTest.result.hitloc.value;
+      let armour = actor.items.filter(x=>(x.type =="weapon" && x.properties.qualities.shield && x.equipped) || (x.type == "armour" && x.worn && x.properties.special?.indexOf('Magiczny') == -1))
+      let protectingArmour = armour.filter(x=>x.currentAP && x.currentAP[APlocation] > 0);
+      let armourToDamage = null;
+      if (protectingArmour.find(x=>x.properties.special?.indexOf("Warstwa Zewnętrzna") != -1))  {
+        armourToDamage = protectingArmour.find(x=>x.properties.special?.indexOf("Warstwa Zewnętrzna") != -1);
+      } else if (protectingArmour.find(x=>x.properties.special?.indexOf("Warstwa Uzupełniająca") != -1)) {
+        armourToDamage = protectingArmour.find(x=>x.properties.special?.indexOf("Warstwa Uzupełniająca") != -1);
+      } else if (protectingArmour.length > 0) {
+        armourToDamage = protectingArmour[0];
+      } else {
+        armourToDamage = armour.find(x=> x.type =="weapon" && x.properties.qualities.shield && x.equipped)
+      }
+
+      if (armourToDamage) {
+        let itemData = armourToDamage.toObject()
+        if (armourToDamage.AP) {
+          let maxDamageAtLocation = armourToDamage.AP[APlocation] + Number(armourToDamage.properties.qualities.durable?.value || 0)
+          itemData.system.APdamage[APlocation] = Math.min(maxDamageAtLocation, itemData.system.APdamage[APlocation] + 1);
+          updateMsg += `<br>${game.i18n.localize("CHAT.DamageAP")} ${game.wfrp4e.config.locations[opposedTest.result.hitloc.value]} - ${armourToDamage.name}`
+        } else {
+          let currentSheild = armourToDamage.properties.qualities.shield.value - Math.max(0, armourToDamage.damageToItem.shield - Number(armourToDamage.properties.qualities.durable?.value || 0));
+          if (currentSheild > 0) {
+            itemData.system.damageToItem.shield += 1; 
+            updateMsg += `<br>${game.i18n.localize("CHAT.DamageAP")} ${game.wfrp4e.config.locations[opposedTest.result.hitloc.value]} - ${armourToDamage.name}`
+          }
+        }
+        await actor.updateEmbeddedDocuments("Item", [itemData]);
+      }
+    }
     if (newWounds <= 0)
       newWounds = 0; // Do not go below 0 wounds
 
