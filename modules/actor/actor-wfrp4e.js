@@ -652,6 +652,7 @@ export default class ActorWfrp4e extends Actor {
         testData.rollMode = cardOptions.rollMode;
         testData.testModifier = Number(html.find('[name="testModifier"]').val());
         testData.testDifficulty = game.wfrp4e.config.difficultyModifiers[html.find('[name="testDifficulty"]').val()];
+        testData.testDifficultyLabel = game.wfrp4e.config.difficultyLabels[html.find('[name="testDifficulty"]').val()];
         testData.successBonus = Number(html.find('[name="successBonus"]').val());
         testData.slBonus = Number(html.find('[name="slBonus"]').val());
         testData.hitLocation = html.find('[name="selectedHitLocation"]').val();
@@ -756,6 +757,7 @@ export default class ActorWfrp4e extends Actor {
         testData.rollMode = cardOptions.rollMode;
         testData.testModifier = Number(html.find('[name="testModifier"]').val());
         testData.testDifficulty = game.wfrp4e.config.difficultyModifiers[html.find('[name="testDifficulty"]').val()];
+        testData.testDifficultyLabel = game.wfrp4e.config.difficultyLabels[html.find('[name="testDifficulty"]').val()];
         testData.successBonus = Number(html.find('[name="successBonus"]').val());
         testData.slBonus = Number(html.find('[name="slBonus"]').val());
         testData.characteristicToUse = html.find('[name="characteristicToUse"]').val();
@@ -895,6 +897,7 @@ export default class ActorWfrp4e extends Actor {
         testData.rollMode = cardOptions.rollMode;
         testData.testModifier = Number(html.find('[name="testModifier"]').val());
         testData.testDifficulty = game.wfrp4e.config.difficultyModifiers[html.find('[name="testDifficulty"]').val()];
+        testData.testDifficultyLabel = game.wfrp4e.config.difficultyLabels[html.find('[name="testDifficulty"]').val()];
         testData.successBonus = Number(html.find('[name="successBonus"]').val());
         testData.slBonus = Number(html.find('[name="slBonus"]').val());
         testData.charging = html.find('[name="charging"]').is(':checked');
@@ -1010,6 +1013,7 @@ export default class ActorWfrp4e extends Actor {
         testData.rollMode = cardOptions.rollMode;
         testData.testModifier = Number(html.find('[name="testModifier"]').val());
         testData.testDifficulty = game.wfrp4e.config.difficultyModifiers[html.find('[name="testDifficulty"]').val()];
+        testData.testDifficultyLabel = game.wfrp4e.config.difficultyLabels[html.find('[name="testDifficulty"]').val()];
         testData.successBonus = Number(html.find('[name="successBonus"]').val());
         testData.slBonus = Number(html.find('[name="slBonus"]').val());
         if (testData.unofficialGrimoire) {
@@ -1128,6 +1132,7 @@ export default class ActorWfrp4e extends Actor {
         testData.rollMode = cardOptions.rollMode;
         testData.testModifier = Number(html.find('[name="testModifier"]').val());
         testData.testDifficulty = game.wfrp4e.config.difficultyModifiers[html.find('[name="testDifficulty"]').val()];
+        testData.testDifficultyLabel = game.wfrp4e.config.difficultyLabels[html.find('[name="testDifficulty"]').val()];
         testData.successBonus = Number(html.find('[name="successBonus"]').val());
         testData.slBonus = Number(html.find('[name="slBonus"]').val());
         if (testData.unofficialGrimoire) {
@@ -1232,6 +1237,7 @@ export default class ActorWfrp4e extends Actor {
         testData.rollMode = cardOptions.rollMode;
         testData.testModifier = Number(html.find('[name="testModifier"]').val());
         testData.testDifficulty = game.wfrp4e.config.difficultyModifiers[html.find('[name="testDifficulty"]').val()];
+        testData.testDifficultyLabel = game.wfrp4e.config.difficultyLabels[html.find('[name="testDifficulty"]').val()];
         testData.successBonus = Number(html.find('[name="successBonus"]').val());
         testData.slBonus = Number(html.find('[name="slBonus"]').val());
         testData.skillSelected = praySkills[Number(html.find('[name="skillSelected"]').val())];
@@ -1325,6 +1331,7 @@ export default class ActorWfrp4e extends Actor {
         testData.rollMode = cardOptions.rollMode;
         testData.testModifier = Number(html.find('[name="testModifier"]').val());
         testData.testDifficulty = game.wfrp4e.config.difficultyModifiers[html.find('[name="testDifficulty"]').val()];
+        testData.testDifficultyLabel = game.wfrp4e.config.difficultyLabels[html.find('[name="testDifficulty"]').val()];
         testData.successBonus = Number(html.find('[name="successBonus"]').val());
         testData.slBonus = Number(html.find('[name="slBonus"]').val());
         testData.charging = html.find('[name="charging"]').is(':checked');
