@@ -6467,6 +6467,7 @@
             color: var(--actor-input-color);
             padding: 3px 0px 0px 0px;
             margin-right: 0x;
+            border: none;
           }
 
   /* ================== 3. INJURIES =========================== */
