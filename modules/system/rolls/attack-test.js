@@ -30,13 +30,13 @@ export default class AttackTest extends TestWFRP {
       if (this.item.weaponGroup?.value == "throwing")
         this.result.scatter = game.i18n.localize("Scatter");
         
-      if (this.item.properties.qualities.blast)
+      if (this.item.properties.qualities.blast && !this.result.other.find(x=>x.indexOf("Rozrzut") > -1))
         this.result.other.push(`<a class='aoe-template' data-item-id="${this.item.id}" data-actor-id="${this.actor.id}" data-type="radius"><i class="fas fa-ruler-combined"></i>${this.item.properties.qualities.blast.value} metrów (Rozrzut)</a>`)
 
     }
     else // if success
     {
-      if (this.item.properties.qualities.blast)
+      if (this.item.properties.qualities.blast && !this.result.other.find(x=>x.indexOf("Rozrzut") > -1))
         this.result.other.push(`<a class='aoe-template' data-item-id="${this.item.id}" data-actor-id="${this.actor.id}" data-type="radius"><i class="fas fa-ruler-combined"></i>${this.item.properties.qualities.blast.value} metrów (Rozrzut)</a>`)
 
       if (this.result.roll % 11 == 0)
