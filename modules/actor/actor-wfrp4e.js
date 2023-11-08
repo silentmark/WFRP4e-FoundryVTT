@@ -906,7 +906,7 @@ export default class ActorWfrp4e extends Actor {
         testData.cardOptions = cardOptions;
         
         if (this.isMounted && testData.charging) {
-          cardOptions.title += " (Mounted)"
+          cardOptions.title += " (Wierzchem)"
         }
         
         testData.skillSelected = skillCharList[Number(html.find('[name="skillSelected"]').val())];
@@ -2927,7 +2927,7 @@ export default class ActorWfrp4e extends Actor {
       if (this.isMounted && item.attackType == "melee" && target) {
         let mountSizeDiff = this.mount.sizeNum - target.sizeNum
         if (target.isMounted)
-          mountSizeDiff = this.mount.sizeNum - target.sizeNum
+          mountSizeDiff = this.mount.sizeNum - target.mount.sizeNum
 
         if (mountSizeDiff >= 1) {
           tooltip.push(`${game.i18n.localize('CHAT.TestModifiers.AttackerMountLarger')} (+20)`);
@@ -2938,18 +2938,15 @@ export default class ActorWfrp4e extends Actor {
       else if (item.attackType == "melee" && target && target.isMounted) {
         let mountSizeDiff = target.mount.sizeNum - this.sizeNum
         if (this.isMounted)
-          mountSizeDiff = target.sizeNum - this.mount.sizeNum
+          mountSizeDiff = target.mount.sizeNum - this.mount.sizeNum
         if (mountSizeDiff >= 1) {
-          if ((item.reachNum || 0) >= 5)
-          {
+          if ((item.reachNum || 0) >= 5) {
             tooltip.push(`${game.i18n.localize('CHAT.TestModifiers.IgnoreDefenderMountLarger')}`);
           }
-          else
-          {
+          else {
             tooltip.push(`${game.i18n.localize('CHAT.TestModifiers.DefenderMountLarger')} (-10)`);
             modifier -= 10;
           }
-
         }
       }
     }
