@@ -4051,7 +4051,7 @@ export default class ActorWfrp4e extends Actor {
     if (this.isToken || token) {
       return {
         token: token?.id || this.token.id,
-        scene: token?.parent.id || this.token.parent.id
+        scene: token?.parent?.id || token?.scene?.id || this.token.parent?.id || this.token.scene?.id
       }
     }
     else {
