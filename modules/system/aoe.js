@@ -140,7 +140,9 @@ export default class AbilityTemplate extends MeasuredTemplate {
     this.document.updateSource({x: snapped.x, y: snapped.y});
     this.refresh();
     this.#moveTime = now;
-    this.constructor.updateAOETargets(this.document)
+    if (game.wfrp4e.utility.CtrlKeyPressed) {
+      this.constructor.updateAOETargets(this.document)
+    }
   }
 
   /* -------------------------------------------- */
