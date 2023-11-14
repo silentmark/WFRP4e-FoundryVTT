@@ -492,7 +492,7 @@ export default class ChatWFRP {
 
           
     if (effect.flags.wfrp4e.effectTrigger == "invoke") {
-      game.wfrp4e.utility.invokeEffect(actor, effectId, item.id)
+      game.wfrp4e.utility.invokeEffect(actor, effect, item.id)
       return
     }
     

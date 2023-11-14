@@ -1121,18 +1121,28 @@ export default class WFRP_Utility {
     return !game.wfrp4e.config.syncEffectTriggers.includes(effect.trigger)
   }
 
-  static async invokeEffect(actor, effectId, itemId) {
+  static async invokeEffect(actor, effectObj, itemId) {
     let item, effect
     if (itemId) {
       item = actor.items.get(itemId);
-      effect = item.effects.get(effectId)
+      if (effectObj.name) {
+        effect = effectObj;
+      } else {
+        effect = item.effects.get(effectObj)
+      }
     }
     else {
-       effect = actor.actorEffects.get(effectId)
+      if (effectObj.name) {
+        effect = effectObj;
+      }
+      else {
+        effect = actor.actorEffects.get(effectId);
+      }
        item = effect.item
     }
-     
-    await effect.reduceItemQuantity()
+    if (effect.reduceItemQuantity) {
+      await effect.reduceItemQuantity();
+    }
     await WFRP_Utility.runSingleEffect(effect, actor, item, {actor, effect, item});
   }
 
