@@ -4,14 +4,13 @@ import WFRP_Utility from "./utility-wfrp4e.js";
 export default class CombatHelpers {
 
 
-    //static scripts = {
-        //startCombat: [CombatHelpers.checkFearTerror],
-        //endCombat: [CombatHelpers.clearCombatantAdvantage, CombatHelpers.endCombatChecks],
-        //startTurn: [CombatHelpers.startTurnChecks],
-        //endRound: [CombatHelpers.checkEndRoundConditions, CombatHelpers.fearReminders],
-        // Functions used by endCombatChecks
-        //endCombatScripts: [CombatHelpers.checkCorruption, CombatHelpers.checkInfection, CombatHelpers.checkDiseases]
-    //}
+    static scripts = {
+        startCombat: [CombatHelpers.checkFearTerror],
+        endCombat: [CombatHelpers.clearCombatantAdvantage, CombatHelpers.checkCorruption, CombatHelpers.checkInfection, CombatHelpers.checkDiseases],
+        startTurn: [CombatHelpers.startTurnChecks],
+        endTurn: [CombatHelpers.endTurnChecks],
+        endRound: [CombatHelpers.checkEndRoundConditions, CombatHelpers.fearReminders]
+    }
 
     static async preUpdateCombat(combat, updateData, context) {
         const previousId = combat.combatant?.id;
@@ -32,7 +31,9 @@ export default class CombatHelpers {
         const is = combat.started;
         if (was || !is) return;
 
-        await CombatHelpers.checkFearTerror(combat);
+        for (let script of CombatHelpers.scripts.startCombat) {
+            await script(combat);
+        }
     }
 
     static async updateCombat(combat, changes, context) {
@@ -64,16 +65,21 @@ export default class CombatHelpers {
 
         if (combat.round != 1 && combat.turns && combat.active) {
             if (cRound > 1 && combat.current.turn == 0) {
-                await CombatHelpers.checkEndRoundConditions(combat);
-                await CombatHelpers.fearReminders(combat);
+                for (let script of CombatHelpers.scripts.endRound) {
+                    await script(combat);
+                }
             }
         }
         
         if (previousCombatant) {
-            CombatHelpers.endTurnChecks(combat, previousCombatant);
+            for (let script of CombatHelpers.scripts.endTurn) {
+                await script(combat, previousCombatant);
+            }
         }
         if (currentCombatant) {
-            CombatHelpers.startTurnChecks(combat, currentCombatant);
+            for (let script of CombatHelpers.scripts.startTurn) {
+                await script(combat, currentCombatant);
+            }
         }
     }
 
@@ -137,23 +143,16 @@ export default class CombatHelpers {
     }
 
     static async endCombat(combat) {
-        await CombatHelpers.clearCombatantAdvantage(combat);
         if (!game.user.isUniqueGM)
             return
 
         let content = ""
         let scriptResult = "";
-        scriptResult = await CombatHelpers.checkCorruption(combat);
-        if(scriptResult) {            
-            content += scriptResult + "<br><br>";
-        }
-        scriptResult = await CombatHelpers.checkDiseases(combat);
-        if(scriptResult) {            
-            content += scriptResult + "<br><br>";
-        }
-        scriptResult = await CombatHelpers.checkDiseases(combat);
-        if(scriptResult) {            
-            content += scriptResult + "<br><br>";
+        for (let script of CombatHelpers.scripts.endCombat) {
+            scriptResult = await script(combat);
+            if (scriptResult) {
+                content += scriptResult + "<br><br>";
+            }
         }
         if (content) {
             content = `<h2>${game.i18n.localize("CHAT.EndCombat")}</h3>` + content;

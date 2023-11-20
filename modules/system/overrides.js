@@ -102,6 +102,8 @@ export default function () {
     Token.prototype._drawEffect = async function(src, tint, value) {
       if ( !src ) return;
       let tex = await loadTexture(src, {fallback: "icons/svg/hazard.svg"});
+      let scalex = 512 / tex.width;
+      let scaley = 512 / tex.height;
       let icon = new PIXI.Sprite(tex);
       if ( tint ) icon.tint = tint;
 
@@ -109,10 +111,8 @@ export default function () {
       if(value)
       {
         let text = new PreciseText(value, game.wfrp4e.config.effectTextStyle)
-        text.x = icon.x + icon.width * 0.1;
-        text.y = icon.y + icon.height * 0.05;
-        text.scale.x = 20;
-        text.scale.y = 20;
+        text.scale.x = 20 / scalex;
+        text.scale.y = 20 / scaley;
         icon.addChild(text)
       }
       

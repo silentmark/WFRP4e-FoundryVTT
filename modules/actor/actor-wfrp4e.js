@@ -1530,6 +1530,33 @@ export default class ActorWfrp4e extends Actor {
     }
     this.computeEncumbrance()
     this.computeAP()
+
+    for(let e of this.effects.map(x=>x)) {
+      if (e.flags?.wfrp4e?.weapon) {
+        this.effects.delete(e.id);
+      }
+    }
+
+    for (let item of this.itemCategories.weapon) {
+      if (item.equipped) {
+        let weaponEffect = new EffectWfrp4e({
+          _id: item.id, name: item.name, icon: item.img, transfer: false, origin: item.uuid, isTemporary: 1, flags: {
+            wfrp4e: {
+              preventDuplicateEffects: true,
+              value: item.twohanded.value ? "\uD83D\uDC50" : (item.offhand.value ? "\uD83D\uDC48" : "\uD83D\uDC49"),
+              weapon: item.id
+            },
+            core: {
+              statusId: item.name
+            }
+          }, duration: {
+            startTime: 87136335184
+          }
+        }, {parent: this});  
+        this.effects.set(item.id, weaponEffect);
+        this.temporaryEffects.push(weaponEffect);
+      }
+    }
   }
 
   computeEncumbrance() {

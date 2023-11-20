@@ -194,20 +194,33 @@ export default class AbilityTemplate extends MeasuredTemplate {
 
   static updateAOETargets(templateData, onlyReturn = false)
   {
-    let grid = canvas.scene.grid;
-    let templateGridSize = templateData.distance/grid.distance * grid.size
-
-    let minx = templateData.x - templateGridSize
-    let miny = templateData.y - templateGridSize
-
-    let maxx = templateData.x + templateGridSize
-    let maxy = templateData.y + templateGridSize
-
     let newTokenTargets = [];
-    canvas.tokens.placeables.forEach(t => {
-      if ((t.x + (t.width / 2)) < maxx && (t.x + (t.width / 2)) > minx && (t.y + (t.height / 2)) < maxy && (t.y + (t.height / 2)) > miny)
+    let type = templateData.t;
+    let distance = templateData.distance;
+    let angle = templateData.angle;
+    let direction = templateData.direction;
+    let width = templateData.width;
+    switch ( type ) {
+      case "circle":
+        templateData.object.shape = MeasuredTemplate.getCircleShape(distance);
+        break;
+      case "cone":
+        templateData.object.shape = MeasuredTemplate.getConeShape(direction, angle, distance);
+        break;
+      case "rect":
+        templateData.object.shape = MeasuredTemplate.getRectShape(direction, distance);
+        break;
+      case "ray":
+        templateData.object.shape = MeasuredTemplate.getRayShape(direction, distance, width);
+        break;
+    }
+
+    let tokens = game.canvas.tokens.placeables.map(x=>x.document);
+    for (let t of tokens) {
+      if (templateData._boundsOverlap(t)) {
         newTokenTargets.push(t.id)
-    })
+      }
+    }
     if (!onlyReturn) {
       game.user.updateTokenTargets(newTokenTargets)
       game.user.broadcastActivity({targets: newTokenTargets})
