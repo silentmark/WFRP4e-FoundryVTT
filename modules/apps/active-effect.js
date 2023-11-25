@@ -101,7 +101,14 @@ export default class WFRPActiveEffectConfig extends ActiveEffectConfig {
             if (game.modules.get("acelib")?.active)
             {
                 this.aceEditor = ace.edit(html.find(".ace-editor input")[0]);
-                this.aceEditor.setOptions(mergeObject(ace.userSettings, {theme : "ace/theme/chaos", mode : "ace/mode/js", keyboardHandler : "ace/mode/vscode"}))
+                this.aceEditor.setOptions(mergeObject(ace.userSettings, {
+                    theme : "ace/theme/chaos", 
+                    mode : "ace/mode/js", 
+                    keyboardHandler : "ace/mode/vscode",
+                    maxLines: Infinity,  // this is going to be very slow on large documents
+                    indentedSoftWrap: false
+                }));
+                this.aceEditor.session.setUseWrapMode(false);
                 this.aceEditor.setValue(this.object.flags.wfrp4e?.script);
             }
         }
