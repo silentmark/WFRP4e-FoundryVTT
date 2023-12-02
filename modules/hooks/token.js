@@ -1,6 +1,6 @@
 import WFRP_Utility from "../system/utility-wfrp4e.js";
-import AbilityTemplate from "../system/aoe.js";
 import passengerRender from "../system/passengerRender.js"
+import AreaHelpers from "../system/area-helpers.js";
 
 export default function() {
   // Adds tooltips to conditions in the condition menu
@@ -11,6 +11,11 @@ export default function() {
         condition.title = "Dead"
     }
   })
+
+  Hooks.on("preUpdateToken", (token, data) => 
+  {
+      // AreaHelpers.checkTokenUpdate(token, data, canvas.templates.placeables);
+  });
 
 
 
@@ -47,6 +52,8 @@ export default function() {
           token.actor.update({"system.status.mount.isToken" : true, "system.status.mount.tokenData" : tokenData})
         }
       }
+
+      AreaHelpers.checkAreas(scene)
     }
 
   })
@@ -70,6 +77,10 @@ export default function() {
 
           }
         }
+        if (updateData.x || updateData.y)
+        {
+          AreaHelpers.checkAreas(scene)
+        }
       }
   })
 
@@ -84,6 +95,9 @@ export default function() {
     else
       passengerRender(token);
   })
+
+
+
   
   function _addMountButton(hud, html)
   {
