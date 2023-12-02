@@ -21,39 +21,26 @@ export default class WeaponTest extends AttackTest {
   }
 
   computeTargetNumber() {
-    // Determine final target if a characteristic was selected
-    try {
-      if (this.preData.skillSelected.char)
-        this.result.target = this.actor.characteristics[this.preData.skillSelected.key].value
-
-      else if (this.preData.skillSelected.name == this.item.getSkillToUse(this.actor).name)
-        this.result.target = this.item.getSkillToUse(this.actor).total.value
-
-      else if (typeof this.preData.skillSelected == "string") {
-        let skill = this.actor.getItemTypes("skill").find(s => s.name == this.preData.skillSelected)
-        if (skill)
-          this.result.target = skill.total.value
-      }
-      else
-        this.result.target = this.item.getSkillToUse(this.actor).total.value
-    }
-    catch
-    {
-      this.result.target = this.item.getSkillToUse(this.actor).total.value
-    }
+    let skill = this.item.skillToUse
+    if (!skill)
+      this.result.target = this.actor.characteristics.ws.value
+    else
+      this.result.target = skill.total.value
 
     super.computeTargetNumber();
   }
 
   async runPreEffects() {
     await super.runPreEffects();
-    await this.actor.runEffects("preRollWeaponTest", { test: this, cardOptions: this.context.cardOptions })
+    await Promise.all(this.actor.runScripts("preRollWeaponTest", { test: this, chatOptions: this.context.chatOptions }))
+    await Promise.all(this.item.runScripts("preRollWeaponTest", { test: this, chatOptions: this.context.chatOptions }))
   }
 
   async runPostEffects() {
     await super.runPostEffects();
-    await this.actor.runEffects("rollWeaponTest", { test: this, cardOptions: this.context.cardOptions }, {item : this.item})
-    Hooks.call("wfrp4e:rollWeaponTest", this, this.context.cardOptions)
+    await Promise.all(this.actor.runScripts("rollWeaponTest", { test: this, chatOptions: this.context.chatOptions }))
+    await Promise.all(this.item.runScripts("rollWeaponTest", { test: this, chatOptions: this.context.chatOptions }))
+    Hooks.call("wfrp4e:rollWeaponTest", this, this.context.chatOptions)
   }
 
 
@@ -124,26 +111,26 @@ export default class WeaponTest extends AttackTest {
   async handleAmmo()
   {
     // Only subtract ammo on the first run, so not when edited, not when rerolled
-    if (this.item.ammo && this.item.consumesAmmo.value && !this.context.edited && !this.context.reroll) {
-      await this.item.ammo.update({ "system.quantity.value": this.item.ammo.quantity.value - 1 })
+    if (this.item.system.ammo && this.item.system.consumesAmmo.value && !this.context.edited && !this.context.reroll) {
+      await this.item.system.ammo.update({ "system.quantity.value": this.item.system.ammo.quantity.value - 1 })
     }
-    else if (this.preData.ammoId && this.item.consumesAmmo.value && !this.context.edited && !this.context.reroll) {
+    else if (this.preData.ammoId && this.item.system.consumesAmmo.value && !this.context.edited && !this.context.reroll) {
       let ammo = this.actor.items.get(this.preData.ammoId)
       await ammo.update({ "system.quantity.value": this.actor.items.get(this.preData.ammoId).quantity.value - 1 })
     }
 
 
-    if (this.item.loading && !this.context.edited && !this.context.reroll) {
-      this.item.loaded.amt--;
-      if (this.item.loaded.amt <= 0) {
-        this.item.loaded.amt = 0
-        this.item.loaded.value = false;
+    if (this.item.system.loading && !this.context.edited && !this.context.reroll) {
+      this.item.system.loaded.amt--;
+      if (this.item.system.loaded.amt <= 0) {
+        this.item.system.loaded.amt = 0
+        this.item.system.loaded.value = false;
 
-        let item = await this.item.update({ "system.loaded.amt": this.item.loaded.amt, "system.loaded.value": this.item.loaded.value });
+        let item = await this.item.system.update({ "system.loaded.amt": this.item.system.loaded.amt, "system.loaded.value": this.item.system.loaded.value });
         await this.actor.checkReloadExtendedTest(item);
       }
       else {
-        await this.item.update({ "system.loaded.amt": this.item.loaded.amt })
+        await this.item.system.update({ "system.loaded.amt": this.item.system.loaded.amt })
       }
     }
   }
@@ -161,7 +148,7 @@ export default class WeaponTest extends AttackTest {
   }
 
   computeMisfire() {
-    let weapon = this.item;
+    let weapon = this.item.system;
     // Blackpowder/engineering/explosive weapons misfire on an even fumble
     if (this.result.fumble && 
       ["blackpowder", "engineering", "explosives"].includes(weapon.weaponGroup.value) && 
@@ -173,7 +160,7 @@ export default class WeaponTest extends AttackTest {
   }
 
   get weapon() {
-    return this.item
+    return this.item.system
   }
 
   get vehicle() {

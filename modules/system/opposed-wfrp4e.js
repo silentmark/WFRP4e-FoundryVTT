@@ -3,6 +3,7 @@ import WFRP_Utility from "./utility-wfrp4e.js";
 
 import ChatWFRP from "./chat-wfrp4e.js";
 import OpposedTest from "./opposed-test.js";
+import SocketHandlers from "./socket-handlers.js";
 
 /**
  * Represents an opposed test. This object is stored in the "targeting" messages and is used as a central manager of a single opposed test.
@@ -114,7 +115,7 @@ export default class OpposedWFRP {
   }
 
   async renderOpposedStart() {
-    let attacker = game.canvas.tokens.get(this.attackerTest.context.cardOptions.speaker.token)?.document ?? this.attacker.prototypeToken;
+    let attacker = game.canvas.tokens.get(this.attackerTest.context.chatOptions.speaker.token)?.document ?? this.attacker.prototypeToken;
     let defender
 
     // Support opposed start messages when defender is not set yet - allows for manual opposed to use this message
@@ -168,7 +169,7 @@ export default class OpposedWFRP {
       await this.message.update(updateData)
     }
     else if (this.message) {
-      await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: this.message.id, updateData }, "Updating message flags");
+      await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: this.message.id, updateData });
     }
   }
 
@@ -235,7 +236,7 @@ export default class OpposedWFRP {
       content = content.replace(loser, `${loser} loser`)
 
       if (!game.user.isGM)
-        await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: this.message.id, updateData: {content} }, "Updating winner/loser color");
+        await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: this.message.id, updateData: {content} });
       else
         await this.message.update({content});
     }
@@ -252,7 +253,7 @@ export default class OpposedWFRP {
         scene: canvas.scene.id,
         opposeFlag: { opposeMessageId: this.data.messageId }
       }
-      await WFRP_Utility.awaitSocket(game.user, "target", payload, "setting oppose flag");
+      await SocketHandlers.executeOnUserAndWait("GM", "target", payload);
     }
     else {
       // Add oppose data flag to the target
@@ -308,10 +309,7 @@ export default class OpposedWFRP {
       hideData: true,
       content: $(resultMessage.content).append(`<div>${damageConfirmation}</div>`).html()
     }
-
-    if (!game.user.isGM)  
-      await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: messageId, updateData: newCard }, "updating opposed damage");
-    else
-      await resultMessage.update(newCard)
+    
+    await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: messageId, updateData: newCard });
   }
 }
