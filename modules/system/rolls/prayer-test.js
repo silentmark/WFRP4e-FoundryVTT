@@ -13,26 +13,39 @@ export default class PrayerTest extends TestWFRP {
   }
 
   computeTargetNumber() {
-    let skill = this.item.skillToUse
-    if (!skill)
-      this.result.target = this.actor.characteristics.fel.value
-    else
-      this.result.target = skill.total.value
+    try {
+      // Determine final target if a characteristic was selected
+      if (this.preData.skillSelected.char)
+        this.result.target = this.actor.characteristics[this.preData.skillSelected.key].value
+
+      else if (this.preData.skillSelected.name == this.item.skillToUse.name)
+        this.result.target = this.item.skillToUse.total.value
+
+      else if (typeof this.preData.skillSelected == "string") {
+        let skill = this.actor.getItemTypes("skill").find(s => s.name == this.preData.skillSelected)
+        if (skill)
+          this.result.target = skill.total.value
+      }
+      else
+        this.result.target = this.item.skillToUse.total.value
+
+    }
+    catch {
+      this.result.target = this.item.skillToUse.total.value
+    }
 
     super.computeTargetNumber();
   }
 
   async runPreEffects() {
     await super.runPreEffects();
-    await Promise.all(this.actor.runScripts("preRollPrayerTest", { test: this, chatOptions: this.context.chatOptions }))
-    await Promise.all(this.item.runScripts("preRollPrayerTest", { test: this, chatOptions: this.context.chatOptions }))
+    await this.actor.runEffects("preRollPrayerTest", { test: this, cardOptions: this.context.cardOptions })
   }
 
   async runPostEffects() {
     await super.runPostEffects();
-    await Promise.all(this.actor.runScripts("rollPrayerTest", { test: this, chatOptions: this.context.chatOptions }))
-    await Promise.all(this.item.runScripts("rollPrayerTest", { test: this, chatOptions: this.context.chatOptions }))
-    Hooks.call("wfrp4e:rollPrayerTest", this, this.context.chatOptions)
+    await this.actor.runEffects("preRollPrayerTest", { test: this, cardOptions: this.context.cardOptions }, {item : this.item})
+    Hooks.call("wfrp4e:rollPrayerTest", this, this.context.cardOptions)
   }
 
   async computeResult() {

@@ -15,21 +15,6 @@ export default class ItemDialog extends Dialog {
 
     static async create(items, count = 1, text)
     {
-
-        if (typeof items == "object" && !Array.isArray(items) && !(items instanceof Collection))
-        {
-            items = this.objectToArray(items);
-        }
-
-        if (count == 0 || items.length == 0)
-        {
-            return [];
-        }
-        else if (items.length == 1)
-        {
-            return items;
-        }
-
         let html = await renderTemplate("systems/wfrp4e/templates/apps/item-dialog.hbs", {items, count, text})
         return new Promise((resolve) => {
             new ItemDialog({
@@ -58,20 +43,6 @@ export default class ItemDialog extends Dialog {
             else 
                 resolve(choice)
         })
-    }
-
-    
-    // simulate document structure with key as the ID and the value as the name
-    static objectToArray(object)
-    {
-        return Object.keys(foundry.utils.deepClone(object)).map(key => 
-        {
-            return {
-                id : key,
-                name : object[key]
-            };
-        });
-
     }
 
     async getData() {
@@ -124,7 +95,7 @@ export default class ItemDialog extends Dialog {
                 document.classList.remove("active")
                 this.chosen--;
             }
-            else if (this.data.system.count == "unlimited" || (this.data.system.count - this.chosen > 0)) {
+            else if (this.data.system.count - this.chosen > 0) {
                 document.classList.add("active")
                 this.chosen++;
             } 

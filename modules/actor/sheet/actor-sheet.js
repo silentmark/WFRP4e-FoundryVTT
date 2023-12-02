@@ -2,8 +2,8 @@ import MarketWfrp4e from "../../apps/market-wfrp4e.js";
 import WFRP_Utility from "../../system/utility-wfrp4e.js";
 import WFRP_Audio from "../../system/audio-wfrp4e.js"
 import NameGenWfrp from "../../apps/name-gen.js";
+import CharacteristicTest from "../../system/rolls/characteristic-test.js"
 import EffectWfrp4e from "../../system/effect-wfrp4e.js";
-import WFRP4eSheetMixin from "./mixin.js"
 
 /**
  * Provides the data and general interaction with Actor Sheets - Abstract class.
@@ -20,15 +20,13 @@ import WFRP4eSheetMixin from "./mixin.js"
  * @see   ActorSheetWfrp4eNPC - NPC sheet class
  * @see   ActorSheetWfrp4eCreature - Creature sheet class
  */
-export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
+export default class ActorSheetWfrp4e extends ActorSheet {
 
   static get defaultOptions() {
     const options = super.defaultOptions;
     options.tabs = [{ navSelector: ".tabs", contentSelector: ".content", initial: "main" }]
     options.width = 576;
-    options.scrollY = [".save-scroll"];
     return options;
-    WFRP4ESH
   }
 
   /**
@@ -41,13 +39,15 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
    * @param {Object} options  used upstream.
    */
   async _render(force = false, options = {}) {
+    this._saveScrollPos(); // Save scroll positions
     await super._render(force, options);
+    this._setScrollPos();  // Set scroll positions
 
     // Add Tooltips
-    this.element.find(".close").attr({"data-tooltip" : game.i18n.localize("SHEET.Close"), "data-tooltip-direction" : "UP"});
-    this.element.find(".configure-sheet").attr({"data-tooltip" : game.i18n.localize("SHEET.Configure"), "data-tooltip-direction" : "UP"});
-    this.element.find(".configure-token").attr({"data-tooltip" : game.i18n.localize("SHEET.Token"), "data-tooltip-direction" : "UP"});
-    this.element.find(".import").attr({"data-tooltip" : game.i18n.localize("SHEET.Import"), "data-tooltip-direction" : "UP"});
+    this.element  .find(".close").attr({"data-tooltip" : game.i18n.localize("SHEET.Close"), "data-tooltip-direction" : "UP"});
+    this.element  .find(".configure-sheet").attr({"data-tooltip" : game.i18n.localize("SHEET.Configure"), "data-tooltip-direction" : "UP"});
+    this.element  .find(".configure-token").attr({"data-tooltip" : game.i18n.localize("SHEET.Token"), "data-tooltip-direction" : "UP"});
+    this.element  .find(".import").attr({"data-tooltip" : game.i18n.localize("SHEET.Import"), "data-tooltip-direction" : "UP"});
 
     WFRP_Utility.replacePopoutTokens(this.element); // Opposed attackers show as tokens, replace popout versions with normal
     WFRP_Utility.addLinkSources(this.element);
@@ -56,40 +56,40 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
   }
 
-  // /**
-  //  * Saves all the scroll positions in the sheet for setScrollPos() to use
-  //  * 
-  //  * All elements in the sheet that use ".save-scroll" class has their position saved to
-  //  * this.scrollPos array, which is used when rendering (rendering a sheet resets all 
-  //  * scroll positions by default).
-  //  */
-  // _saveScrollPos() {
-  //   if (this.form === null)
-  //     return;
+  /**
+   * Saves all the scroll positions in the sheet for setScrollPos() to use
+   * 
+   * All elements in the sheet that use ".save-scroll" class has their position saved to
+   * this.scrollPos array, which is used when rendering (rendering a sheet resets all 
+   * scroll positions by default).
+   */
+  _saveScrollPos() {
+    if (this.form === null)
+      return;
 
-  //   const html = $(this.form).parent();
-  //   this.scrollPos = [];
-  //   let lists = $(html.find(".save-scroll"));
-  //   for (let list of lists) {
-  //     this.scrollPos.push($(list).scrollTop());
-  //   }
-  // }
+    const html = $(this.form).parent();
+    this.scrollPos = [];
+    let lists = $(html.find(".save-scroll"));
+    for (let list of lists) {
+      this.scrollPos.push($(list).scrollTop());
+    }
+  }
 
-  // /**
-  //  * Sets all scroll positions to what was saved by saveScrollPos()
-  //  * 
-  //  * All elements in the sheet that use ".save-scroll" class has their position set to what was
-  //  * saved by saveScrollPos before rendering. 
-  //  */
-  // _setScrollPos() {
-  //   if (this.scrollPos) {
-  //     const html = $(this.form).parent();
-  //     let lists = $(html.find(".save-scroll"));
-  //     for (let i = 0; i < lists.length; i++) {
-  //       $(lists[i]).scrollTop(this.scrollPos[i]);
-  //     }
-  //   }
-  // }
+  /**
+   * Sets all scroll positions to what was saved by saveScrollPos()
+   * 
+   * All elements in the sheet that use ".save-scroll" class has their position set to what was
+   * saved by saveScrollPos before rendering. 
+   */
+  _setScrollPos() {
+    if (this.scrollPos) {
+      const html = $(this.form).parent();
+      let lists = $(html.find(".save-scroll"));
+      for (let i = 0; i < lists.length; i++) {
+        $(lists[i]).scrollTop(this.scrollPos[i]);
+      }
+    }
+  }
 
   _refocus(html) {
     try {
@@ -117,7 +117,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
    */
   async getData() {
     const sheetData = await super.getData();
-    sheetData.system = sheetData.actor.system // project system data so that handlebars has the same name and value paths
+    sheetData.system = sheetData.data.system // project system data so that handlebars has the same name and value paths
 
     sheetData.items = this.constructItemLists(sheetData)
     this.formatArmourSection(sheetData)
@@ -380,13 +380,13 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     sheetData.effects.disabled = []
     sheetData.effects.targeted = []
 
-    for (let e of Array.from(this.actor.allApplicableEffects(true)))
-    {
+    for (let e of this.actor.actorEffects) {
       if (!e.show)
         continue
       if (e.isCondition) sheetData.effects.conditions.push(e)
       else if (e.disabled) sheetData.effects.disabled.push(e)
       else if (e.isTemporary) sheetData.effects.temporary.push(e)
+      else if (e.isTargeted) sheetData.effects.targeted.push(e)
       else sheetData.effects.passive.push(e);
     }
 
@@ -515,11 +515,10 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
         this.actor.castTest(setupData)
       });
     else {
+      renderTemplate("systems/wfrp4e/templates/dialog/cast-channel-dialog.hbs").then(dlg => {
         new Dialog({
           title: game.i18n.localize("DIALOG.CastOrChannel"),
-          content: `<div class="cast-channel-dialog selection"> 
-                    <p>${game.i18n.localize("DIALOG.CastChannel")}</p> 
-                    </div>`,
+          content: dlg,
           buttons: {
             cast: {
               label: game.i18n.localize("Cast"),
@@ -553,6 +552,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
           },
           default: 'cast'
         }).render(true);
+      })
     }
   }
 
@@ -626,8 +626,8 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     html.find('.item-create').click(this._onItemCreate.bind(this));
     html.find(".aggregate").click(this._onAggregateClick.bind(this));
     html.find('.worn-container').click(this._onWornClick.bind(this));
-    html.find('.effect-toggle').click(this._onEffectToggle.bind(this));
-    html.find('.effect-title').click(this._onEffectEdit.bind(this));
+    html.find('.effect-toggle').click(this._onEffectEdit.bind(this));
+    html.find('.effect-title').click(this._onEffectClick.bind(this));
     html.find('.spell-roll').mousedown(this._onSpellRoll.bind(this));
     html.find('.trait-roll').mousedown(this._onTraitRoll.bind(this));
     html.find(".skill-switch").click(this._onSkillSwitch.bind(this));
@@ -635,6 +635,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     html.find('.ammo-selector').change(this._onSelectAmmo.bind(this));
     html.find('.randomize').click(this._onRandomizeClicked.bind(this));
     html.find('.input.species').change(this._onSpeciesEdit.bind(this));
+    html.find('.effect-target').click(this._onEffectTarget.bind(this));
     html.find('.effect-delete').click(this._onEffectDelete.bind(this));
     html.find('.prayer-roll').mousedown(this._onPrayerRoll.bind(this));
     html.find('.effect-create').click(this._onEffectCreate.bind(this));
@@ -732,6 +733,10 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
   }
 
+  _getItemId(ev) {
+    return $(ev.currentTarget).parents(".item").attr("data-item-id")
+  }
+
   //#region ROLLING
   //@@@@@@@@@ ROLLING @@@@@@@@@@@/
 
@@ -744,7 +749,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onSkillClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let skill = this.actor.items.get(itemId);
 
     if (ev.button == 0) {
@@ -759,14 +764,14 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onExtendedTestSelect(ev) {
-    let itemId = this._getId(ev)
+    let itemId = this._getItemId(ev)
     let item = this.actor.items.get(itemId)
     this.actor.setupExtendedTest(item)
   }
 
   _onWeaponNameClick(ev) {
     ev.preventDefault();
-    let itemId = this._getId(ev);
+    let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let weapon = this.actor.items.get(itemId)
     if (weapon) this.actor.setupWeapon(weapon).then(setupData => {
       if (!setupData.abort)
@@ -818,7 +823,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     if (ev.button == 2)
       return this._onItemSummary(ev);
 
-    let itemId = this._getId(ev);
+    let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let trait = this.actor.items.get(itemId)
     this.actor.setupTrait(trait).then(setupData => {
       this.actor.traitTest(setupData)
@@ -829,7 +834,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     if (ev.button == 2)
       return this._onItemSummary(ev);
 
-    let itemId = this._getId(ev);
+    let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let spell = this.actor.items.get(itemId)
     this.spellDialog(spell)
   }
@@ -839,7 +844,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     if (ev.button == 2)
       return this._onItemSummary(ev);
 
-    let itemId = this._getId(ev);
+    let itemId = $(ev.currentTarget).parents(".item").attr("data-item-id");
     let prayer = this.actor.items.get(itemId)
     this.actor.setupPrayer(prayer).then(setupData => {
       this.actor.prayerTest(setupData)
@@ -852,8 +857,8 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   //@@@@@@@@@ INTERACTIONS @@@@@@@@@@@/
 
   _saveFocus(ev) {
-    if (ev.target.attributes["data-id"])
-      this.saveFocus = `data-id="${ev.target.attributes["data-id"].value}`
+    if (ev.target.attributes["data-item-id"])
+      this.saveFocus = `data-item-id="${ev.target.attributes["data-item-id"].value}`
 
     if (ev.target.attributes["data-char"])
       this.saveFocus = `data-char="${ev.target.attributes["data-char"].value}`
@@ -861,7 +866,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
   async _onEditChar(ev) {
     ev.preventDefault();
-    let characteristics = duplicate(this.actor._source.characteristics);
+    let characteristics = duplicate(this.actor._source.system.characteristics);
     let ch = ev.currentTarget.attributes["data-char"].value;
     let newValue = Number(ev.target.value);
 
@@ -888,7 +893,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
   async _onChangeSkillAdvances(ev) {
     ev.preventDefault()
-    let itemId = ev.target.attributes["data-id"].value;
+    let itemId = ev.target.attributes["data-item-id"].value;
     let itemToEdit = this.actor.items.get(itemId);
     if (this.actor.type == "character")
     {
@@ -909,20 +914,20 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onSelectAmmo(ev) {
-    let itemId = ev.target.attributes["data-id"].value;
+    let itemId = ev.target.attributes["data-item-id"].value;
     const item = this.actor.items.get(itemId);
     WFRP_Audio.PlayContextAudio({ item, action: "load" })
     return item.update({ "system.currentAmmo.value": ev.target.value });
   }
 
   _onSelectSpell(ev) {
-    let itemId = ev.target.attributes["data-id"].value;
+    let itemId = ev.target.attributes["data-item-id"].value;
     const ing = this.actor.items.get(itemId);
     return ing.update({ "system.spellIngredient.value": ev.target.value });
   }
 
   _onSelectIngredient(ev) {
-    let itemId = ev.target.attributes["data-id"].value;
+    let itemId = ev.target.attributes["data-item-id"].value;
     const spell = this.actor.items.get(itemId);
     return spell.update({ "system.currentIng.value": ev.target.value });
   }
@@ -933,7 +938,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onExtendedSLClick(ev) {
-    let itemId = this._getId(ev)
+    let itemId = this._getItemId(ev)
     let item = this.actor.items.get(itemId)
     let SL
     if (ev.button == 0) SL = item.SL.current + 1;
@@ -945,7 +950,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onAPClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let APlocation = $(ev.currentTarget).parents(".armour-box").attr("data-location");
     let item = this.actor.items.get(itemId)
     let itemData = item.toObject()
@@ -965,7 +970,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onWeaponDamageClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let item = this.actor.items.get(itemId);
     let itemData = item.toObject()
 
@@ -1079,7 +1084,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   async _onMemorizedClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     const spell = this.actor.items.get(itemId)
 
 
@@ -1110,7 +1115,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onSpellSLClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     const spell = this.actor.items.get(itemId)
     let SL = spell.cn.SL
     switch (ev.button) {
@@ -1149,7 +1154,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   async _onDiseaseRoll(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     const disease = this.actor.items.get(itemId).toObject()
     let type = ev.target.dataset["type"];
     if (type == "incubation")
@@ -1179,7 +1184,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   async _onInjuryDurationClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let injury = this.actor.items.get(itemId).toObject()
     if (!isNaN(injury.system.duration.value)) {
       if (ev.button == 0)
@@ -1208,33 +1213,31 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onItemEdit(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     const item = this.actor.items.get(itemId)
     return item.sheet.render(true)
   }
 
+  _onEffectClick(ev) {
+    let id = this._getItemId(ev);
+    let effect = this.actor.actorEffects.get(id)
+    return effect.sheet.render(true)
+  }
+
   _onEffectDelete(ev) {
-    let uuid = this._getUUID(ev);
-    let effect = fromUuidSync(uuid);
-    effect.delete();  
+    let id = $(ev.currentTarget).parents(".item").attr("data-item-id");
+    return this.actor.deleteEmbeddedDocuments("ActiveEffect", [id])
   }
 
-  async _onEffectEdit(ev) {
-    let uuid = this._getUUID(ev);
-    let effect = fromUuidSync(uuid)
-    return effect.sheet.render(true);
-  }
-
-  async _onEffectToggle(ev)
-  {
-    let uuid = this._getUUID(ev);
-    let effect = fromUuidSync(uuid)
-    return effect.update({disabled : !effect.disabled});
+  _onEffectEdit(ev) {
+    let id = $(ev.currentTarget).parents(".item").attr("data-item-id");
+    let effect = this.actor.actorEffects.get(id)
+    return effect.update({ disabled: !effect.disabled })
   }
 
 
   _onEffectTarget(ev) {
-    let id = this._getId(ev);
+    let id = $(ev.currentTarget).parents(".item").attr("data-item-id");
     
     let effect = this.actor.populateEffect(id);
     if (effect.trigger == "apply")
@@ -1249,44 +1252,40 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onItemDelete(ev) {
-    let li = $(ev.currentTarget).parents(".item")
-    let itemId = this._getId(ev);
+    let li = $(ev.currentTarget).parents(".item"), itemId = li.attr("data-item-id");
     if (this.actor.items.get(itemId).name == "Boo") {
       AudioHelper.play({ src: `${game.settings.get("wfrp4e", "soundPath")}squeek.wav` }, false)
       return
     }
     renderTemplate('systems/wfrp4e/templates/dialog/delete-item-dialog.hbs').then(html => {
       new Dialog({
-        title: game.i18n.localize("Delete Confirmation"), 
-        content: `<div class="delete-item-dialog selection"> 
-                  <label>${game.i18n.localize("DIALOG.DeleteItem")}</label>
-                  </div>`,
-        buttons: {
-          yes: {
+        title: game.i18n.localize("Delete Confirmation"), content: html, buttons: {
+          Yes: {
             icon: '<i class="fa fa-check"></i>', label: game.i18n.localize("Yes"), callback: async dlg => {
               await this.actor.deleteEmbeddedDocuments("Item", [itemId]);
+              await this.actor.deleteEffectsFromItem(itemId);
               li.slideUp(200, () => this.render(false))
             }
           }, cancel: { icon: '<i class="fas fa-times"></i>', label: game.i18n.localize("Cancel") },
-        }, default: 'yes'
+        }, default: 'Yes'
       }).render(true)
     })
   }
 
   _onItemRemove(ev) {
-    let itemId = this._getId(ev);
+    let li = $(ev.currentTarget).parents(".item"), itemId = li.attr("data-item-id");
     const item = this.actor.items.get(itemId)
     return item.update({ "system.location.value": "" })
   }
 
   _onToggleContainerEncumbrance(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     const item = this.actor.items.get(itemId)
     return item.update({ "system.countEnc.value": !item.countEnc.value })
   }
 
   _onItemToggle(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let item = this.actor.items.get(itemId).toObject()
     let equippedState;
     if (item.type == "armour") {
@@ -1315,13 +1314,13 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onCheckboxClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let target = $(ev.currentTarget).attr("data-target")
     this.toggleItemCheckbox(itemId, target)
   }
 
   _onLoadedClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let item = this.actor.items.get(itemId)
     let itemObject = item.toObject()
     if (item.repeater) {
@@ -1342,7 +1341,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onRepeaterClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let item = this.actor.items.get(itemId).toObject()
     item.system.loaded.value = !item.system.loaded.value
     if (item.system.loaded.value) item.system.loaded.amt = item.system.loaded.max || 1
@@ -1350,13 +1349,13 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   }
 
   _onWornClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let item = this.actor.items.get(itemId)
     return item.update({ "system.worn.value": !item.worn.value })
   }
 
   _onQuantityClick(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     let item = this.actor.items.get(itemId)
     let quantity = item.quantity.value
     switch (ev.button) {
@@ -1399,7 +1398,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
             label: game.i18n.localize("Split"), callback: (dlg) => {
               let amt = Number(dlg.find('[name="split-amt"]').val());
               if (Number.isNumeric(amt))
-                return this.splitItem(this._getId(ev), amt)
+                return this.splitItem(this._getItemId(ev), amt)
             }
           }
         }, default: "split"
@@ -1545,7 +1544,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     elementToAddTo.toggleClass("expanded")
   }
   _onItemPostClicked(ev) {
-    let itemId = this._getId(ev);
+    let itemId = this._getItemId(ev);
     const item = this.actor.items.get(itemId)
     item.postItem()
   }
@@ -1650,21 +1649,21 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     this.actor.createEmbeddedDocuments("Item", [data]);
   }
 
-  // _onEffectCreate(ev) {
-  //   let type = ev.currentTarget.attributes["data-effect"].value
-  //   let effectData = { name: game.i18n.localize("New Effect") }
-  //   if (type == "temporary") {
-  //     effectData["duration.rounds"] = 1;
-  //   }
-  //   if (type == "applied") {
-  //     effectData["flags.wfrp4e.effectApplication"] = "apply"
-  //   }
-  //   this.actor.createEmbeddedDocuments("ActiveEffect", [effectData])
-  // }
+  _onEffectCreate(ev) {
+    let type = ev.currentTarget.attributes["data-effect"].value
+    let effectData = { name: game.i18n.localize("New Effect") }
+    if (type == "temporary") {
+      effectData["duration.rounds"] = 1;
+    }
+    if (type == "applied") {
+      effectData["flags.wfrp4e.effectApplication"] = "apply"
+    }
+    this.actor.createEmbeddedDocuments("ActiveEffect", [effectData])
+  }
 
 
   _onInvokeClick(ev) {
-    let id = this._getId(ev);
+    let id = $(ev.currentTarget).parents(".item").attr("data-item-id");
     game.wfrp4e.utility.invokeEffect(this.actor, id)
   }
 
@@ -1689,26 +1688,14 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     // Create drag data
     let dragData;
 
-    if (li.dataset.uuid)
-    {
-      let doc = fromUuidSync(li.dataset.uuid)
-      dragData = doc.toDragData();
-    }
-
-    // Owned Items (assumed)
-    else if ( li.dataset.id ) {
-      const item = this.actor.items.get(li.dataset.id);
-      dragData = item.toDragData();
-    }
-
-    // Owned Items (explicit)
-    else if ( li.dataset.itemId ) {
+    // Owned Items
+    if ( li.dataset.itemId ) {
       const item = this.actor.items.get(li.dataset.itemId);
       dragData = item.toDragData();
     }
 
     // Active Effect
-    else if ( li.dataset.effectId ) {
+    if ( li.dataset.effectId ) {
       const effect = this.actor.effects.get(li.dataset.effectId);
       dragData = effect.toDragData();
     }
@@ -1776,7 +1763,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
   async _onDropIntoContainer(ev) {
     let dragData = JSON.parse(ev.dataTransfer.getData("text/plain"));
-    let dropID = $(ev.target).parents(".item").attr("data-id");
+    let dropID = $(ev.target).parents(".item").attr("data-item-id");
 
     let item = (await Item.implementation.fromDropData(dragData))?.toObject()
 
@@ -1796,7 +1783,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
   // Dropping a character creation result
   _onDropCharGen(dragData) {
-    let data = duplicate(this.actor._source);
+    let data = duplicate(this.actor._source.system);
     if (dragData.generationType == "attributes") // Characteristsics, movement, metacurrency, etc.
     {
       data.details.species.value = dragData.payload.species;
@@ -1850,7 +1837,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
   // From character creation - exp drag values
   _onDropExperience(dragData) {
-    let system = duplicate(this.actor._source);
+    let system = duplicate(this.actor._source.system);
     system.details.experience.total += dragData.payload;
     system.details.experience.log = this.actor._addToExpLog(dragData.payload, "Character Creation", undefined, system.details.experience.total);
     this.actor.update({ "system": system })
@@ -1957,9 +1944,9 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   async _onItemSummary(ev) {
     ev.preventDefault();
     let li = $(ev.currentTarget).parents(".item"),
-      item = this.actor.items.get(li.attr("data-id"));
+      item = this.actor.items.get(li.attr("data-item-id"));
     // Call the item's expandData() which gives us what to display
-    let expandData = await item.system.expandData(
+    let expandData = await item.getExpandData(
       {
         secrets: this.actor.isOwner
       });
@@ -1983,12 +1970,12 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
 
       if (expandData.targetEffects.length) {
-        let effectButtons = expandData.targetEffects.map(e => `<a class="apply-effect" data-id=${item.id} data-effect-id=${e.id}>${game.i18n.format("SHEET.ApplyEffect", { effect: e.name })}</a>`)
+        let effectButtons = expandData.targetEffects.map(e => `<a class="apply-effect" data-item-id=${item.id} data-effect-id=${e.id}>${game.i18n.format("SHEET.ApplyEffect", { effect: e.name })}</a>`)
         let effects = $(`<div>${effectButtons}</div>`)
         div.append(effects)
       }
       if (expandData.invokeEffects.length) {
-        let effectButtons = expandData.invokeEffects.map(e => `<a class="invoke-effect" data-id=${item.id} data-effect-id=${e.id}>${game.i18n.format("SHEET.InvokeEffect", { effect: e.name })}</a>`)
+        let effectButtons = expandData.invokeEffects.map(e => `<a class="invoke-effect" data-item-id=${item.id} data-effect-id=${e.id}>${game.i18n.format("SHEET.InvokeEffect", { effect: e.name })}</a>`)
         let effects = $(`<div>${effectButtons}</div>`)
         div.append(effects)
       }
@@ -2088,7 +2075,8 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   _toggleWeaponProperty(ev)
   {
     ev.stopPropagation();
-    item = this.actor.items.get(this._getId(ev));
+    let li = $(ev.currentTarget).parents(".item"),
+    item = this.actor.items.get(li.attr("data-item-id"));
     let index = ev.currentTarget.dataset.index;
     let inactive = Object.values(item.properties.inactiveQualities);
 
@@ -2195,7 +2183,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
       properties = mergeObject(WFRP_Utility.qualityList(), WFRP_Utility.flawList()), // Property names
       propertyDescr = Object.assign(duplicate(game.wfrp4e.config.qualityDescriptions), game.wfrp4e.config.flawDescriptions); // Property descriptions
     
-    let item = this.actor.items.get(li.attr("data-id")).toObject()
+    let item = this.actor.items.get(li.attr("data-item-id")).toObject()
 
     // Add custom properties descriptions
     if (item)
@@ -2213,7 +2201,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     let propertyKey = "";
     if (property == game.i18n.localize("Special Ammo")) // Special Ammo comes from user-entry in an Ammo's Special box
     {
-      this.actor.items.get(li.attr("data-id")).toObject()
+      this.actor.items.get(li.attr("data-item-id")).toObject()
       let ammo = this.actor.items.get(item.system.currentAmmo.value).toObject()
       // Add the special value to the object so that it can be looked up
       propertyDescr = Object.assign(propertyDescr,
@@ -2224,7 +2212,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     }
     else if (property == "Special") // Special comes from user-entry in a Weapon's Special box
     {
-      this.actor.items.get(li.attr("data-id"))
+      this.actor.items.get(li.attr("data-item-id"))
       // Add the special value to the object so that it can be looked up
       propertyDescr = Object.assign(propertyDescr,
         {
@@ -2286,7 +2274,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     let classes = $(ev.currentTarget);
     let expansionText = "";
 
-    let item = this.actor.items.get(li.attr("data-id"))
+    let item = this.actor.items.get(li.attr("data-item-id"))
     // Breakdown weapon range bands for easy reference (clickable, see below)
     if (classes.hasClass("weapon-range")) {
       if (!game.settings.get("wfrp4e", "mooRangeBands"))

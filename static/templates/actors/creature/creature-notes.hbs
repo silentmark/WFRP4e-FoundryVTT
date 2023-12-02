@@ -9,7 +9,7 @@
 
 <ol class="inventory-list trait-list">
   {{#each items.traits as |item i|}}
-  <li class="item" data-id="{{item.id}}">
+  <li class="item" data-item-id="{{item.id}}">
     <div class="content">
       {{#if item.included}}
       <div class="item-name trait-name">
@@ -19,6 +19,19 @@
         <div class="image item-image" style="background-image: url({{item.img}})"></div>
         <a class = "name trait-include">{{item.DisplayName}}</a>
       </div>
+
+      {{#if ../document.isOwner}}
+        <div class="list-controls effect-controls" style="display: flex;justify-content: center;align-items: center;height: 37px;">
+          {{#each item.effects as |effect e|}}
+            {{#if (eq effect.application "apply")}}
+              <a class="effect-control apply-effect" data-item-id="{{item.id}}" data-effect-id="{{effect.id}}" title="Zastosuj do Celu - {{effect.name}}"><i class="fas fa-crosshairs"></i></a>
+            {{/if}}
+            {{#if (eq effect.trigger "invoke")}} 
+              <a class="effect-control invoke-effect" data-item-id="{{item.id}}" data-effect-id="{{effect.id}}" title="Wywołaj {{effect.name}}"><i class="fas fa-crosshairs"></i></a>
+            {{/if}}
+          {{/each}}
+        </div>
+      {{/if}}
 
       {{#if ../document.isOwner}}
       <div class="item-controls">

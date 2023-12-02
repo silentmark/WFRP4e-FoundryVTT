@@ -10,12 +10,10 @@
 import ItemWfrp4e from "./item-wfrp4e.js";
 import WFRP_Utility from "../system/utility-wfrp4e.js";
 import EffectWfrp4e from "../system/effect-wfrp4e.js";
-import ScriptConfig from "../apps/script-config.js";
-import WFRP4eSheetMixin from "../actor/sheet/mixin.js"
 
 
-export default class ItemSheetWfrp4e extends WFRP4eSheetMixin(ItemSheet) 
-{
+
+export default class ItemSheetWfrp4e extends ItemSheet {
   constructor(item, options) {
     super(item, options);
     this.mce = null;
@@ -82,8 +80,7 @@ export default class ItemSheetWfrp4e extends WFRP4eSheetMixin(ItemSheet)
     const data = await super.getData();
     data.system = data.item._source.system // Use source data to avoid modifications being applied
 
-    if (this.item.type == "spell") 
-    {
+    if (this.item.type == "spell") {
       if (game.wfrp4e.config.magicLores[this.item.lore.value]) {
         data["loreValue"] = game.wfrp4e.config.magicLores[this.item.lore.value]
       }
@@ -276,8 +273,11 @@ export default class ItemSheetWfrp4e extends WFRP4eSheetMixin(ItemSheet)
   }
 
   _onCheckboxClick(event) {
+    this._onSubmit(event);
     let target = $(event.currentTarget).attr("data-target");
-    this.item.update({[target] : !getProperty(this.item, target)})
+    let data = this.item.toObject()
+    setProperty(data, target, !getProperty(data, target))
+    this.item.update(data)
   }
 
   // This listener converts comma separated lists in the career section to arrays,
@@ -367,16 +367,20 @@ export default class ItemSheetWfrp4e extends WFRP4eSheetMixin(ItemSheet)
     await this.item.createEmbeddedDocuments("ActiveEffect", symptomEffects)
 
     this.item.update({ "system.symptoms.value": symptoms.join(", ") })
-  } 
-  
+  }
+
+  _onEffectCreate(ev) {
+    this.item.createEmbeddedDocuments("ActiveEffect", [{ label: this.item.name, icon: this.item.img, transfer: !(this.item.type == "spell" || this.item.type == "prayer") }])
+  }
+
   _onEffectTitleClick(ev) {
-    let id = this._getId(ev);
+    let id = $(ev.currentTarget).parents(".item").attr("data-item-id");
     const effect = this.item.effects.find(i => i.id == id)
     effect.sheet.render(true);
   }
 
   _onEffectDelete(ev) {
-    let id = this._getId(ev);
+    let id = $(ev.currentTarget).parents(".item").attr("data-item-id");
     this.item.deleteEmbeddedDocuments("ActiveEffect", [id])
   }
 
@@ -404,10 +408,11 @@ export default class ItemSheetWfrp4e extends WFRP4eSheetMixin(ItemSheet)
     else if (ev.button == 2)
       this.item.removeCondition(condKey)
   }
-      
-  _onScriptConfig(ev)
-  {
-      new ScriptConfig(this.object, {path : this._getPath(ev)}).render(true);
-  }
 
 }
+
+Items.unregisterSheet("core", ItemSheet);
+Items.registerSheet("wfrp4e", ItemSheetWfrp4e,
+  {
+    makeDefault: true
+  });

@@ -26,11 +26,6 @@ export default function () {
                 return array.join(", ")
         })
 
-        Handlebars.registerHelper("hasProperty", function (obj, key) 
-        {
-            return hasProperty(obj, key);
-        });    
-
         Handlebars.registerHelper("tokenImg", function(actor) {
             let tokens = actor.getActiveTokens();
             let tokenDocument = actor.prototypeToken;

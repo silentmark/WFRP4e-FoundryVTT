@@ -27,19 +27,6 @@ export default function () {
         return OpposedTest.recreate(getProperty(this, "flags.wfrp4e.opposeTestData"))
     }
 
-    CONFIG.MeasuredTemplate.documentClass.prototype.areaEffect = function () {
-      if (this.getFlag("wfrp4e", "effectUuid"))
-      {
-        let effect = fromUuidSync(this.getFlag("wfrp4e", "effectUuid"))
-        if (effect)
-        {
-          effect.updateSource({"flags.wfrp4e.fromMessage" : this.getFlag("wfrp4e", "messageId")})
-          effect.updateSource({"flags.wfrp4e.fromArea" : this.uuid})
-          return effect;
-        }
-      }
-    }
-
     // Automatically disable Auto Fill Advantage if group advantage is enabled
     if (game.settings.get("wfrp4e", "useGroupAdvantage", true) && 
       game.user.isGM && 
@@ -49,7 +36,10 @@ export default function () {
       game.settings.set("wfrp4e", "autoFillAdvantage", false)
     }
 
-    SocketHandlers.register();
+    game.socket.on("system.wfrp4e", data => {
+      SocketHandlers[data.type](data)
+    })
+
     const doc = $(document);
     doc.on("keydown", WFRP_Utility._setSocketTests)
     doc.on("keyup", WFRP_Utility._resetSocketTests);

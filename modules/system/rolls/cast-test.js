@@ -20,21 +20,34 @@ export default class CastTest extends TestWFRP {
   }
 
   computeTargetNumber() {
+    try {
 
-      let skill = this.item.skillToUse
-      if (!skill)
-        this.result.target = this.actor.characteristics.int.value
+      // Determine final target if a characteristic was selected
+      if (this.preData.skillSelected.char)
+        this.result.target = this.actor.characteristics[this.preData.skillSelected.key].value
+
+      else if (this.preData.skillSelected.name == this.item?.skillToUse?.name)
+        this.result.target = this.item.skillToUse.total.value
+
+      else if (typeof this.preData.skillSelected == "string") {
+        let skill = this.actor.getItemTypes("skill").find(s => s.name == this.preData.skillSelected)
+        if (skill)
+          this.result.target = skill.total.value
+      }
       else
-        this.result.target = skill.total.value
+        this.result.target = this.item.skillToUse.total.value
+
+    }
+    catch {
+      this.result.target = this.item.skillToUse.total.value
+    }
 
     super.computeTargetNumber();
   }
 
   async runPreEffects() {
     await super.runPreEffects();
-    await Promise.all(this.actor.runScripts("preRollCastTest", { test: this, chatOptions: this.context.chatOptions }))
-    await Promise.all(this.item.runScripts("preRollCastTest", { test: this, chatOptions: this.context.chatOptions }))
-
+    await this.actor.runEffects("preRollCastTest", { test: this, cardOptions: this.context.cardOptions })
     //@HOUSE
     if (this.preData.unofficialGrimoire && this.preData.unofficialGrimoire.ingredientMode == 'power' && this.hasIngredient) { 
       game.wfrp4e.utility.logHomebrew("unofficialgrimoire");
@@ -45,9 +58,8 @@ export default class CastTest extends TestWFRP {
 
   async runPostEffects() {
     await super.runPostEffects();
-    await Promise.all(this.actor.runScripts("rollCastTest", { test: this, chatOptions: this.context.chatOptions }))
-    await Promise.all(this.item.runScripts("rollCastTest", { test: this, chatOptions: this.context.chatOptions }))
-    Hooks.call("wfrp4e:rollCastTest", this, this.context.chatOptions)
+    await this.actor.runEffects("rollCastTest", { test: this, cardOptions: this.context.cardOptions }, {item : this.item})
+    Hooks.call("wfrp4e:rollCastTest", this, this.context.cardOptions)
   }
 
   async computeResult() {
@@ -170,7 +182,7 @@ export default class CastTest extends TestWFRP {
       if (game.settings.get("wfrp4e", "mooCriticalChannelling")) {
         game.wfrp4e.utility.logHomebrew("mooCriticalChannelling")
         if (this.spell.flags.criticalchannell && CNtoUse == 0) {
-          this.result.SL = "+" + Number(this.result.SL) + this.item._source.cn.value
+          this.result.SL = "+" + Number(this.result.SL) + this.item._source.system.cn.value
           this.result.other.push(game.i18n.localize("MOO.CriticalChanelling"))
         }
       }
@@ -243,61 +255,68 @@ export default class CastTest extends TestWFRP {
   
   async moveVortex() 
   {
-    for (let id of this.context.templates) {
+    for(let id of this.context.templates)
+    {
       let template = canvas.scene.templates.get(id);
-      if (template) {
+      let tableRoll = (await game.wfrp4e.tables.rollTable("vortex", {}, "map"))
+      let dist = (await new Roll("2d10").roll({async: true})).total
+      let pixelsPerYard = canvas.scene.grid.size / canvas.scene.grid.distance
+      let straightDelta = dist * pixelsPerYard;
+      let diagonalDelta = straightDelta / Math.sqrt(2);
+      tableRoll.result = tableRoll.result.replace("[[2d10]]", dist);
 
-        let tableRoll = (await game.wfrp4e.tables.rollTable("vortex", {}, "map"))
-        let dist = (await new Roll("2d10").roll({ async: true })).total
-        let pixelsPerYard = canvas.scene.grid.size / canvas.scene.grid.distance
-        let straightDelta = dist * pixelsPerYard;
-        let diagonalDelta = straightDelta / Math.sqrt(2);
-        tableRoll.result = tableRoll.result.replace("[[2d10]]", dist);
+      let {x, y} = template || {};
+      ChatMessage.create({content : tableRoll.result, speaker : {alias : this.item.name}});
+      if (tableRoll.roll == 1)
+      {
+        await template?.delete();
+        this.context.templates = this.context.templates.filter(i => i != id);
+        await this.updateMessageFlags();
+        continue;
+      }
+      else if (tableRoll.roll == 2)
+      {
+        y -= straightDelta
+      }
+      else if (tableRoll.roll == 3)
+      {
+        y -= diagonalDelta;
+        x += diagonalDelta;
+      }
+      else if (tableRoll.roll == 4)
+      {
+        x += straightDelta;
+      }
+      else if (tableRoll.roll == 5)
+      {
 
-        if (tableRoll) {
-          let { x, y } = template || {};
-          ChatMessage.create({ content: tableRoll.result, speaker: { alias: this.item.name } });
-          if (tableRoll.roll == 1) {
-            await template?.delete();
-            this.context.templates = this.context.templates.filter(i => i != id);
-            await this.updateMessageFlags();
-            continue;
-          }
-          else if (tableRoll.roll == 2) {
-            y -= straightDelta
-          }
-          else if (tableRoll.roll == 3) {
-            y -= diagonalDelta;
-            x += diagonalDelta;
-          }
-          else if (tableRoll.roll == 4) {
-            x += straightDelta;
-          }
-          else if (tableRoll.roll == 5) {
-
-          }
-          else if (tableRoll.roll == 6) {
-            y += diagonalDelta;
-            x += diagonalDelta
-          }
-          else if (tableRoll.roll == 7) {
-            y += straightDelta;
-          }
-          else if (tableRoll.roll == 8) {
-            y += diagonalDelta;
-            x -= diagonalDelta;
-          }
-          else if (tableRoll.roll == 9) {
-            x -= straightDelta;
-          }
-          else if (tableRoll.roll == 10) {
-            y -= diagonalDelta;
-            x -= diagonalDelta;
-          }
-          template.update({ x, y }).then(template => {
-            // AbilityTemplate.updateAOETargets(template);
-          });
-        }
+      }
+      else if (tableRoll.roll == 6)
+      {
+        y += diagonalDelta;
+        x += diagonalDelta
+      }
+      else if (tableRoll.roll == 7)
+      {
+        y += straightDelta;
+      }
+      else if (tableRoll.roll == 8)
+      {
+        y += diagonalDelta;
+        x -= diagonalDelta;
+      }
+      else if (tableRoll.roll == 9)
+      {
+        x -= straightDelta;
+      }
+      else if (tableRoll.roll == 10)
+      {
+        y -= diagonalDelta;
+        x -= diagonalDelta;
+      }
+      if (template)
+      {
+        template.update({x, y});
       }
     }
   }

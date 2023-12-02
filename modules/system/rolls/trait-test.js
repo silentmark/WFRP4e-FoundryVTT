@@ -35,15 +35,13 @@ export default class TraitTest extends AttackTest {
   
   async runPreEffects() {
     await super.runPreEffects();
-    await Promise.all(this.actor.runScripts("preRollTraitTest", { test: this, chatOptions: this.context.chatOptions }))
-    await Promise.all(this.item.runScripts("preRollTraitTest", { test: this, chatOptions: this.context.chatOptions }))
+    await this.actor.runEffects("preRollTraitTest", { test: this, cardOptions: this.context.cardOptions })
   }
 
   async runPostEffects() {
     await super.runPostEffects();
-    await Promise.all(this.actor.runScripts("rollTraitTest", { test: this, chatOptions: this.context.chatOptions }))
-    await Promise.all(this.item.runScripts("rollTraitTest", { test: this, chatOptions: this.context.chatOptions }))
-    Hooks.call("wfrp4e:rollTraitTest", this, this.context.chatOptions)
+    await this.actor.runEffects("rollTraitTest", { test: this, cardOptions: this.context.cardOptions }, {item : this.item})
+    Hooks.call("wfrp4e:rollTraitTest", this, this.context.cardOptions)
   }
 
   async calculateDamage() {

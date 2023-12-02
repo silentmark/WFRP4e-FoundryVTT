@@ -10,13 +10,15 @@ import canvas from "../hooks/canvas.js"
 import chat from "../hooks/chat.js"
 import combat from "../hooks/combat.js"
 import hotbarDrop from "../hooks/hotbarDrop.js"
+import actor from "../hooks/actor.js"
+import item from "../hooks/item.js"
+import activeEffects from "../hooks/activeEffects.js"
 import journal from "../hooks/journal.js"
 import sidebar from "../hooks/sidebar.js"
 import rolltable from "../hooks/rolltable.js"
 import entryContext from "../hooks/entryContext.js"
 import token from "../hooks/token.js"
 import handlebars from "../hooks/handlebars.js"
-import templates from "../hooks/templates.js"
 
 export default function registerHooks() {
     init()
@@ -26,6 +28,9 @@ export default function registerHooks() {
     combat()
     controlButtons()
     hotbarDrop()
+    actor()
+    item()
+    activeEffects()
     journal()
     sidebar()
     rolltable()
@@ -35,7 +40,6 @@ export default function registerHooks() {
     i18n();
     settings();
     keepId();
-    templates();
     notes();
 
 

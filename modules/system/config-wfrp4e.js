@@ -42,6 +42,7 @@ WFRP4E.toTranslate = [
 "moneyNames",
 "hitLocationTables",
 "extendedTestCompletion",
+"effectApplication",
 "applyScope",
 "weaponGroupDescriptions",
 "qualityDescriptions",
@@ -52,8 +53,7 @@ WFRP4E.toTranslate = [
 "symptomDescriptions",
 "symptomTreatment",
 "reachDescription",
-"classTrappings",
-"effectApplications"
+"classTrappings"
 ]
 
 // "Trappings" are more than "trapping" type items
@@ -1896,7 +1896,7 @@ WFRP4E.conditionScripts = {
         let msg = `<h2>${game.i18n.localize("WFRP4E.ConditionName.Ablaze")}</h2><b>${game.i18n.localize("Formula")}</b>: @FORMULA<br><b>${game.i18n.localize("Roll")}</b>: @ROLLTERMS` 
         
         let args = {msg, formula}
-        await Promise.all(actor.runScripts("preApplyCondition", {effect, data : args}));
+        await actor.runEffects("preApplyCondition", {effect, data : args});
         formula = args.formula;
         msg = args.msg;
         let roll = await new Roll(`${formula}`).roll({async: true});
@@ -1909,7 +1909,7 @@ WFRP4E.conditionScripts = {
         msg += damageMsg.join("");
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await Promise.all(actor.runScripts("applyCondition", {effect, data : {messageData}}))
+        await actor.runEffects("applyCondition", {effect, data : {messageData}})
         return messageData
     },
     "poisoned" : async function (actor) {
@@ -1918,7 +1918,7 @@ WFRP4E.conditionScripts = {
 
         let damage = effect.conditionValue;
         let args = {msg, damage};
-        await Promise.all(actor.runScripts("preApplyCondition", {effect, data : args}))
+        await actor.runEffects("preApplyCondition", {effect, data : args})
         msg = args.msg;
         damage = args.damage;
         msg += await actor.applyBasicDamage(damage, {damageType : game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL, suppressMsg : true})
@@ -1934,7 +1934,7 @@ WFRP4E.conditionScripts = {
         }
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await Promise.all(actor.runScripts("applyCondition", {effect, data : {messageData}}))
+        await actor.runEffects("applyCondition", {effect, data : {messageData}})
         return messageData
     },
     "bleeding" : async function(actor) {
@@ -1945,7 +1945,7 @@ WFRP4E.conditionScripts = {
 
         let damage = effect.conditionValue;
         let args = {msg, damage};
-        await Promise.all(actor.runScripts("preApplyCondition", {effect, data : args}))
+        await actor.runEffects("preApplyCondition", {effect, data : args})
         msg = args.msg;
         damage = args.damage;
         msg += await actor.applyBasicDamage(damage, {damageType : game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL, minimumOne : false, suppressMsg : true})
@@ -1977,16 +1977,13 @@ WFRP4E.conditionScripts = {
 
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await Promise.all(actor.runScripts("applyCondition", {effect, data : {messageData, bleedingRoll}}))
+        await actor.runEffects("applyCondition", {effect, data : {messageData, bleedingRoll}})
         return messageData
     },
     "stunned" : async function(actor) {
         let effect = actor.hasCondition("stunned")
         let conditionValue = effect.conditionValue;
         let msg = `<h2>${game.i18n.localize("WFRP4E.ConditionName.Stunned")}</h2>`
-        let damage = effect.conditionValue;
-        let args = {msg, damage};
-        await Promise.all(actor.runScripts("preApplyCondition", {effect, data : args}))
         if (actor.isOwner) {
             let test = await actor.setupSkill(game.i18n.localize("NAME.Endurance"), {appendTitle : " - Oszołomienie"})
             await test.roll();
@@ -1999,15 +1996,12 @@ WFRP4E.conditionScripts = {
         }
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await Promise.all(actor.runScripts("applyCondition", {effect, data : {messageData}}))
         return messageData
     },
     "broken" : async function(actor) {
         let effect = actor.hasCondition("broken")
         let conditionValue = effect.conditionValue;
         let msg = `<h2>${game.i18n.localize("WFRP4E.ConditionName.Broken")}</h2>`
-        let args = {msg, conditionValue};
-        await Promise.all(actor.runScripts("preApplyCondition", {effect, data : args}))
         if (actor.isOwner) {
             let test = await actor.setupSkill(game.i18n.localize("NAME.Cool"), {appendTitle : " - Panika"})
             await test.roll();
@@ -2020,18 +2014,15 @@ WFRP4E.conditionScripts = {
         }
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await Promise.all(actor.runScripts("applyCondition", {effect, data : {messageData}}))
         return messageData
     },
     "entangled" : async function(actor) {
         let effect = actor.hasCondition("entangled")
         let conditionValue = effect.conditionValue;
         let conditionStrength = effect.flags.wfrp4e.extra;
-        let msg = `<h2>Pochwycenie</h2>`
-        let args = {msg, conditionValue, conditionStrength};
-        await Promise.all(actor.runScripts("preApplyCondition", {effect, data : args}))
         let test = await actor.setupCharacteristic("s", {appendTitle : " - Pochwycenie vs " + conditionStrength})
         await test.roll();
+        let msg = `<h2>Pochwycenie</h2>`
         if (conditionStrength) {
             const roll = await new Roll("1d100").roll();
             await game.dice3d.showForRoll(roll, game.user, true, null, false);
@@ -2053,7 +2044,6 @@ WFRP4E.conditionScripts = {
         }
         let messageData = game.wfrp4e.utility.chatDataSetup(msg);
         messageData.speaker = {alias: actor.prototypeToken.name}
-        await Promise.all(actor.runScripts("applyCondition", {effect, data : {messageData}}))
         return messageData
     }
 }
@@ -2066,34 +2056,31 @@ WFRP4E.effectTextStyle = CONFIG.canvasTextStyle.clone();
 WFRP4E.effectTextStyle.fontSize = "30";
 WFRP4E.effectTextStyle.fontFamily="CaslonAntique"
 
-WFRP4E.rollModes = CONFIG.Dice.rollModes;
 
-WFRP4E.effectApplications = {
-    document : "EffectApplication.Type.Document",
-    damage : "EffectApplication.Type.Damage",
-    target : "EffectApplication.Type.Target",
-    area : "EffectApplication.Type.Area",
-    aura : "EffectApplication.Type.Aura",
-    other : "EffectApplication.Type.Other"
+WFRP4E.effectApplication = {
+    "actor" : "WFRP4E.effectApplication.actor",
+    "equipped" : "WFRP4E.effectApplication.equipped",
+    "apply" : "WFRP4E.effectApplication.apply",
+    "damage" : "WFRP4E.effectApplication.damage",
+    "item" : "WFRP4E.effectApplication.item",
+    "area" : "WFRP4E.effectApplication.area"
 }
 
+WFRP4E.applyScope = {
+    "actor" : "WFRP4E.applyScope.actor",
+    "item" : "WFRP4E.applyScope.item"
+}
 
-// To migrate
-// "invoke => manual"
-// "oneTime" => "immediate"
-// "addItems" => "immediate"
-// "dialogChoice" => ???
-// "prefillDialog" => "dialog"
-// "targetPrefillDialog" => "dialog" with targeter option true
-WFRP4E.scriptTriggers = {
-    "manual" : "Manually Invoked",
-    "immediate" : "Immediate",
-    "dialog" : "Dialog",
+WFRP4E.effectTriggers = {
+    "invoke" : "Manually Invoked",
+    "oneTime" : "Immediate",
+    "addItems" : "Add Items",
+    "dialogChoice" : "Dialog Choice",
+    "prefillDialog" : "Prefill Dialog",
     "update" : "On Update",
     "prePrepareData" : "Pre-Prepare Data",
     "prePrepareItems" : "Pre-Prepare Actor Items",
     "prepareData" : "Prepare Data",
-    "prepareOwned" : "Prepare Owned Data (For Items)",
     "preWoundCalc" : "Pre-Wound Calculation",
     "woundCalc" : "Wound Calculation",
     "calculateSize" : "Size Calculation",
@@ -2133,13 +2120,15 @@ WFRP4E.scriptTriggers = {
     "endCombat" : "End Combat"
 }
 
-WFRP4E.syncTriggers = [
+WFRP4E.syncEffectTriggers = [
     "prePrepareData",
     "prePrepareItems",
     "prepareData",
     "preWoundCalc",
     "woundCalc",
     "calculateSize",
+    "targetPrefillDialog",
+    "prefillDialog",
     "preAPCalc",
     "APCalc",
     "prePrepareItem",
@@ -2368,7 +2357,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     testData: All the data needed to evaluate test results
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
     "preRollWeaponTest" :  
     `This effect is applied before a weapon test is calculated. Can be async.
@@ -2376,7 +2365,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     testData: All the data needed to evaluate test results
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "preRollCastTest" :  
@@ -2385,7 +2374,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     testData: All the data needed to evaluate test results
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "preChannellingTest" :  
@@ -2394,7 +2383,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     testData: All the data needed to evaluate test results
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "preRollPrayerTest" :  
@@ -2403,7 +2392,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     testData: All the data needed to evaluate test results
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "preRollTraitTest" :  
@@ -2412,7 +2401,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     testData: All the data needed to evaluate test results
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "rollTest" : 
@@ -2421,7 +2410,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     test: object containing test and result information
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
     "rollIncomeTest" : 
     `This effect is applied after an income test is calculated. Can be async.
@@ -2429,7 +2418,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     test: object containing test and result information
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "rollWeaponTest" : 
@@ -2438,7 +2427,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     test: object containing test and result information
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "rollCastTest" : 
@@ -2447,7 +2436,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     test: object containing test and result information
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "rollChannellingTest" : 
@@ -2456,7 +2445,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     test: object containing test and result information
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "rollPrayerTest" : 
@@ -2465,7 +2454,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     test: object containing test and result information
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "rollTraitTest" : 
@@ -2474,7 +2463,7 @@ WFRP4E.effectPlaceholder = {
     args:
 
     test: object containing test and result information
-    chatOptions: Data for the card display, title, template, etc
+    cardOptions: Data for the card display, title, template, etc
     `,
 
     "preOpposedAttacker" : 

@@ -13,7 +13,6 @@ import WFRP_Utility from "./utility-wfrp4e.js";
 
 import OpposedWFRP from "./opposed-wfrp4e.js";
 import AOETemplate from "./aoe.js"
-import SocketHandlers from "./socket-handlers.js";
 
 
 export default class ChatWFRP {
@@ -103,8 +102,7 @@ export default class ChatWFRP {
     html.on("click", ".terror-button", this._onTerrorButtonClicked.bind(this))
     html.on("click", ".experience-button", this._onExpButtonClicked.bind(this))
     html.on("click", ".condition-script", this._onConditionScriptClick.bind(this))
-    html.on("click", ".apply-target-effect", this._onApplyTargetEffect.bind(this))
-    html.on("click", ".place-area-effect", this._onPlaceAreaEffect.bind(this))
+    html.on("click", ".apply-effect", this._onApplyEffectClick.bind(this))
     html.on("click", ".attacker, .defender", this._onOpposedImgClick.bind(this))
     html.on("click", ".apply-condition", this._onApplyCondition.bind(this));
 
@@ -119,21 +117,6 @@ export default class ChatWFRP {
 
       AOETemplate.fromString(event.currentTarget.text, actorId, itemId, messageId, type=="diameter").drawPreview(event);
     });
-
-    html.on("click", '.place-area-effect', async event => {
-      let messageId = $(event.currentTarget).parents('.message').attr("data-message-id");
-      let effectUuid = event.currentTarget.dataset.uuid;
-
-      let test = game.messages.get(messageId).getTest()
-      let radius
-      if (test?.result.overcast)
-      {
-        radius = game.messages.get(messageId).getTest().result.overcast.usage.target.current;
-      }
-
-      (await AOETemplate.fromEffect(effectUuid, messageId, radius)).drawPreview(event);
-    });
-  
 
     // Post an item property (quality/flaw) description when clicked
     html.on("click", '.item-property', event => {
@@ -489,50 +472,40 @@ export default class ChatWFRP {
     if (game.user.isGM)
       message.update(conditionResult)
     else
-      await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: msgId, updateData: conditionResult });
+      WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: msgId, updateData: conditionResult }, "executing condition script");
   }
 
-  static async _onApplyTargetEffect(event) {
-
-    let uuid = event.target.dataset.uuid// || (event.target.dataset.lore ? "lore" : "")
-    let messageId = $(event.currentTarget).parents('.message').attr("data-message-id");
-    let message = game.messages.get(messageId);
-    let test = message.getTest()
-    let actor = test.actor;
-    let item = test.item;
-
-    if (!actor.isOwner)
-      return ui.notifications.error("CHAT.ApplyError")
-
-
-    // let effect = actor.populateEffect(effectId, item, test)
-    
-    let targets = (game.user.targets.size ? game.user.targets : test.context.targets.map(t => WFRP_Utility.getToken(t))).map(t => t.actor)
-    game.user.updateTokenTargets([]);
-    game.user.broadcastActivity({ targets: [] });
-     
-          
-    if (item && // If spell's Target and Range is "You", Apply to caster, not targets
-      item.range && 
-      item.range.value.toLowerCase() == game.i18n.localize("You").toLowerCase() && 
-      item.target && 
-      item.target.value.toLowerCase() == game.i18n.localize("You").toLowerCase())
-      {
-        targets = [actor]
-      }
-
-      for(let target of targets)
-      {
-        await target.applyEffect({effectUuids : uuid, messageId})
-      }
-  }
-
-  static _onPlaceAreaEffect(event) {
+  static _onApplyEffectClick(event) {
 
     let effectId = event.target.dataset.effectId || (event.target.dataset.lore ? "lore" : "")
     let messageId = $(event.currentTarget).parents('.message').attr("data-message-id");
     let message = game.messages.get(messageId);
     let test = message.getTest()
+    let item = test.item
+    let actor = test.actor
+
+    if (!actor.isOwner)
+      return ui.notifications.error("CHAT.ApplyError")
+
+    let effect = actor.populateEffect(effectId, item, test);
+    mergeObject(effect, { flags: {wfrp4e: { messageId: messageId } } });
+
+          
+    if (effect.flags.wfrp4e.effectTrigger == "invoke") {
+      game.wfrp4e.utility.invokeEffect(actor, effect, item.id)
+      return
+    }
+    
+
+    if ( // If spell's Target and Range is "You", Apply to caster, not targets
+      !effect.flags.wfrp4e?.notSelf && 
+      item.range && 
+      item.range.value.toLowerCase() == game.i18n.localize("You").toLowerCase() && 
+      item.target && 
+      item.target.value.toLowerCase() == game.i18n.localize("You").toLowerCase())
+      game.wfrp4e.utility.applyEffectToTarget(effect, [{ actor }]) 
+    else
+      game.wfrp4e.utility.applyEffectToTarget(effect, null)
   }
 
   static _onOpposedImgClick(event) {

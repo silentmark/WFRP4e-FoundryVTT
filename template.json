@@ -600,7 +600,8 @@
         "value": ""
       },
       "currentAmmo": {
-        "value": ""
+        "type": "Number",
+        "value": 0
       },
       "consumesAmmo" : {
         "value" : true
@@ -822,7 +823,7 @@
       "tests": {
         "type": "String",
         "label": "Tests",
-        "value": ""
+        "value": null
       }
     },
     "skill": {

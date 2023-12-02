@@ -29,16 +29,14 @@ export default class AttackTest extends TestWFRP {
 
       if (this.item.weaponGroup?.value == "throwing")
         this.result.scatter = game.i18n.localize("Scatter");
-
-      if (this.item.properties.qualities.blast && !this.result.other.find(x=>x.indexOf(game.i18n.localize("Scatter")) > -1)) {
-        this.result.other.push(`<a class='aoe-template' data-id="${this.item.id}" data-actor-id="${this.actor.id}" data-type="radius"><i class="fas fa-ruler-combined"></i>${this.item.properties.qualities.blast.value} metrów (${game.i18n.localize("Scatter")})</a>`)
-      }
+        
+      if (this.item.properties.qualities.blast && !this.result.other.find(x=>x.indexOf(game.i18n.localize("Scatter")) > -1))
+        this.result.other.push(`<a class='aoe-template' data-item-id="${this.item.id}" data-actor-id="${this.actor.id}" data-type="radius"><i class="fas fa-ruler-combined"></i>${this.item.properties.qualities.blast.value} metrów (${game.i18n.localize("Scatter")})</a>`)
     }
     else // if success
     {
-      if (this.item.properties.qualities.blast && !this.result.other.find(x=>x.indexOf(game.i18n.localize("Scatter")) > -1)) {
-        this.result.other.push(`<a class='aoe-template' data-id="${this.item.id}" data-actor-id="${this.actor.id}" data-type="radius"><i class="fas fa-ruler-combined"></i>${this.item.properties.qualities.blast.value} metrów (${game.i18n.localize("Scatter")})</a>`)
-      }
+      if (this.item.properties.qualities.blast && !this.result.other.find(x=>x.indexOf(game.i18n.localize("Scatter")) > -1))
+        this.result.other.push(`<a class='aoe-template' data-item-id="${this.item.id}" data-actor-id="${this.actor.id}" data-type="radius"><i class="fas fa-ruler-combined"></i>${this.item.properties.qualities.blast.value} metrów (${game.i18n.localize("Scatter")})</a>`)
 
       if (this.result.roll % 11 == 0)
         this.result.critical = game.i18n.localize("Critical")

