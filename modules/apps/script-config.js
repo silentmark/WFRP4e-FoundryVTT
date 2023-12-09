@@ -47,14 +47,25 @@ export default class ScriptConfig extends FormApplication
             this.editor = ace.edit(html.find(".ace-editor")[0]);
             this.editor.setValue(this._getScript() || "");
             this.editor.setOptions(mergeObject(ace.userSettings, {
-                theme : "ace/theme/solarized_dark", 
-                mode : "ace/mode/js", 
+                theme : "ace/theme/solarized_dark",
                 keyboardHandler : "ace/mode/vscode",
                 printMargin : 0,
-                maxLines: Infinity,
-                indentedSoftWrap: false
+                maxLines: 999999,
+                indentedSoftWrap: false,
+                esVersion: 13,
             }));
+            this.editor.session.on('changeMode', function(e, session){
+                if ("ace/mode/javascript" === session.getMode().$id) {
+                    if (!!session.$worker) {
+                        session.$worker.send("setOptions", [{
+                            "esversion": 13
+                        }]);
+                    }
+                }
+            });
+            this.editor.session.setMode("ace/mode/javascript");
             this.editor.session.setUseWrapMode(false);
+            this.editor.setAutoScrollEditorIntoView(true);
             this.editor.clearSelection();
         }
 
