@@ -65,7 +65,9 @@ export class OvercastItemModel extends BaseItemModel {
       }
       catch (e) {
         console.error(`Spell from ${this.parent?.actor?.name} threw error: ${e}.\n Arguments:`, this, formula);
-        throw ui.notifications.error(game.i18n.format("ERROR.ParseSpell"))
+        if (ui.notifications) {
+          throw ui.notifications.error(game.i18n.format("ERROR.ParseSpell"))
+        }
       }
   }
 
