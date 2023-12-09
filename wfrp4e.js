@@ -71,6 +71,7 @@ import { VehicleModModel } from "./modules/model/item/vehicleMod.js";
 import { CargoModel } from "./modules/model/item/cargo.js";
 import WFRP4eActiveEffectConfig from "./modules/apps/effect-config.js";
 import EffectWfrp4e from "./modules/system/effect-wfrp4e.js";
+import SocketHandlers from "./modules/system/socket-handlers.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -170,6 +171,7 @@ Hooks.once("init", async function () {
     combat: CombatHelpers,
     aoe: AOETemplate,
     migration: Migration,
+    socket: SocketHandlers,
     tags : new TagManager()
   }
 

@@ -13,7 +13,6 @@ import WFRP_Utility from "./utility-wfrp4e.js";
 
 import OpposedWFRP from "./opposed-wfrp4e.js";
 import AOETemplate from "./aoe.js"
-import SocketHandlers from "./socket-handlers.js";
 
 
 export default class ChatWFRP {
@@ -489,7 +488,7 @@ export default class ChatWFRP {
     if (game.user.isGM)
       message.update(conditionResult)
     else
-      await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: msgId, updateData: conditionResult });
+      await game.wfrp4e.socket.executeOnUserAndWait("GM", "updateMsg", { id: msgId, updateData: conditionResult });
   }
 
   static async _onApplyTargetEffect(event) {

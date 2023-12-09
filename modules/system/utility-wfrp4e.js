@@ -4,7 +4,6 @@ import ItemWfrp4e from "../item/item-wfrp4e.js";
 import ChatWFRP from "./chat-wfrp4e.js";
 import ItemDialog from "../apps/item-dialog.js";
 import TestWFRP from "../system/rolls/test-wfrp4e.js";
-import SocketHandlers from "../system/socket-handlers.js";
 
 
 /**
@@ -1222,7 +1221,7 @@ export default class WFRP_Utility {
     }
     let msg = await ChatMessage.create(chatData);
     payload.messageId = msg.id;
-    await SocketHandlers.executeOnUserAndWait(owner.id, "setupSocket", payload);
+    await game.wfrp4e.socket.executeOnUserAndWait(owner.id, "setupSocket", payload);
     msg = game.messages.get(msg.id);
     if (!msg) {
       return null;

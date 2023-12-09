@@ -10,7 +10,6 @@ import ChannellingDialog from "../apps/roll-dialog/channelling-dialog.js";
 import TraitDialog from "../apps/roll-dialog/trait-dialog.js";
 import PrayerDialog from "../apps/roll-dialog/prayer-dialog.js";
 import EffectWfrp4e from "../system/effect-wfrp4e.js";
-import SocketHandlers from "../system/socket-handlers.js";
 
 /**
  * Provides the main Actor data computation and organization.
@@ -913,7 +912,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
         }   
         else 
         {
-            SocketHandlers.executeOnOwner(this, "applyEffect", {effectUuids, effectData, actorUuid : this.uuid, messageId});
+            game.wfrp4e.socket.executeOnOwner(this, "applyEffect", {effectUuids, effectData, actorUuid : this.uuid, messageId});
         }
     }
 

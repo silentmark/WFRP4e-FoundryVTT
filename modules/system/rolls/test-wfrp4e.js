@@ -1,7 +1,6 @@
 import WFRP_Utility from "../utility-wfrp4e.js";
 import OpposedWFRP from "../opposed-wfrp4e.js";
 import WFRP_Audio from "../audio-wfrp4e.js";
-import SocketHandlers from "../socket-handlers.js";
 
 export default class TestWFRP {
   constructor(data, actor) {
@@ -628,7 +627,7 @@ export default class TestWFRP {
         await this.message.update(chatOptions)
       }
       else {
-        await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: this.message.id, updateData : chatOptions });
+        await game.wfrp4e.socket.executeOnUserAndWait("GM", "updateMsg", { id: this.message.id, updateData : chatOptions });
       }
       await this.updateMessageFlags()
     }
@@ -645,7 +644,7 @@ export default class TestWFRP {
       await this.message.update(update)
 
     else if (this.message) {
-      await SocketHandlers.executeOnUserAndWait("GM", "updateMsg", { id: this.message.id, updateData : update });
+      await game.wfrp4e.socket.executeOnUserAndWait("GM", "updateMsg", { id: this.message.id, updateData : update });
     }
   }
 
