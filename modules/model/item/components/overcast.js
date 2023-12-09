@@ -43,31 +43,33 @@ export class OvercastItemModel extends BaseItemModel {
    */
       computeSpellDamage(formula, isMagicMissile) {
       try {
-        if (formula) {
-            formula = formula.toLowerCase();
+      if (formula) {
+          formula = formula.toLowerCase();
 
-            if (isMagicMissile) {// If it's a magic missile, damage includes willpower bonus
-              formula += "+" + this.parent.actor.characteristics["wp"].bonus
-            }
+          if (isMagicMissile) {// If it's a magic missile, damage includes willpower bonus
+          formula += "+" + this.parent.actor.characteristics["wp"].bonus
+          }
 
-            let labels = game.wfrp4e.config.characteristics;
-            let sortedCharacteristics = Object.entries(this.parent.actor.characteristics).sort((a,b) => -1 * labels[a[0]].localeCompare(labels[b[0]]));
-            sortedCharacteristics.forEach(arr => {
-              let ch = arr[0];
-              // Handle characteristic with bonus first
-              formula = formula.replace(game.wfrp4e.config.characteristicsBonus[ch].toLowerCase(), this.parent.actor.characteristics[ch].bonus);
-              formula = formula.replace(game.wfrp4e.config.characteristics[ch].toLowerCase(), this.parent.actor.characteristics[ch].value);
-            });
+          let labels = game.wfrp4e.config.characteristics;
+          let sortedCharacteristics = Object.entries(this.parent.actor.characteristics).sort((a,b) => -1 * labels[a[0]].localeCompare(labels[b[0]]));
+          sortedCharacteristics.forEach(arr => {
+          let ch = arr[0];
+          // Handle characteristic with bonus first
+          formula = formula.replace(game.wfrp4e.config.characteristicsBonus[ch].toLowerCase(), this.parent.actor.characteristics[ch].bonus);
+          formula = formula.replace(game.wfrp4e.config.characteristics[ch].toLowerCase(), this.parent.actor.characteristics[ch].value);
+          });
 
-            return (0, eval)(formula);
-        }
-        return 0;
+          return (0, eval)(formula);
+      }
+      return 0;
       }
       catch (e) {
         console.error(`Spell from ${this.parent?.actor?.name} threw error: ${e}.\n Arguments:`, this, formula);
-        throw ui.notifications.error(game.i18n.format("ERROR.ParseSpell"));
+        throw ui.notifications.error(game.i18n.format("ERROR.ParseSpell"))
       }
   }
+
+
 
   // Don't really like this here as it uses assumed subclass data, but it'll do for now
   computeOvercastingData() {
@@ -201,8 +203,9 @@ export class OvercastItemModel extends BaseItemModel {
    * @returns {String}  formula   processed formula
    */
   computeSpellPrayerFormula(type, aoe = false, formulaOverride) {
-    let formula = formulaOverride || this[type]?.value
     try {
+
+      let formula = formulaOverride || this[type]?.value
       if (Number.isNumeric(formula))
         return formula
 

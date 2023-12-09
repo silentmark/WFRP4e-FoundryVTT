@@ -109,7 +109,7 @@ export default class EffectWfrp4e extends ActiveEffect
             if (scripts.length)
             {
                 await Promise.all(scripts.map(s => s.execute({data, options, user})));
-                return !this.scripts.every(s => s.options.immediate?.deleteEffect);
+                return !this.scripts.every(s => s.options?.immediate?.deleteEffect);
                 // If all scripts agree to delete the effect, return false (to prevent creation);
             }
         }
@@ -679,7 +679,6 @@ function _migrateEffect(data, context)
             // To reflect that, migrated prefill tiggers need to always be active in the dialog
             setProperty(newScript, "options.dialog.activateScript", "return true")
         }
-
     }
     else if (flags.effectTrigger == "dialogChoice")
     {

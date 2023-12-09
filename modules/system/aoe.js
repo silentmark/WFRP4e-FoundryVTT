@@ -222,6 +222,7 @@ export default class AbilityTemplate extends MeasuredTemplate {
     this.#events.reject();
   }
 
+  // TODO: implement missing methods.
   static updateAOETargets(templateData, onlyReturn = false)
   {
     let newTokenTargets = [];

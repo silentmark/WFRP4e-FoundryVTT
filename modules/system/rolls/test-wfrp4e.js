@@ -29,8 +29,7 @@ export default class TestWFRP {
         additionalDamage: data.additionalDamage || 0,
         selectedHitLocation : typeof data.hitLocation == "string" ? data.hitLocation : "", // hitLocation could be boolean
         hitLocationTable : data.hitLocationTable,
-        prefillTooltip : data.prefillTooltip,
-        prefillTooltipCount : data.prefillTooltipCount
+        dialogTooltips : data.dialogTooltips,
       },
       result: {
         roll: data.roll,
@@ -640,16 +639,6 @@ export default class TestWFRP {
   // Update message data without rerendering the message content
   async updateMessageFlags(updateData = {}) {
     let data = mergeObject(this.data, updateData, { overwrite: true })
-    //TODO: CZY TO POTRZEBNE?
-    //if (data.result?.options?.weapon?.effects) {
-    //  data.result.options.weapon = data.result.options.weapon.toObject();
-    //  delete data.result.options.weapon.effects;
-    //}
-    //if (data.preData?.options?.weapon?.effects) {
-    //  data.preData.options.weapon = data.preData.options.weapon.toObject();
-    //  delete data.preData.options.weapon.effects;
-    //}
-    //END OF TODO
     let update = { "flags.testData": data }
     
     if (this.message && game.user.isGM)

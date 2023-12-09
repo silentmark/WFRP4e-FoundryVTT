@@ -105,67 +105,12 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
   }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
   get conditions() {
     return this.effects.filter(e => e.isCondition)
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-  /**
-     * Shared setup data for all different dialogs
-     * Each dialog also has its own "setup" function
-     *
-     * @param {Object} dialogOptions      Dialog template, buttons, everything associated with the dialog
-     * @param {Object} dialogClass           Test info: target number, SL bonus, success bonus, etc
-     */
+  // Shared setup data for all different dialogs
+  // Each dialog also has its own "setup" function
   _setupTest(dialogData, dialogClass)
   {
     dialogData.data.targets = Array.from(game.user.targets);
@@ -208,16 +153,13 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     const isSocketTest = game.wfrp4e.utility.IsSocketTest();
     let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
     if (owner.id != game.user.id && isSocketTest) {
-      return this.setupSocket(dialogData, dialogClass);
+      let payload = { dialogData, dialogClass, userId: game.user.id, actorId: this.id };
+      return game.wfrp4e.utility.setupSocket(owner, payload, content);
     } else {
       return dialogClass.setup(dialogData.fields, dialogData.data, dialogData.options)
     }
   }
 
-  setupSocket(dialogData, dialogClass) {
-    let payload = { dialogData, dialogClass, userId: game.user.id, actorId: this.id };
-      return game.wfrp4e.utility.setupSocket(owner, payload, content);
-  }
 
   /**
    * Setup a Characteristic Test.
@@ -1916,8 +1858,10 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     value = value || 1
     let terror = duplicate(game.wfrp4e.config.systemItems.terror)
     terror.flags.wfrp4e.terrorValue = value
-    //TODO: change.
-    await game.wfrp4e.utility.applyOneTimeEffect(terror, this)
+    let scripts = new EffectWfrp4e(terror, {parent: this}).getScripts();
+    for (let s of scripts) {
+      await s.execute({ actor: this });
+    }
   }
 
   awardExp(amount, reason) {

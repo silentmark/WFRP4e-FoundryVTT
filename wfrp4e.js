@@ -76,7 +76,7 @@ import EffectWfrp4e from "./modules/system/effect-wfrp4e.js";
 /*  Foundry VTT Initialization                  */
 /* -------------------------------------------- */
 
-Hooks.once("init", function () {
+Hooks.once("init", async function () {
 
   // #if _ENV === "development"
   CONFIG.debug.wfrp4e = true;
@@ -177,21 +177,6 @@ Hooks.once("init", function () {
   CONFIG.Item.documentClass = ItemWfrp4e;
   CONFIG.ActiveEffect.documentClass = EffectWfrp4e
   CONFIG.ActiveEffect.legacyTransferral = false;
-
-  //TODO: CHNECK IF NEEDED.
-  CONFIG.ChatMessage.documentClass.prototype.getTest = function () {
-    if (hasProperty(this, "flags.testData"))
-      return game.wfrp4e.rolls.TestWFRP.recreate(this.flags.testData)   
-  }
-  CONFIG.ChatMessage.documentClass.prototype.getOppose = function () {
-    if (hasProperty(this, "flags.wfrp4e.opposeData"))
-      return new OpposedWFRP(getProperty(this, "flags.wfrp4e.opposeData"))
-  }
-
-  CONFIG.ChatMessage.documentClass.prototype.getOpposedTest = function () {
-    if (hasProperty(this, "flags.wfrp4e.opposeTestData"))
-      return game.wfrp4e.opposedTest.recreate(getProperty(this, "flags.wfrp4e.opposeTestData"))
-  }
 });
 
 registerHooks()

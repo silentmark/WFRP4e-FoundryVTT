@@ -31,7 +31,6 @@ export class StandardActorModel extends BaseActorModel {
             "flags.autoCalcEnc": data.flags?.autoCalcEnc || true,
             "flags.autoCalcSize": data.flags?.autoCalcSize || true,
             "prototypeToken.actorLink": true,
-            "prototypeToken.disposition": CONST.TOKEN_DISPOSITIONS.HOSTILE,
             "prototypeToken.sight": { enabled: true }
         });
         mergeObject(preCreateData, this.checkWounds(true));
@@ -60,7 +59,7 @@ export class StandardActorModel extends BaseActorModel {
             this.parent._displayScrollingChange(options.deltaWounds > 0 ? "+" + options.deltaWounds : options.deltaWounds);
         }
         if (options.deltaAdv) {
-            //this.parent._displayScrollingChange(options.deltaAdv, { advantage: true });
+            this.parent._displayScrollingChange(options.deltaAdv, { advantage: true });
         }
 
         // return mergeObject(update, this.checkWounds());

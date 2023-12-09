@@ -15,7 +15,7 @@ export default class WFRP4eScript
     {
         try 
         {
-            let scriptFunction = this.async ? Object.getPrototypeOf(async function () { }).constructor : Function;
+            let scriptFunction =this.async ? Object.getPrototypeOf(async function () { }).constructor : Function;
             game.wfrp4e.utility.log("Running Script > " + this.label);
             return (new scriptFunction("args",`${CONFIG.debug.scripts ? "debugger;" : ""}` + this.script)).bind(this.context)(args);
         }

@@ -103,6 +103,7 @@ export default class RollDialog extends Application {
         }
         let data = mergeObject(this.data, this.fields);
         data.options = this.options
+        data.dialogTooltips = this.tooltips.getCollectedTooltips();
         data.targets = Array.from(data.targets).map(t => t.actor.speakerData(t.document))
         data.chatOptions = this._setupChatOptions()
         return data
@@ -136,7 +137,7 @@ export default class RollDialog extends Application {
         
         this._hideScripts();
         this._activateScripts();
-        await this.computeScripts();        
+        await this.computeScripts();
         await this.customPrefillModifiers();
         await this.computeFields();
 
