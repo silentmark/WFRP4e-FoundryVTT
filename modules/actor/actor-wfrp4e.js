@@ -149,14 +149,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     {
       dialogData.fields.hitLocation = "none"
     }
-    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
-    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
-    if (owner.id != game.user.id && isSocketTest) {
-      let payload = { dialogData, dialogClass, userId: game.user.id, actorId: this.id };
-      return game.wfrp4e.utility.setupSocket(owner, payload, content);
-    } else {
-      return dialogClass.setup(dialogData.fields, dialogData.data, dialogData.options)
-    }
+    return dialogClass.setup(dialogData.fields, dialogData.data, dialogData.options)
   }
 
 
@@ -179,7 +172,17 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       options : options || {}         // Application/optional properties
     }
     // TODO: handle abort
-    return this._setupTest(dialogData, CharacteristicDialog)
+    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
+    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
+    if (owner.id != game.user.id && isSocketTest) {
+      let dialogClassName = CharacteristicDialog.name;      
+      owner.updateTokenTargets(Array.from(game.user.targets.map(x=>x.id)));
+      owner.broadcastActivity({ targets: Array.from(game.user.targets.map(x=>x.id))});
+      let payload = { dialogData, dialogClassName, userId: game.user.id, actorId: this.id };
+      return game.wfrp4e.utility.setupSocket(owner, payload);
+    } else {
+      return this._setupTest(dialogData, CharacteristicDialog)
+    }
   }
 
   /**
@@ -249,8 +252,20 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       },    
       options : options || {}         // Application/optional properties
     }
-
-    return this._setupTest(dialogData, WeaponDialog)
+    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
+    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
+    if (owner.id != game.user.id && isSocketTest) {
+      let dialogClassName = WeaponDialog.name;
+      dialogData.data.weapon = weapon.toObject();
+      owner.updateTokenTargets([]);
+      owner.updateTokenTargets(Array.from(game.user.targets.map(x=>x.id)));
+      owner.broadcastActivity({ targets: Array.from(game.user.targets.map(x=>x.id))});
+      await game.wfrp4e.utility.sleep(250);
+      let payload = { dialogData, dialogClassName, userId: game.user.id, actorId: this.id };
+      return game.wfrp4e.utility.setupSocket(owner, payload);
+    } else {
+      return this._setupTest(dialogData, WeaponDialog)
+    }
   }
 
 

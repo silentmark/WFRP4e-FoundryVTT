@@ -34,7 +34,9 @@ export default class CombatHelpers {
         for (let script of CombatHelpers.scripts.startCombat) {
             await script(combat);
         }
-        await Promise.all(turn.actor.runScripts("startCombat", combat, currentCombatant))
+        for (let turn of combat.turns) {
+            await Promise.all(turn.actor.runScripts("startCombat", combat));
+        }
     }
 
     static async updateCombat(combat, changes, context) {
@@ -69,7 +71,10 @@ export default class CombatHelpers {
                 for (let script of CombatHelpers.scripts.endRound) {
                     await script(combat);
                 }
-                await Promise.all(turn.actor.runScripts("endRound", combat))
+                
+                for (let turn of combat.turns) {
+                    await Promise.all(turn.actor.runScripts("endRound", combat));
+                }
             }
         }
         
@@ -77,13 +82,13 @@ export default class CombatHelpers {
             for (let script of CombatHelpers.scripts.endTurn) {
                 await script(combat, previousCombatant);
             }
-            await Promise.all(turn.actor.runScripts("endTurn", combat, previousCombatant))
+            await Promise.all(previousCombatant.actor.runScripts("endTurn", combat, previousCombatant))
         }
         if (currentCombatant) {
             for (let script of CombatHelpers.scripts.startTurn) {
                 await script(combat, currentCombatant);
             }
-            await Promise.all(turn.actor.runScripts("startTurn", combat, currentCombatant))
+            await Promise.all(currentCombatant.actor.runScripts("startTurn", combat, currentCombatant))
         }
     }
 
@@ -107,7 +112,7 @@ export default class CombatHelpers {
             }
 
             let msgContent = ""
-            let startTurnConditions = combatant.actor.actorEffects.filter(e => e.conditionTrigger == "startTurn")
+            let startTurnConditions = combatant.actor.effects.contents.filter(e => e.conditionTrigger == "startTurn")
             for (let cond of startTurnConditions) {
                 if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
                     let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
@@ -130,7 +135,7 @@ export default class CombatHelpers {
 
         if (combatant) {
             let msgContent = ""
-            let endTurnConditions = combatant.actor.actorEffects.filter(e => e.conditionTrigger == "endTurn")
+            let endTurnConditions = combatant.actor.effects.contents.filter(e => e.conditionTrigger == "endTurn")
             for (let cond of endTurnConditions) {
                 if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
                     let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
@@ -161,7 +166,9 @@ export default class CombatHelpers {
             content = `<h2>${game.i18n.localize("CHAT.EndCombat")}</h3>` + content;
             ChatMessage.create({ content, whisper: ChatMessage.getWhisperRecipients("GM") })
         }
-        await Promise.all(turn.actor.runScripts("endCombat", combat))
+        for (let turn of combat.turns) {
+            await Promise.all(turn.actor.runScripts("endCombat", combat))
+        }
     }
 
     static async checkFearTerror(combat) {
@@ -353,7 +360,7 @@ export default class CombatHelpers {
         }
 
         for (let turn of combat.turns) {
-            let endRoundConditions = turn.actor.actorEffects.filter(e => e.conditionTrigger == "endRound")
+            let endRoundConditions = turn.actor.effects.contents.filter(e => e.conditionTrigger == "endRound")
             for (let cond of endRoundConditions) {
                 if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
                     let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
@@ -366,7 +373,7 @@ export default class CombatHelpers {
                 }
             }
 
-            let conditions = turn.actor.actorEffects.filter(e => e.isCondition)
+            let conditions = turn.actor.effects.contents.filter(e => e.isCondition)
             for (let cond of conditions) {
                 // I swear to god whoever thought it was a good idea for these conditions to reduce every *other* round...
                 if (cond.conditionId == "deafened" || cond.conditionId == "blinded" && Number.isNumeric(cond.flags.wfrp4e.roundReceived)) {
@@ -380,8 +387,6 @@ export default class CombatHelpers {
                     }
                 }
             }
-            await Promise.all(turn.actor.runScripts("endRound", combat))
-
         }
         if (removedConditions.length)
             await ChatMessage.create({ content: removedConditions.join("<br>") })

@@ -1,10 +1,14 @@
 import ActorWfrp4e from "../actor/actor-wfrp4e.js";
+import WeaponDialog from "../apps/roll-dialog/weapon-dialog.js";
 import EffectWfrp4e from "./effect-wfrp4e.js";
 
 export default class SocketHandlers  {
 
     static call(type, payload, userId)
     {
+        if (userId == "GM") {
+            userId = game.users.activeGM.id;
+        }
         game.socket.emit("system.wfrp4e", {type, payload, userId});
     }
 
@@ -12,7 +16,6 @@ export default class SocketHandlers  {
     {
         game.socket.on("system.wfrp4e", async data => 
         {
-            if (data.userId == "GM" && game.user.id != game.users.contents.filter(u => u.active).find(u => u.isGM).id) return;
             if (data.userId != game.user.id && data.userId != "ALL") return;
 
             let result = await this[data.type]({...data.payload}, data.userId);
@@ -92,51 +95,20 @@ export default class SocketHandlers  {
     }
 
     static async setupSocket(payload) {
+        let dialogData = payload.dialogData;
+        let dialogClass = eval(payload.dialogClassName);
         let actorId = payload.actorId; 
-        let type = payload.type;
-        let options = payload.options || {};
         let messageId = payload.messageId;
         let actor = game.actors.get(actorId);
         let owner = game.wfrp4e.utility.getActiveDocumentOwner(actor);
-
-        let test;
         if (owner.id == game.user.id) {
-            if (canvas.scene) { 
-                if (options.gmTargets) {
-                    game.user.updateTokenTargets(options.gmTargets);
-                    game.user.broadcastActivity({targets: options.gmTargets});
-                } else {
-                    game.user.updateTokenTargets([]);
-                    game.user.broadcastActivity({targets: []});
-                }
+            if (dialogClass.name == WeaponDialog.name) {
+                dialogData.data.weapon = actor.items.get(dialogData.data.weapon._id);
             }
-            if (type == "setupCharacteristic") {
-                let characteristicId = payload.characteristicId;
-                test = await actor.setupCharacteristic(characteristicId, options);
-            } else if (type == "setupSkill") {
-                let skillName = payload.skillName;
-                test = await actor.setupSkill(skillName, options);
-            } else if (type == "setupWeapon") {
-                let weapon = payload.weapon;
-                test = await actor.setupWeapon(weapon, options);
-            } else if (type == "setupCast") {
-                let spell = payload.spell;
-                test = await actor.setupCast(spell, options);
-            } else if (type == "setupChannell") {
-                let spell = payload.spell;
-                test = await actor.setupChannell(spell, options);
-            } else if (type == "setupPrayer") {
-                let prayer = payload.prayer;
-                test = await actor.setupPrayer(prayer, options);
-            } else if (type == "setupTrait") {
-                let trait = payload.trait;
-                test = await actor.setupTrait(trait, options);
-            }
-            if (owner.isGM && test) {
-                await test.roll();
-            }
+            let test = await actor._setupTest(dialogData, dialogClass);
             let message = game.messages.get(messageId);
             if (test) {
+                await test.roll();
                 await message.update({"flags.data.test": test});
             } else {
                 await message.delete();
@@ -169,18 +141,19 @@ export default class SocketHandlers  {
             result = await this[type](payload);
         } else {
             ui.notifications.notify(game.i18n.format("SOCKET.SendingSocketRequest", { name: userId }));
-            let msg = await SocketHandlers.createSocketRequestMessage(owner, content);
+            let owner = game.users.get(userId) ?? game.users.activeGM;
+            let msg = await SocketHandlers.createSocketRequestMessage(owner, "Sending socket message to " + owner.name + "...");
             payload.socketMessageId = msg.id;
             SocketHandlers.call(type, payload, userId);
             do {
-                await WFRP_Utility.sleep(250);
+                await game.wfrp4e.utility.sleep(250);
                 msg = game.messages.get(msg.id);
                 result = msg?.getFlag("wfrp4e", "socketResult");
             } while (msg && !result);
             if (msg && game.user.isGM) {
-                message.delete();
+                msg.delete();
             } else {
-                SocketHandlers.executeOnGM("deleteMsg", { "id": message.id });
+                SocketHandlers.executeOnGM("deleteMsg", { "id": msg.id });
             }
         }
         return result;

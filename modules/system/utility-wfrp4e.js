@@ -1211,9 +1211,9 @@ export default class WFRP_Utility {
  
 
 
-  static async setupSocket(owner, payload, content) {
+  static async setupSocket(owner, payload) {
     let chatData = {
-      content: "<b><u>" + owner.name + "</u></b>: " + content,
+      content: "<b><u>" + owner.name + "</u></b>: oczekiwanie na test",
       whisper: ChatMessage.getWhisperRecipients("GM")
     }
     if (game.user.isGM) {
