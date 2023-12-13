@@ -108,6 +108,13 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     return this.effects.filter(e => e.isCondition)
   }
 
+  async _preSetupSocketTest(owner) {
+    owner.updateTokenTargets([]);
+    owner.updateTokenTargets(Array.from(game.user.targets.map(x=>x.id)));
+    owner.broadcastActivity({ targets: Array.from(game.user.targets.map(x=>x.id))});
+    await game.wfrp4e.utility.sleep(250);
+  }
+
   // Shared setup data for all different dialogs
   // Each dialog also has its own "setup" function
   _setupTest(dialogData, dialogClass)
@@ -175,9 +182,8 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     const isSocketTest = game.wfrp4e.utility.IsSocketTest();
     let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
     if (owner.id != game.user.id && isSocketTest) {
+      await this._preSetupSocketTest(owner);
       let dialogClassName = CharacteristicDialog.name;      
-      owner.updateTokenTargets(Array.from(game.user.targets.map(x=>x.id)));
-      owner.broadcastActivity({ targets: Array.from(game.user.targets.map(x=>x.id))});
       let payload = { dialogData, dialogClassName, userId: game.user.id, actorId: this.id };
       return game.wfrp4e.utility.setupSocket(owner, payload);
     } else {
@@ -256,11 +262,8 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
     if (owner.id != game.user.id && isSocketTest) {
       let dialogClassName = WeaponDialog.name;
+      await this._preSetupSocketTest(owner);
       dialogData.data.weapon = weapon.toObject();
-      owner.updateTokenTargets([]);
-      owner.updateTokenTargets(Array.from(game.user.targets.map(x=>x.id)));
-      owner.broadcastActivity({ targets: Array.from(game.user.targets.map(x=>x.id))});
-      await game.wfrp4e.utility.sleep(250);
       let payload = { dialogData, dialogClassName, userId: game.user.id, actorId: this.id };
       return game.wfrp4e.utility.setupSocket(owner, payload);
     } else {

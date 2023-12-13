@@ -1,6 +1,7 @@
 import ActorWfrp4e from "../actor/actor-wfrp4e.js";
 import WeaponDialog from "../apps/roll-dialog/weapon-dialog.js";
 import EffectWfrp4e from "./effect-wfrp4e.js";
+import WFRP_Utility from "./utility-wfrp4e.js";
 
 export default class SocketHandlers  {
 
@@ -25,16 +26,12 @@ export default class SocketHandlers  {
                 result = "success";
             }
             data.payload.socketResult = result;
-            SocketHandlers.executeOnGM("updateSocketMessageResult", data.payload);
+            if (game.user.isGM) {
+                SocketHandlers.updateSocketMessageResult(data.payload);
+            } else {
+                SocketHandlers.call(type, payload, "GM");
+            }
         });
-    }
-    
-    static executeOnGM(type, payload) {
-        if (game.user.isGM) {
-            this[type](payload);
-        } else {
-            SocketHandlers.call(type, payload, "GM");
-        }
     }
 
     static updateSocketMessageResult(payload) {
@@ -67,8 +64,7 @@ export default class SocketHandlers  {
         }
     }
 
-    static async applyEffect({effectUuids, effectData, actorUuid, messageId})
-{
+    static async applyEffect({effectUuids, effectData, actorUuid, messageId}) {
         let result = await fromUuidSync(actorUuid)?.applyEffect({effectUuids, effectData, messageId});
         return result;
     }
@@ -130,9 +126,10 @@ export default class SocketHandlers  {
         let ownerUser = game.wfrp4e.utility.getActiveDocumentOwner(document);
         if (game.user.id == ownerUser.id) {
             this[type](payload);
+        } else {
+            WFRP_Utility.log(game.i18n.format("SOCKET.SendingSocketRequest", { name: ownerUser.name }));
+            SocketHandlers.call(type, payload, ownerUser.id);
         }
-        ui.notifications.notify(game.i18n.format("SOCKET.SendingSocketRequest", { name: ownerUser.name }));
-        SocketHandlers.call(type, payload, ownerUser.id);
     }
 
     static async executeOnUserAndWait(userId, type, payload) {
@@ -140,7 +137,7 @@ export default class SocketHandlers  {
         if (game.user.id == userId || (userId == "GM" && game.user.isGM)) {
             result = await this[type](payload);
         } else {
-            ui.notifications.notify(game.i18n.format("SOCKET.SendingSocketRequest", { name: userId }));
+            WFRP_Utility.log(game.i18n.format("SOCKET.SendingSocketRequest", { name: userId }));
             let owner = game.users.get(userId) ?? game.users.activeGM;
             let msg = await SocketHandlers.createSocketRequestMessage(owner, "Sending socket message to " + owner.name + "...");
             payload.socketMessageId = msg.id;
@@ -152,8 +149,8 @@ export default class SocketHandlers  {
             } while (msg && !result);
             if (msg && game.user.isGM) {
                 msg.delete();
-            } else {
-                SocketHandlers.executeOnGM("deleteMsg", { "id": msg.id });
+            } else if (msg && !game.user.isGM) {
+                SocketHandlers.call("deleteMsg", { "id": msg.id }, "GM");
             }
         }
         return result;
