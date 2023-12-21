@@ -96,11 +96,11 @@ export class StandardActorModel extends BaseActorModel {
         flags.resolute = 0
         flags.ambi = 0;
 
-        this.parent.runScripts("prePrepareData", { actor: this })
+        this.parent.runScripts("prePrepareData", { actor: this.parent })
     }
 
-    computeDerived(items, flags) {
-        this.parent.runScripts("prePrepareItems", {actor : this})
+    computeDerived() {
+        this.parent.runScripts("prePrepareItems", {actor : this.parent })
         this.computeItems();
         super.computeDerived(items, flags);
         // Recompute bonuses as active effects may have changed it
@@ -117,7 +117,7 @@ export class StandardActorModel extends BaseActorModel {
         this.computeAP();
         this.computeMount()
 
-        this.parent.runScripts("prepareData", { actor: this })
+        this.parent.runScripts("prepareData", { actor: this.parent })
     }
 
     computeAdvantage() {
@@ -267,7 +267,7 @@ export class StandardActorModel extends BaseActorModel {
         if (flags.autoCalcCritW)
             this.status.criticalWounds.max = tb;
 
-        let effectArgs = { sb, tb, wpb, multiplier, actor: this }
+        let effectArgs = { sb, tb, wpb, multiplier, actor: this.parent }
         this.parent.runScripts("preWoundCalc", effectArgs);
         ({ sb, tb, wpb } = effectArgs);
 
@@ -306,7 +306,7 @@ export class StandardActorModel extends BaseActorModel {
             }
         }
 
-        effectArgs = { wounds, actor: this }
+        effectArgs = { wounds, actor: this.parent }
         this.parent.runScripts("woundCalc", effectArgs);
         wounds = effectArgs.wounds;
         return wounds
