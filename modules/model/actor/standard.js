@@ -99,7 +99,7 @@ export class StandardActorModel extends BaseActorModel {
         this.parent.runScripts("prePrepareData", { actor: this.parent })
     }
 
-    computeDerived() {
+    computeDerived(items, flags) {
         this.parent.runScripts("prePrepareItems", {actor : this.parent })
         this.computeItems();
         super.computeDerived(items, flags);
