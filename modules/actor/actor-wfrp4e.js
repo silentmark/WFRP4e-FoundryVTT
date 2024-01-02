@@ -20,6 +20,9 @@ import ItemWfrp4e from "../item/item-wfrp4e.js";
  * Additionally, it handles all the different types of roll requests, setting up the
  * test dialog, how each test is displayed, etc.
  *
+ * @extends Actor
+ * @mixes WFRP4eDocumentMixin
+ * @category - Documents
  *
  * @see   ActorSheetWfrp4e - Base sheet class
  * @see   ActorSheetWfrp4eCharacter - Character sheet class
@@ -39,10 +42,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
    *
    */
   async _preCreate(data, options, user) {
-
-    if (data._id)
-      options.keepId = WFRP_Utility._keepID(data._id, this)
-
 
     let migration = game.wfrp4e.migration.migrateActorData(this)
     this.updateSource({ effects: game.wfrp4e.migration.removeLoreEffects(data) }, { recursive: false });

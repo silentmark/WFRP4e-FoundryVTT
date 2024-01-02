@@ -112,9 +112,8 @@ export default class CombatHelpers {
             }
 
             let msgContent = ""
-            let startTurnConditions = combatant.actor.effects.contents.filter(e => e.conditionTrigger == "startTurn")
+            let startTurnConditions = combatant.actor.effects.contents.filter(e => e.applicationData?.conditionTrigger == "startTurn")
             for (let cond of startTurnConditions) {
-                if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
                     let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
                     if (Number.isNumeric(cond.flags.wfrp4e.value))
                         conditionName += ` ${cond.flags.wfrp4e.value}`
@@ -122,7 +121,6 @@ export default class CombatHelpers {
                 <h2>${conditionName}</h2>
                 <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
                     await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
-                }
             }
 
         }
@@ -135,9 +133,8 @@ export default class CombatHelpers {
 
         if (combatant) {
             let msgContent = ""
-            let endTurnConditions = combatant.actor.effects.contents.filter(e => e.conditionTrigger == "endTurn")
+            let endTurnConditions = combatant.actor.effects.contents.filter(e => e.applicationData?.conditionTrigger == "endTurn")
             for (let cond of endTurnConditions) {
-                if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
                     let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
                     if (Number.isNumeric(cond.flags.wfrp4e.value))
                         conditionName += ` ${cond.flags.wfrp4e.value}`
@@ -145,7 +142,6 @@ export default class CombatHelpers {
                 <h2>${conditionName}</h2>
                 <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
                     await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
-                }
             }
         }
     }
@@ -360,17 +356,15 @@ export default class CombatHelpers {
         }
 
         for (let turn of combat.turns) {
-            let endRoundConditions = turn.actor.effects.contents.filter(e => e.conditionTrigger == "endRound")
+            let endRoundConditions = turn.actor.effects.contents.filter(e => e.applicationData?.conditionTrigger == "endRound")
             for (let cond of endRoundConditions) {
-                if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
-                    let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
-                    if (Number.isNumeric(cond.flags.wfrp4e.value))
-                        conditionName += ` ${cond.flags.wfrp4e.value}`
-                    msgContent = `
-              <h2>${conditionName}</h2>
-              <a class="condition-script" data-combatant-id="${turn.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
-                    await ChatMessage.create({ content: msgContent, speaker: { alias: turn.token.name } });
-                }
+                let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
+                if (Number.isNumeric(cond.flags.wfrp4e.value))
+                    conditionName += ` ${cond.flags.wfrp4e.value}`
+                msgContent = `
+            <h2>${conditionName}</h2>
+            <a class="condition-script" data-combatant-id="${turn.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
+                await ChatMessage.create({ content: msgContent, speaker: { alias: turn.token.name } });
             }
 
             let conditions = turn.actor.effects.contents.filter(e => e.isCondition)
