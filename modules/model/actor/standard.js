@@ -105,6 +105,7 @@ export class StandardActorModel extends BaseActorModel {
         super.computeDerived(items, flags);
         // Recompute bonuses as active effects may have changed it
         this.characteristics.compute();
+        this.runScripts("computeCharacteristics", this.parent);
         if (this.checkWounds())
         {
             return;
@@ -113,6 +114,7 @@ export class StandardActorModel extends BaseActorModel {
         this.computeMove();
         this.computeSize();
         this.computeEncumbranceMax();
+        this.runScripts("computeEncumbrance", this.parent);
         this.computeEncumbranceState();
         this.computeAP();
         this.computeMount()
@@ -241,6 +243,10 @@ export class StandardActorModel extends BaseActorModel {
         this.status.armour = AP
     }
 
+    addAP(ap)
+    {
+        
+    }
 
     /**
   * Calculates the wounds of an actor based on prepared items
