@@ -49,7 +49,7 @@ export default function() {
               scene : scene._id,
               token : mountToken._id
             }
-          token.actor.update({"system.status.mount.isToken" : true, "system.status.mount.tokenData" : tokenData})
+          await token.actor.update({"system.status.mount.isToken" : true, "system.status.mount.tokenData" : tokenData})
         }
       }
 
@@ -58,7 +58,7 @@ export default function() {
 
     if (game.user.id == user)
     {
-        token.actor.runScripts("createToken", token);
+      await Promise.all(token.actor.runScripts("createToken", token));
     }
 
   })
