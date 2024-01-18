@@ -935,6 +935,7 @@ WFRP4E.subspecies = {};
 WFRP4E.speciesCharacteristics = {}
 WFRP4E.speciesSkills = {}
 WFRP4E.speciesTalents = {}
+WFRP4E.speciesRandomTalents = {}
 WFRP4E.speciesMovement = {}
 WFRP4E.speciesFate = {}
 WFRP4E.speciesRes = {}
@@ -2395,6 +2396,7 @@ WFRP4E.scriptTriggers = {
     "targetPrefillDialog" : "Prefill Targeter's Dialog",
     "getInitiativeFormula" : "Get Initiative",
     "createToken" : "Create Token",
+    "deleteEffect" : "Effect Deleted",
     "endTurn" : "End Turn",
     "startTurn" : "Start Turn",
     "endRound" : "End Round",
