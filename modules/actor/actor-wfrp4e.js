@@ -389,7 +389,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       fields : options.fields || {},  // Fields are data properties in the dialog template
       data : {                  // Data is internal dialog data
         trait,
-        hitLoc : (trait.rollable.rollCharacteristic == "ws" || trait.rollable.rollCharacteristic == "bs")
+        hitLoc : (trait.system.rollable.rollCharacteristic == "ws" || trait.system.rollable.rollCharacteristic == "bs")
       },    
       options : options || {}         // Application/optional properties
     }
@@ -808,34 +808,17 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       actor.addCondition("entangled", 1, attacker.characteristics.s.value);
     }
 
-    if (ward > 0) {
+    if (ward > 0) 
+    {
       let roll = Math.ceil(CONFIG.Dice.randomUniform() * 10);
 
       if (roll >= ward) {
         updateMsg = `<span style = "text-decoration: line-through">${updateMsg}</span><br>${game.i18n.format("OPPOSED.Ward", { roll })}`
         return updateMsg;
       }
-      else if (Number.isNumeric(target)) {
-        updateMsg += `<br>${game.i18n.format("OPPOSED.DaemonicRoll", { roll: daemonicRoll })}`
+      else {
+        updateMsg += `<br>${game.i18n.format("OPPOSED.WardRoll", { roll })}`
       }
-
-    }
-
-    if (wardTrait) {
-      let wardRoll = Math.ceil(CONFIG.Dice.randomUniform() * 10);
-      let target = wardTrait.specification.value
-      // Remove any non numbers
-      if (isNaN(target))
-        target = target.split("").filter(char => /[0-9]/.test(char)).join("")
-
-      if (Number.isNumeric(target) && wardRoll >= parseInt(wardTrait.specification.value)) {
-        updateMsg = `<span style = "text-decoration: line-through">${updateMsg}</span><br>${game.i18n.format("OPPOSED.Ward", { roll: wardRoll })}`
-        return updateMsg;
-      }
-      else if (Number.isNumeric(target)) {
-        updateMsg += `<br>${game.i18n.format("OPPOSED.WardRoll", { roll: wardRoll })}`
-      }
-
     }
 
     if (extraMessages.length > 0)
@@ -1515,7 +1498,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     const symptoms = disease.system.symptoms.value.toLowerCase();
 
     if (symptoms.includes("lingering")) {
-      let lingering = disease.effects.find(e => e.name.includes(game.i18n.localize("WFRP4E.Symptom.Lingering")));
+      let lingering = disease.effects.find(e => e.name.includes(game.i18n.localize("WFRP4E.Symptom.Lingering")))
       if (lingering) {
         let difficulty = lingering.name.substring(lingering.name.indexOf("(") + 1, lingering.name.indexOf(")")).toLowerCase();
 
@@ -1834,10 +1817,10 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
 
   setAdvantage(val) {
-    this.update({ "system.status.advantage.value": val })
+    return this.update({ "system.status.advantage.value": val })
   }
   modifyAdvantage(val) {
-    this.setAdvantage(this.status.advantage.value + val)
+    return this.setAdvantage(this.status.advantage.value + val)
   }
 
   setWounds(val) {
@@ -1986,7 +1969,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     value = value || 1
     let terror = duplicate(game.wfrp4e.config.systemItems.terror)
     terror.flags.wfrp4e.terrorValue = value
-    let scripts = new EffectWfrp4e(terror, {parent: this}).getScripts();
+    let scripts = new EffectWfrp4e(terror, {parent: this}).scripts;
     for (let s of scripts) {
       await s.execute({ actor: this });
     }
