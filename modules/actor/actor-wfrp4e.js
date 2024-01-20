@@ -2167,30 +2167,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     return (await this.update({ "flags.-=oppose": null }));
   }
 
-  /**
-   * This function stores temporary active effects on an actor
-   * Generally used by effect scripts to add conditional effects
-   * that are removed when the source effect is removed
-   * 
-   * @param {Object} data Active Effect Data
-   */
-  createConditionalEffect(data)
-  {
-    let conditionalEffects = foundry.utils.deepClone(this.flags.wfrp4e?.conditionalEffects || [])
-
-    if (!data.id)
-    {
-      data.id == randomID()
-    }
-
-    conditionalEffects.push(data);
-    setProperty(this, "flags.wfrp4e.conditionalEffects", conditionalEffects);
-  }
-
   // @@@@@@@@ BOOLEAN GETTERS
-  get isUniqueOwner() {
-    return game.user.id == game.users.find(u => u.active && (this.ownership[u.id] >= 3 || u.isGM))?.id
-  }
 
   get inCollection() {
     return game.actors && game.actors.get(this.id)
@@ -2240,6 +2217,17 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       }
       return effects;
   }
+
+  get mainArmLoc() 
+  {
+    return (this.system.details.mainHand || "r") + "Arm"
+  }
+
+  get secondaryArmLoc() 
+  {
+    return (this.system.details.mainHand == "r" ? "l" : "r") + "Arm"
+  }
+
 
 
   speakerData(token) {
