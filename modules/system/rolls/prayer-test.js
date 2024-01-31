@@ -125,7 +125,7 @@ export default class PrayerTest extends TestWFRP {
   }
 
   get characteristicKey() {
-    if (this.preData.skillSelected.char)
+    if (this.preData.skillSelected?.char)
       return this.preData.skillSelected.key
 
     else {
