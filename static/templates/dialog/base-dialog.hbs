@@ -26,9 +26,16 @@
     </div>
     <div class="dialog-modifiers">
       <label>{{localize "DIALOG.DialogModifiers"}}</label>
-      <ul class="modifier-list">
+      <ul class="scripts modifier-list">
         {{#each data.scripts}}
             <li class="modifier {{#if this.isActive}}active {{else if this.isHidden}}hidden{{/if}}" data-tooltip="{{this.effect.name}} {{#if this.options.dialog.targeter}}(Cel){{/if}}" data-tooltip-direction="RIGHT" data-index="{{@key}}" >&#8226; <a>{{this.Label}}</a></li>
+        {{/each}}
+      </ul>
+      <ul class="talents modifier-list">
+        {{#each data.talents as |item i|}}
+            {{#if item.tests.value}}
+              <li class="modifier {{#if this.isActive}}active {{/if}}" data-tooltip="{{this.name}}" data-tooltip-direction="RIGHT" data-index="{{@key}}" >&#8226; <a>{{this.tests.value}} {{#unless (eq this.Advances 1)}} ({{this.Advances}}){{/unless}}</a></li>
+            {{/if}}
         {{/each}}
       </ul>
     </div>
