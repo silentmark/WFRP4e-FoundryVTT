@@ -112,6 +112,11 @@ export default class RollDialog extends Application {
         {
             this.resolve(test);
         }
+        if (game.canvas.scene)
+        {
+            game.user.updateTokenTargets([]);
+            game.user.broadcastActivity({ targets: [] });
+        }
         this.close();
         return test;
     }
@@ -160,7 +165,6 @@ export default class RollDialog extends Application {
         this._hideScripts();
         this._activateScripts();
         await this.computeScripts();
-        await this.customPrefillModifiers();
         await this.computeFields();
 
         return {
@@ -256,19 +260,6 @@ export default class RollDialog extends Application {
                 }
                 this.tooltips.finish(this, script.Label);
             }
-        }
-    }
-    
-    // TODO: Adjust prefil modifiers. 
-    async customPrefillModifiers() 
-    {
-        const obj = game.wfrp4e.config.customPrefillModifiers
-        const functions = Object.getOwnPropertyNames(obj).filter(function (p) { return typeof obj[p] === 'function' });
-        for (let func of functions) 
-        {
-            this.tooltips.start(this);
-            await game.wfrp4e.config.customPrefillModifiers[func].call(this);
-            this.tooltips.finish(this, func.label);
         }
     }
 

@@ -346,21 +346,6 @@ export default class CombatHelpers {
         let removedConditions = []
         let msgContent = ""
         for (let turn of combat.turns) {
-            if (turn.actor.status.wounds.value == 0) {
-                if (turn.actor.status.roundsToPassOut.value < turn.actor.status.roundsToPassOut.max) {
-                    turn.actor.status.roundsToPassOut.value++;
-                    await turn.actor.update({ "system.status.roundsToPassOut.value": turn.actor.status.roundsToPassOut.value })
-                    if (turn.actor.status.roundsToPassOut.value == turn.actor.status.roundsToPassOut.max) {
-                        await turn.actor.addCondition("unconscious")
-                    }
-                }
-            } else {
-                turn.actor.status.roundsToPassOut.value = 0;
-                await turn.actor.update({ "system.status.roundsToPassOut.value": 0 })
-            }
-        }
-
-        for (let turn of combat.turns) {
             let endRoundConditions = turn.actor.effects.contents.filter(e => e.applicationData?.conditionTrigger == "endRound")
             for (let cond of endRoundConditions) {
                 let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])

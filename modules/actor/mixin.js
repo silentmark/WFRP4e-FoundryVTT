@@ -122,7 +122,7 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
     }
 
     //#region Condition Handling
-    async addCondition(effect, value = 1) {
+    async addCondition(effect, value = 1, flags) {
         if (typeof (effect) === "string")
             effect = duplicate(game.wfrp4e.config.statusEffects.find(e => e.id == effect))
         if (!effect)
@@ -139,12 +139,18 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
         else if (existing) {
             existing = duplicate(existing)
             existing.flags.wfrp4e.value += value;
+            if (flags) {
+                effect.flags.wfrp4e.extra = flags;
+            }
             return this.updateEmbeddedDocuments("ActiveEffect", [existing])
         }
         else if (!existing) {
             effect.name = game.i18n.localize(effect.name);
             if (Number.isNumeric(effect.flags.wfrp4e.value))
                 effect.flags.wfrp4e.value = value;
+            if (flags) {
+                effect.flags.wfrp4e.extra = flags;
+                }
             delete effect.id
             return this.createEmbeddedDocuments("ActiveEffect", [effect], {condition: true});
         }

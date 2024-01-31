@@ -218,30 +218,6 @@
   </div>
 </div>
 
-<div class="main-row third">
-  <div class="roundsToPassOut row-section">
-    <div class="roundsToPassOut-section">
-      <span class="top label">{{localize "Rundy do utraty przytomności"}}</span>
-      <div class="roundsToPassOut-value-box">
-        <div id="value">
-          <input type="text" data-dtype="{{system.status.roundsToPassOut.type}}" name="system.status.roundsToPassOut.value" value="{{system.status.roundsToPassOut.value}}" >
-        </div>
-        <div id="divisor" class="divisor">
-          /
-        </div>
-        <div id="roundsToPassOut-max">
-          {{#if actor.flags.autoCalcCritW}}
-          <a class="auto-calc-toggle" toggle-type="rtpo">{{system.status.roundsToPassOut.max}}</a>
-          {{else}}
-          <input class="auto-calc-toggle" toggle-type="rtpo" name="system.status.roundsToPassOut.max" type="text"
-            value="{{system.status.roundsToPassOut.max}}">
-          {{/if}}
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <div class="career-list">
   <div class="inventory-header item">
     <span id="career">{{localize "Career"}}</span>

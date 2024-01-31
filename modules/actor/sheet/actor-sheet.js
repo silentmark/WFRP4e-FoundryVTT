@@ -316,7 +316,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     // Add names of containers to item.location object. Used for ammo selection
     inContainers.forEach(i => {
       const container = this.actor.getItemTypes("container").find(c => c.id === i.location.value);
-      i.location.name = container.name || false;
+      i.location.name = container?.name || false;
     });
 
     misc.totalShieldDamage = categories["weapons"].items.reduce((prev, current) => prev += current.damageToItem.shield, 0)
@@ -1307,9 +1307,6 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
       item.system.equipped = !item.system.equipped;
       equippedState = item.system.equipped
       let newEqpPoints = item.system.twohanded.value ? 2 : 1
-      if (item.flags?.wfrp4e?.noEqpPoints) {
-        newEqpPoints = 0;
-      }
       if (game.settings.get("wfrp4e", "limitEquippedWeapons") && this.actor.type != "vehicle")
         if (this.actor.equipPointsUsed + newEqpPoints > this.actor.equipPointsAvailable && equippedState) {
           AudioHelper.play({ src: `${game.settings.get("wfrp4e", "soundPath")}/no.wav` }, false)

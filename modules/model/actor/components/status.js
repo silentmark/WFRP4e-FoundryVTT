@@ -24,9 +24,6 @@ export class StandardStatusModel extends foundry.abstract.DataModel {
         schema.corruption = new fields.SchemaField({
             value: new fields.NumberField({ initial: 0 })
         });
-        schema.roundsToPassOut = new fields.SchemaField({
-            value: new fields.NumberField({ initial: 0 })
-        });
 
         schema.encumbrance = new fields.SchemaField({
             current: new fields.NumberField({ initial: 0 }),

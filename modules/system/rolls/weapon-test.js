@@ -138,11 +138,25 @@ export default class WeaponTest extends AttackTest {
   async handleDualWielder() 
   {
     if (this.preData.dualWielding && !this.context.edited) {
+      let offHandData = duplicate(this.preData)
+
       if (!this.actor.hasSystemEffect("dualwielder"))
         await this.actor.addSystemEffect("dualwielder")
 
       if (this.result.outcome == "success") {
-        await this.actor.setFlag("wfrp4e", "offHandData", this);
+        let offhandWeapon = this.actor.getItemTypes("weapon").find(w => w.offhand.value);
+        if (this.result.roll % 11 == 0 || this.result.roll == 100)
+          delete offHandData.roll
+        else {
+          let offhandRoll = this.result.roll.toString();
+          if (offhandRoll.length == 1)
+            offhandRoll = offhandRoll[0] + "0"
+          else
+            offhandRoll = offhandRoll[1] + offhandRoll[0]
+          offHandData.roll = Number(offhandRoll);
+        }
+
+        this.actor.setupWeapon(offhandWeapon, { appendTitle: ` (${game.i18n.localize("SHEET.Offhand")})`, offhand: true, offhandReverse: offHandData.roll }).then(test => test.roll());
       }
     }
   }

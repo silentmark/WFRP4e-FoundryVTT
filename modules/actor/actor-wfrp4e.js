@@ -108,26 +108,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     return this.effects.filter(e => e.isCondition)
   }
 
-  async _setupSocketTest(owner, dialogData, dialogClassName) {
-    owner.updateTokenTargets([]);
-    owner.updateTokenTargets(Array.from(game.user.targets.map(x=>x.id)));
-    owner.broadcastActivity({ targets: Array.from(game.user.targets.map(x=>x.id))});
-    await game.wfrp4e.utility.sleep(250);
-
-    let props = Object.getOwnPropertyNames(dialogData.data);
-    dialogData.datasets = [];
-    for (let prop of props) {
-      if (dialogData.data[prop]?.constructor?.name == ItemWfrp4e.name) {
-        dialogData.data[prop] = dialogData.data[prop].toObject();
-        dialogData.datasets.push(prop);
-      }
-    }
-    
-    let payload = { dialogData, dialogClassName, userId: game.user.id, actorId: this.id };
-    let test = await game.wfrp4e.utility.setupSocket(owner, payload);
-    return test;
-  }
-
   // Shared setup data for all different dialogs
   // Each dialog also has its own "setup" function
   _setupTest(dialogData, dialogClass)
@@ -156,10 +136,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       if (typeof dialogData.options.context.failure === "string")
         dialogData.options.context.failure = [dialogData.options.context.failure]
     }
-    if (canvas.scene) {
-      game.user.updateTokenTargets([]);
-      game.user.broadcastActivity({ targets: [] });
-    }
     if (dialogData.data.hitLoc)
     {
       dialogData.fields.hitLocation = "roll", // Default a WS or BS test to have hit location;
@@ -169,9 +145,9 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     {
       dialogData.fields.hitLocation = "none"
     }
+
     return dialogClass.setup(dialogData.fields, dialogData.data, dialogData.options)
   }
-
 
   /**
    * Setup a Characteristic Test.
@@ -192,13 +168,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       options : options || {}         // Application/optional properties
     }
     // TODO: handle abort
-    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
-    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
-    if (owner.id != game.user.id && isSocketTest) {
-      return this._setupSocketTest(owner, dialogData, CharacteristicDialog.name);
-    } else {
-      return this._setupTest(dialogData, CharacteristicDialog)
-    }
+    return this._setupTest(dialogData, CharacteristicDialog)
   }
 
   /**
@@ -241,13 +211,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       options : options || {}         // Application/optional properties
     }
 
-    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
-    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
-    if (owner.id != game.user.id && isSocketTest) {
-      return this._setupSocketTest(owner, dialogData, SkillDialog.name);
-    } else {
-      return this._setupTest(dialogData, SkillDialog)
-    }
+    return this._setupTest(dialogData, SkillDialog)
     // if (options.corruption)
     //   cardOptions.rollMode = "gmroll"
   }
@@ -272,13 +236,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       },    
       options : options || {}         // Application/optional properties
     }
-    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
-    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
-    if (owner.id != game.user.id && isSocketTest) {
-      return this._setupSocketTest(owner, dialogData, WeaponDialog.name);
-    } else {
-      return this._setupTest(dialogData, WeaponDialog)
-    }
+    return this._setupTest(dialogData, WeaponDialog)
   }
 
 
@@ -302,14 +260,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       },    
       options : options || {}         // Application/optional properties
     }
-
-    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
-    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
-    if (owner.id != game.user.id && isSocketTest) {
-      return this._setupSocketTest(owner, dialogData, CastDialog.name);
-    } else {
-      return this._setupTest(dialogData, CastDialog)
-    }
+    return this._setupTest(dialogData, CastDialog)
   }
 
   /**
@@ -333,14 +284,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       },    
       options : options || {}         // Application/optional properties
     }
-
-    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
-    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
-    if (owner.id != game.user.id && isSocketTest) {
-      return this._setupSocketTest(owner, dialogData, ChannellingDialog.name);
-    } else {
-      return this._setupTest(dialogData, ChannellingDialog)
-    }
+    return this._setupTest(dialogData, ChannellingDialog)
   }
 
   /**
@@ -363,14 +307,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       },    
       options : options || {}         // Application/optional properties
     }
-
-    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
-    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
-    if (owner.id != game.user.id && isSocketTest) {
-      return this._setupSocketTest(owner, dialogData, PrayerDialog.name);
-    } else {
-      return this._setupTest(dialogData, PrayerDialog)
-    }
+    return this._setupTest(dialogData, PrayerDialog)
   }
 
   /**
@@ -394,14 +331,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       options : options || {}         // Application/optional properties
     }
 
-    const isSocketTest = game.wfrp4e.utility.IsSocketTest();
-    let owner = game.wfrp4e.utility.getActiveDocumentOwner(this);
-    if (owner.id != game.user.id && isSocketTest) {
-      return this._setupSocketTest(owner, dialogData, TraitDialog.name);
-    } else {
-      return this._setupTest(dialogData, TraitDialog)
-    }
-   
+    return this._setupTest(dialogData, TraitDialog) 
     //   champion: !!this.has(game.i18n.localize("NAME.Champion")),
     //   deadeyeShot : this.has(game.i18n.localize("NAME.DeadeyeShot"), "talent") && weapon.attackType == "ranged"
   }
@@ -866,6 +796,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
         updateMsg += `<br><a class ="table-click critical-roll" data-table = "crit${opposedTest.result.hitloc.value}" ><i class='fas fa-list'></i> ${game.i18n.localize("Critical")}</a>`
     }
     if (hack) {
+      debugger;
 
       let APlocation = opposedTest.result.hitloc.value;
       let armour = actor.items.filter(x=>(x.type =="weapon" && x.properties.qualities.shield && x.equipped) || (x.type == "armour" && x.worn && x.properties.special?.indexOf('Magiczny') == -1))
@@ -905,9 +836,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     if (item?.properties && item?.properties.qualities.slash && updateMsg.includes("critical-roll")) {
       updateMsg += `<br>${game.i18n.format("PROPERTY.SlashAlert", {value : parseInt(item?.properties.qualities.slash.value)})}`
     }
-    if (item.properties && item.properties.qualities.entangle) {
-      actor.addCondition("entangled", 1, attacker.characteristics.s.value);
-    }
 
     if (ward > 0) 
     {
@@ -935,12 +863,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
     // Update actor wound value
     actor.update({ "system.status.wounds.value": newWounds })
-    if (newWounds == 0) {
-      // await actor.addCondition("prone");
-    }
-    if (item.type == "weapon" && item.properties.qualities.slash && updateMsg.includes("critical-roll")) {
-      // await actor.addCondition("bleeding", item.properties.qualities.slash.value);
-    }
 
     return updateMsg;
   }
@@ -993,9 +915,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     if (newWounds < 0)
       newWounds = 0;
     await this.update({ "system.status.wounds.value": newWounds })
-    if (newWounds == 0) {
-      // await this.addCondition("prone");
-    }
 
     if (!suppressMsg)
       await ChatMessage.create({ content: msg })
@@ -1954,7 +1873,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
   }
 
 
-  async addCondition(effect, value = 1, flags = undefined) {
+  async addCondition(effect, value = 1, flags) {
     if (value == 0)
     {
       return;
@@ -2032,24 +1951,20 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     if (existing && !existing.isNumberedCondition) {
       if (effect.id == "unconscious")
         await this.addCondition("fatigued");
-      await existing.delete();
-      return;
+      return existing.delete();
     }
     else if (existing) {
-      let conditionValue = existing.conditionValue - value;
-      if (conditionValue <= 0) {
-        await existing.delete();
-      } else {
-        await existing.setFlag("wfrp4e", "value", conditionValue);
-      }
+      await existing.setFlag("wfrp4e", "value", existing.conditionValue - value);
+      if (existing.conditionValue) // Only display if there's still a condition value (if it's 0, already handled by effect deletion)
+        existing._displayScrollingStatus(false);
       //                                                                                                                   Only add fatigued after stunned if not already fatigued
-      if (conditionValue == 0 && (effect.id == "bleeding" || effect.id == "poisoned" || effect.id == "broken" || (effect.id == "stunned" && !this.hasCondition("fatigued")))) {
+      if (existing.conditionValue == 0 && (effect.id == "bleeding" || effect.id == "poisoned" || effect.id == "broken" || (effect.id == "stunned" && !this.hasCondition("fatigued")))) {
         if (!game.settings.get("wfrp4e", "mooConditions") || !effect.id == "broken") // Homebrew rule prevents broken from causing fatigue
           await this.addCondition("fatigued")
       }
 
-      if (conditionValue > 0) // Only display if there's still a condition value (if it's 0, already handled by effect deletion)
-        existing._displayScrollingStatus(false);
+      if (existing.conditionValue <= 0)
+        return existing.delete();
     }
   }
 
