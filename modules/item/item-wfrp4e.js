@@ -44,9 +44,10 @@ export default class ItemWfrp4e extends WFRP4eDocumentMixin(Item)
     }
     await super._onCreate(data, options, user);
 
-    if (this.parent?.actor)
+    if (this.isOwned)
     {
-      await Promise.all(this.parent.actor.runScripts("update", {item, context: "create"}))
+      await Promise.all(this.actor.runScripts("update", {item, context: "create"}))
+      await Promise.all(this.runScripts("addItems", {data, options, user}))
     }
 
   }
@@ -57,6 +58,7 @@ export default class ItemWfrp4e extends WFRP4eDocumentMixin(Item)
     {
         return;
     }
+    super._onUpdate(data, options, user)
 
     if (hasProperty(data, "system.worn") || hasProperty(data, "system.equipped"))
     {
@@ -350,6 +352,11 @@ export default class ItemWfrp4e extends WFRP4eDocumentMixin(Item)
         return game.wfrp4e.config.trappingCategories[this.trappingType.value];
       else
         return game.wfrp4e.config.trappingCategories[this.type];
+  }
+
+  get parenthesesText()
+  {
+    return game.wfrp4e.utility.extractParenthesesText(this.name)
   }
 
   // While I wish i could remove most of these, scripts use them and removing them would cause a lot of disruption

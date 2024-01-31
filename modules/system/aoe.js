@@ -50,7 +50,8 @@ export default class AbilityTemplate extends MeasuredTemplate {
           wfrp4e: {
             itemuuid: `Actor.${actorId}.Item.${itemId}`,
             messageId: messageId,
-            round: game.combat?.round ?? -1
+            round: game.combat?.round ?? -1,
+            target : true
           }
         }
       };
@@ -82,13 +83,14 @@ export default class AbilityTemplate extends MeasuredTemplate {
         wfrp4e: {
           effectUuid: effectUuid,
           messageId: messageId,
-          round: game.combat?.round ?? -1
+          round: game.combat?.round ?? -1,
+          instantaneous : effect.applicationData.areaType == "instantaneous"
         }
       }
     };
 
     const cls = CONFIG.MeasuredTemplate.documentClass;
-    const template = new cls(templateData, { parent: canvas.scene });
+    const template = new cls(templateData, {target: true, parent: canvas.scene });
 
     // Return the template constructed from the item data
     return new this(template);
@@ -172,7 +174,10 @@ export default class AbilityTemplate extends MeasuredTemplate {
     this.document.updateSource({x: snapped.x, y: snapped.y});
     this.refresh();
     this.#moveTime = now;
-    this.constructor.updateAOETargets(this.document)
+    if (this.document.getFlag("wfrp4e", "target"))
+    {
+      this.updateAOETargets()
+    }
   }
 
   /* -------------------------------------------- */
@@ -222,9 +227,17 @@ export default class AbilityTemplate extends MeasuredTemplate {
     this.#events.reject();
   }
 
-  // TODO: implement missing methods.
-  static updateAOETargets(templateData, onlyReturn = false)
+  updateAOETargets()
   {
+    let grid = canvas.scene.grid;
+    let templateGridSize = this.document.distance/grid.distance * grid.size
+
+    let minx = this.document.x - templateGridSize
+    let miny = this.document.y - templateGridSize
+
+    let maxx = this.document.x + templateGridSize
+    let maxy = this.document.y + templateGridSize
+
     let newTokenTargets = [];
     let type = templateData.t;
     let distance = templateData.distance;

@@ -78,6 +78,13 @@ export default class EffectWfrp4e extends ActiveEffect
         {
             await Promise.all(this.parent.runScripts("update", {data, options, user}));
         }
+        if (this.actor)
+        {
+            for(let script of this.scripts.filter(i => i.trigger == "addItems"))
+            {
+                await script.execute({data, options, user});
+            }
+        }
     }
 
     //#region Creation Handling
@@ -529,6 +536,11 @@ export default class EffectWfrp4e extends ActiveEffect
         return ChatMessage.getSpeakerActor(this.sourceTest.context.speaker);
     }
 
+    get sourceItem() 
+    {
+        return fromUuidSync(this.flags.wfrp4e.sourceItem);
+    }
+
     get radius()
     {
         return Roll.safeEval(Roll.getFormula(Roll.parse(this.applicationData.radius, {effect : this, actor : this.actor, item : this.item})))
@@ -605,7 +617,7 @@ export default class EffectWfrp4e extends ActiveEffect
             keep : false, // Area/Aura - should they keep the effect when leaving
             radius : null, // Area/Aura radius, if null, inherit from item
 
-            areaType : "instantaneous", // Area - "instantaneous" or "sustained"
+            areaType : "sustained", // Area - "instantaneous" or "sustained"
 
             targetedAura : false, // Aura - if the aura should be applied to a target and not self
 
