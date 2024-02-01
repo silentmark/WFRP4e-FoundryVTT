@@ -1770,10 +1770,9 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     let fear = duplicate(game.wfrp4e.config.systemItems.fear)
     fear.system.SL.target = value;
 
-    if (name)
-      fear.effects[0].flags.wfrp4e.fearName = name
+    setProperty(fear, "flags.wfrp4e.fearName", name)
 
-    let items = await this.createEmbeddedDocuments("Item", [fear]);
+    let items = await this.createEmbeddedDocuments("Item", [fear], {condition: true});
     await this.setupExtendedTest(items[0], {appendTitle : ` - ${items[0].name}`});
   }
 
