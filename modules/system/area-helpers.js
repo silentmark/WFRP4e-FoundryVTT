@@ -110,7 +110,7 @@ export default class AreaHelpers
         let template = {
             t: "circle",
             user: game.user.id,
-            distance: effect.radius,
+            distance: effect.applicationData.radius,
             direction: 0,
             x: token.center.x,
             y: token.center.y,
@@ -122,6 +122,9 @@ export default class AreaHelpers
                 }
             }
         };
+        if (effect.flags.wfrp4e.sourceTest?.data.context.messageId) {
+            template.flags.wfrp4e.messageId = effect.flags.wfrp4e.sourceTest.data.context.messageId;
+        }
         return template
     }
 
@@ -148,15 +151,17 @@ export default class AreaHelpers
             //check auras and create templates if needed
             let auraEffects = token.actor.auras;
             for (let auraEffect of auraEffects) {
-                let existingTemplate = templates
-                    .find(t => t.getFlag("wfrp4e", "effectUuid") == auraEffect.uuid && t.getFlag("wfrp4e", "auraToken") == token.uuid);
-                if (!existingTemplate) { // create template
-                    let templateData = AreaHelpers.auraEffectToTemplateData(auraEffect, token.object);
-                    existingTemplate = await token.object.scene.createEmbeddedDocuments("MeasuredTemplate", [templateData]);
-                    templates.push(existingTemplate[0]);
-                } else { // move template to token
-                    const updates = { _id: existingTemplate._id, flags: {wfrp4e: {preventRecursive: Date.now()}}, ...token.object.center };
-                    await token.object.scene.updateEmbeddedDocuments("MeasuredTemplate", [updates]);
+                    if (auraEffect.applicationData.radius) {
+                    let existingTemplate = templates
+                        .find(t => t.getFlag("wfrp4e", "effectUuid") == auraEffect.uuid && t.getFlag("wfrp4e", "auraToken") == token.uuid);
+                    if (!existingTemplate) { // create template
+                        let templateData = AreaHelpers.auraEffectToTemplateData(auraEffect, token.object);
+                        existingTemplate = await token.object.scene.createEmbeddedDocuments("MeasuredTemplate", [templateData]);
+                        templates.push(existingTemplate[0]);
+                    } else { // move template to token
+                        const updates = { _id: existingTemplate._id, flags: {wfrp4e: {preventRecursive: Date.now()}}, ...token.object.center };
+                        await token.object.scene.updateEmbeddedDocuments("MeasuredTemplate", [updates]);
+                    }
                 }
             }
         }

@@ -239,37 +239,12 @@ export default class AbilityTemplate extends MeasuredTemplate {
     let maxy = this.document.y + templateGridSize
 
     let newTokenTargets = [];
-    let type = templateData.t;
-    let distance = templateData.distance;
-    let angle = templateData.angle;
-    let direction = templateData.direction;
-    let width = templateData.width;
-    switch ( type ) {
-      case "circle":
-        templateData.object.shape = MeasuredTemplate.getCircleShape(distance);
-        break;
-      case "cone":
-        templateData.object.shape = MeasuredTemplate.getConeShape(direction, angle, distance);
-        break;
-      case "rect":
-        templateData.object.shape = MeasuredTemplate.getRectShape(direction, distance);
-        break;
-      case "ray":
-        templateData.object.shape = MeasuredTemplate.getRayShape(direction, distance, width);
-        break;
-    }
-
-    let tokens = game.canvas.tokens.placeables.map(x=>x.document);
-    for (let t of tokens) {
-      if (templateData._boundsOverlap(t)) {
+    canvas.tokens.placeables.forEach(t => {
+      if ((t.x + (t.width / 2)) < maxx && (t.x + (t.width / 2)) > minx && (t.y + (t.height / 2)) < maxy && (t.y + (t.height / 2)) > miny)
         newTokenTargets.push(t.id)
-      }
-    }
-    if (!onlyReturn) {
-      game.user.updateTokenTargets(newTokenTargets)
-      game.user.broadcastActivity({targets: newTokenTargets})
-    }
-    return newTokenTargets;
+    })
+    game.user.updateTokenTargets(newTokenTargets)
+    game.user.broadcastActivity({targets: newTokenTargets})
   }
 }
 
