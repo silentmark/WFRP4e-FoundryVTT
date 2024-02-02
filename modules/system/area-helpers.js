@@ -117,7 +117,8 @@ export default class AreaHelpers
             flags: {
                 wfrp4e: {
                     effectUuid: effect.uuid,
-                    auraToken: token.document.uuid
+                    auraToken: token.document.uuid,
+                    round: game.combat?.round ?? -1
                 }
             }
         };
@@ -131,10 +132,14 @@ export default class AreaHelpers
         for (let template of templates) {
             let auraTokenUuid = template.getFlag("wfrp4e", "auraToken");
             let effectUuid = template.getFlag("wfrp4e", "effectUuid");
+            if (!effectUuid) continue;
+            let effect = await fromUuid(effectUuid);
+            if (!effect) {
+                await template.delete();
+            }
             if (!auraTokenUuid) continue;
             let token = await fromUuid(auraTokenUuid);
-            let effect = await fromUuid(effectUuid);
-            if (!token || !effect) {
+            if (!token) {
                 await template.delete();
             }
         }

@@ -368,8 +368,21 @@ export default class EffectWfrp4e extends ActiveEffect
             else if (item.duration.value.toLowerCase().includes(game.i18n.localize("Days")))
             effect.duration.seconds = duration * 60 * 60 * 24
     
-            else if (item.duration.value.toLowerCase().includes(game.i18n.localize("Rounds")))
-            effect.duration.rounds = duration;
+            else if (item.duration.value.toLowerCase().includes(game.i18n.localize("Rounds"))) {
+                let expiringDuration = duration;
+                if (game.combat?.active && effect.flags.wfrp4e.fromArea && effect.applicationData.keep) {
+                    let template = fromUuidSync(effect.flags.wfrp4e.fromArea);
+                    if (template) {
+                        let startingRound = template.flags?.wfrp4e?.round;
+                        if (startingRound && startingRound > -1) {
+                            expiringDuration = duration - (game.combat.round - startingRound);
+                        }
+                    }
+                    effect.duration.rounds = expiringDuration;
+                } else {
+                    effect.duration.rounds = expiringDuration;
+                }
+            }
         }
 
         // When transferred to another actor, effects lose their reference to the item it was in
