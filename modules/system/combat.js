@@ -13,8 +13,8 @@ export default class CombatHelpers {
     }
 
     static async preUpdateCombat(combat, updateData, context) {
-        const previousId = combat.combatant?.id;
-        const path = "wfrp4e.previousCombatant";
+        const previousId = getProperty(context, "wfrp4e-pl-addons.pc") ?? combat.combatant?.id;
+        const path = "wfrp4e.previousCombatant";     
         foundry.utils.setProperty(context, path, previousId);
     
         const prevPath = "wfrp4e.previousTR";
