@@ -10,8 +10,10 @@ export default class CastTest extends TestWFRP {
 
     this.preData.itemData = data.itemData || this.item.toObject() // Store item data to avoid rerolls being affected by changed channeled SL
     this.preData.skillSelected = data.skillSelected;
-    this.preData.unofficialGrimoire = data.unofficialGrimoire;
-    this.data.preData.malignantInfluence = data.malignantInfluence
+    this.data.preData.malignantInfluence = data.malignantInfluence;
+    this.data.preData.unofficialGrimoire = data.unofficialGrimoire;
+    this.data.preData.overchannelling = data.overchannelling;
+    this.data.preData.ingredientMode = data.ingredientMode;
 
     this.data.context.templates = data.templates || [];
 
@@ -36,7 +38,7 @@ export default class CastTest extends TestWFRP {
     await Promise.all(this.item.runScripts("preRollCastTest", { test: this, chatOptions: this.context.chatOptions }))
 
     //@HOUSE
-    if (this.preData.unofficialGrimoire && this.preData.unofficialGrimoire.ingredientMode == 'power' && this.hasIngredient) { 
+    if (this.preData.unofficialGrimoire && this.preData.ingredientMode == 'power' && this.hasIngredient) { 
       game.wfrp4e.utility.logHomebrew("unofficialgrimoire");
       this.preData.canReverse = true;
     }
@@ -119,7 +121,7 @@ export default class CastTest extends TestWFRP {
         //@/HOUSE
       }
       //@/HOUSE
-      if (this.preData.unofficialGrimoire && this.preData.unofficialGrimoire.overchannelling > 0) { 
+      if (this.preData.unofficialGrimoire && this.preData.overchannelling > 0) { 
         game.wfrp4e.utility.logHomebrew("overchannelling");
         this.result.tooltips.miscast.push(game.i18n.localize("CHAT.OverchannellingMiscast"))
         miscastCounter++;
@@ -131,7 +133,7 @@ export default class CastTest extends TestWFRP {
       this.result.castOutcome = "failure"
       this.result.description = game.i18n.localize("ROLL.CastingFailed")
       //@/HOUSE
-      if (this.preData.unofficialGrimoire && this.preData.unofficialGrimoire.overchannelling > 0) { 
+      if (this.preData.unofficialGrimoire && this.preData.overchannelling > 0) { 
         game.wfrp4e.utility.logHomebrew("overchannelling");
         this.result.tooltips.miscast.push(game.i18n.localize("CHAT.OverchannellingMiscast"))
         miscastCounter++;
@@ -153,9 +155,9 @@ export default class CastTest extends TestWFRP {
       this.result.castOutcome = "success"
       this.result.description = game.i18n.localize("ROLL.CastingSuccess");
       //@/HOUSE
-      if (this.preData.unofficialGrimoire && this.preData.unofficialGrimoire.overchannelling > 0) {
+      if (this.preData.unofficialGrimoire && this.preData.overchannelling > 0) {
         game.wfrp4e.utility.logHomebrew("overchannelling");
-        slOver += this.preData.unofficialGrimoire.overchannelling;
+        slOver += this.preData.overchannelling;
       }
       //@/HOUSE
 
@@ -192,7 +194,7 @@ export default class CastTest extends TestWFRP {
 
     // TODO handle all tooltips (when they are added) in one place
     // TODO Fix weird formatting in tooltips (indenting)
-    this.result.tooltips.miscast = this.result.tooltips.miscast.join("\n")
+    this.result.tooltips.miscast = "<ul style='text-align: left'>" + this.result.tooltips.miscast.map(t => `<li>${t}</li>`).join("") + "</ul>";
 
     return this.result;
   }
@@ -308,7 +310,7 @@ export default class CastTest extends TestWFRP {
     //@/HOUSE
     if (this.preData.unofficialGrimoire) {
       game.wfrp4e.utility.logHomebrew("unofficialgrimoire");
-      if (this.preData.unofficialGrimoire.ingredientMode != 'none' && this.hasIngredient && this.item.ingredient?.quantity.value > 0 && !this.context.edited && !this.context.reroll) {
+      if (this.preData.ingredientMode != 'none' && this.hasIngredient && this.item.ingredient?.quantity.value > 0 && !this.context.edited && !this.context.reroll) {
         await this.item.ingredient.update({ "system.quantity.value": this.item.ingredient.quantity.value - 1 })
         ChatMessage.create({ speaker: this.context.speaker, content: game.i18n.localize("ConsumedIngredient") })
       }
