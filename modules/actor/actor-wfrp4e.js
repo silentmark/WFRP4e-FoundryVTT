@@ -622,7 +622,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     {
       modifiers.ap.shield = this.status.armour.shield
     }
-    else if (opposedTest.defenderTest.weapon) // RAW Shields required the shield to be used
+    else if (opposedTest.defenderTest.weapon && actor.hasCondition("defensive")) // RAW Shields required the shield to be used + we use custom defensive approach.
     {
       if (opposedTest.defenderTest.weapon.properties.qualities.shield)
       {

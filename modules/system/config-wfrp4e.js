@@ -1588,20 +1588,9 @@ WFRP4E.PrepareSystemItems = function() {
                             options : {
                                 dialog : {
                                     hideScript : "return !this.actor.isOpposing",
-                                    activateScript : `
-                                        let skillName = this.effect.name.substring(this.effect.name.indexOf("[") + 1, this.effect.name.indexOf("]"))
-                                        return args.skill?.name == skillName
-                                    `
+                                    activateScript : `this.actor.isOpposing`
                                 }
                             }
-                        },
-                        {
-                            label : "@effect.name",
-                            trigger : "immediate",
-                            script : `
-                                let choice = await ItemDialog.create(this.actor.itemTypes.skill.sort((a, b) => a.name > b.name ? 1 : -1), 1, "Choose which skill to use with On the Defensive");    
-                                this.effect.updateSource({name : this.effect.name + " [" +  choice[0]?.name + "]"})
-                                `
                         }
                     ]
                 }
