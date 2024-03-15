@@ -73,6 +73,7 @@ export default class WomCastTest extends CastTest {
     if (!game.settings.get("wfrp4e", "useWoMOvercast")) {
       await super._overcast(choice);
     } else {
+      let otherCost = 2;
       const overcastData = this.result.overcast
 
       if (!overcastData.available)
@@ -96,12 +97,18 @@ export default class WomCastTest extends CastTest {
       } 
       // Other options are not in the table, so assume cost is 2 per original rules
       else if (choice == "other") {
+        if (overcastData.valuePerOvercast.cost) {
+          otherCost = parseInt(eval(overcastData.valuePerOvercast.cost
+                          .replace("{{current}}", overcastData.usage[choice].current)
+                          .replace("{{count}}", overcastData.usage[choice].count)));
+        }
         if (game.wfrp4e.config.magicWind[this.spell.lore.value] == "Dhar") {
-          if (1 > overcastData.available) {
+          otherCost = Math.min(otherCost - 1, 1);
+          if (otherCost > overcastData.available) {
             return overcastData
           }
         } else {
-          if (2 > overcastData.available) {
+          if (otherCost > overcastData.available) {
             return overcastData
           }
         }
@@ -154,13 +161,13 @@ export default class WomCastTest extends CastTest {
       // Subtract cost of overcasting from available SL
       // AoE is separate column from target, so must be tested separately 
       if (choice == "target" && overcastData.usage.target.AoE) {
-        overcastData.available = overcastData.available - overCastTable["AoE"][count].cost
+        overcastData.available = overcastData.available - overCastTable["AoE"][count].cost;
       } 
       else if (choice == "other") {
-        overcastData.available = overcastData.available - 2
+        overcastData.available = overcastData.available - otherCost;
       }
       else {
-        overcastData.available = overcastData.available - overCastTable[choice][count].cost
+        overcastData.available = overcastData.available - overCastTable[choice][count].cost;
       }
 
       overcastData.usage[choice].count++;

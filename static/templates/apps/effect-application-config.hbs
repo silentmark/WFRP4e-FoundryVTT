@@ -204,11 +204,11 @@
                 <p class="notes">{{{localize "EffectApplication.PromptHint"}}}</p>
             </div>
         {{/if}}
-        {{!-- {{#if (hasProperty this "applicationData.consume")}}
             <div class="form-group">
-                <label>{{localize "EffectApplication.Consume"}}</label>
-                <p class="notes">{{localize "EffectApplication.ConsumeHint"}}</p>
+                <label>Uruchom skrypty jako GM?</label>
+                <input type="checkbox" name="flags.wfrp4e.applicationData.runAsGM" {{checked
+                    flags.wfrp4e.applicationData.runAsGM}}>
+                <p class="notes">{{localize "EffectApplication.RunAsGM"}}</p>
             </div>
-        {{/if}} --}}
     {{/with}}
 </div>

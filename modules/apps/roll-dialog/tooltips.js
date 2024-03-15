@@ -143,8 +143,8 @@ export class DialogTooltips
         let typeLabel = ({
             "modifier" : "",
             "difficulty" : "",
-            "slBonus" : "SL Bonus",
-            "successBonus" : "Success Bonus",
+            "slBonus" : "Bonus PS",
+            "successBonus" : "Bonus PS do zdanych testów",
         })[type]
 
         if (this[`_${type}`].length == 0)

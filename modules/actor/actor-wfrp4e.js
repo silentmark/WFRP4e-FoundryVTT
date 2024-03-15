@@ -795,20 +795,20 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
         updateMsg += `<br><a class ="table-click critical-roll" data-table = "crit${opposedTest.result.hitloc.value}" ><i class='fas fa-list'></i> ${game.i18n.localize("Critical")}</a>`
     }
     if (hack) {
-      debugger;
-
+      let isMagical = opposedTest.attackerTest.item?.isMagical || false;
       let APlocation = opposedTest.result.hitloc.value;
-      let armour = actor.items.filter(x=>(x.type =="weapon" && x.properties.qualities.shield && x.equipped) || (x.type == "armour" && x.worn && x.properties.special?.indexOf('Magiczny') == -1))
-      let protectingArmour = armour.filter(x=>x.currentAP && x.currentAP[APlocation] > 0);
+      let armour = actor.items.filter(x => (x.type =="weapon" && x.properties.qualities.shield && x.equipped) || 
+                                           (x.type == "armour" && x.worn && (!x.isMagical || isMagical)));
+      let protectingArmour = armour.filter(x => x.currentAP && x.currentAP[APlocation] > 0);
       let armourToDamage = null;
-      if (protectingArmour.find(x=>x.properties.special?.indexOf("Warstwa Zewnętrzna") != -1))  {
-        armourToDamage = protectingArmour.find(x=>x.properties.special?.indexOf("Warstwa Zewnętrzna") != -1);
-      } else if (protectingArmour.find(x=>x.properties.special?.indexOf("Warstwa Uzupełniająca") != -1)) {
-        armourToDamage = protectingArmour.find(x=>x.properties.special?.indexOf("Warstwa Uzupełniająca") != -1);
+      if (protectingArmour.find(x => x.system.special.value?.indexOf("Warstwa Zewnętrzna") != -1))  {
+        armourToDamage = protectingArmour.find(x=>x.system.special.value?.indexOf("Warstwa Zewnętrzna") != -1);
+      } else if (protectingArmour.find(x => x.system.special.value?.indexOf("Warstwa Uzupełniająca") != -1)) {
+        armourToDamage = protectingArmour.find(x=>x.system.special.value?.indexOf("Warstwa Uzupełniająca") != -1);
       } else if (protectingArmour.length > 0) {
         armourToDamage = protectingArmour[0];
       } else {
-        armourToDamage = armour.find(x=> x.type =="weapon" && x.properties.qualities.shield && x.equipped)
+        armourToDamage = armour.find(x => x.type =="weapon" && x.properties.qualities.shield && x.equipped)
       }
 
       if (armourToDamage) {
@@ -963,31 +963,32 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     // e.g. the players can actually test to avoid an effect, instead of the GM doing it
     async applyEffect({effectUuids=[], effectData=[], messageId}={})
     {
-        let owningUser = game.wfrp4e.utility.getActiveDocumentOwner(this);
-
         if (typeof effectUuids == "string")
         {
             effectUuids = [effectUuids];
         }
 
-        if (owningUser?.id == game.user.id)
+        for (let uuid of effectUuids)
         {
-            for (let uuid of effectUuids)
-            {
-                let effect = fromUuidSync(uuid);
-                let message = game.messages.get(messageId);
-                await ActiveEffect.implementation.create(effect.convertToApplied(message?.getTest()), {parent: this, message : message?.id});
-            }
-            for(let data of effectData)
+            let effect = fromUuidSync(uuid);
+            let message = game.messages.get(messageId);
+            let data = effect.convertToApplied(message?.getTest());
+            effectData.push(data);
+        }
+
+        for (let data of effectData) 
+        {
+            let owningUser = game.wfrp4e.utility.getActiveDocumentOwner(this, data.flags?.wfrp4e?.applicationData?.runAsGM);
+            if (owningUser?.id == game.user.id)
             {
                 await ActiveEffect.implementation.create(data, {parent: this, message : messageId});
+            }   
+            else 
+            {
+                await game.wfrp4e.socket.executeOnOwnerAndWait(this, "applyEffect", {effectUuids : [], effectData : [data], actorUuid : this.uuid, messageId});
             }
-        }   
-        else 
-        {
-            game.wfrp4e.socket.executeOnOwner(this, "applyEffect", {effectUuids, effectData, actorUuid : this.uuid, messageId});
         }
-    }
+  }
 
 
   /* --------------------------------------------------------------------------------------------------------- */

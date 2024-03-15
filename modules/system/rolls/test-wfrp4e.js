@@ -15,7 +15,7 @@ export default class TestWFRP {
         rollClass: this.constructor.name,
         testModifier: data.modifier || 0,
         testDifficulty: (typeof data.difficulty == "string" ? game.wfrp4e.config.difficultyModifiers[data.difficulty] : data.difficulty) || 0,
-        testDifficultyLabel: (typeof data.testDifficultyLabel == "string" ? data.testDifficultyLabel : ""),
+        testDifficultyLabel: (typeof data.difficulty == "string" ? game.wfrp4e.config.difficultyLabels[data.difficulty] : game.wfrp4e.config.difficultyLabels[Object.keys(game.wfrp4e.config.difficultyModifiers).find(x=> game.wfrp4e.config.difficultyModifiers[x] == 20)] || "Wymagający (+0)"),
         successBonus: data.successBonus || 0,
         slBonus: data.slBonus || 0,
         hitLocation: data.hitLocation != "none" && data.hitLocation || false,

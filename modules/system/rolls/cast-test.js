@@ -13,7 +13,7 @@ export default class CastTest extends TestWFRP {
     this.data.preData.malignantInfluence = data.malignantInfluence;
     this.data.preData.unofficialGrimoire = data.unofficialGrimoire;
     this.data.preData.overchannelling = data.overchannelling;
-    this.data.preData.ingredientMode = data.ingredientMode;
+    this.data.preData.ingredientMode = data.ingredientMode ?? "none";
 
     this.data.context.templates = data.templates || [];
 

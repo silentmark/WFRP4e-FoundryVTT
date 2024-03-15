@@ -10,7 +10,7 @@ export default class ChannelTest extends TestWFRP {
     this.preData.skillSelected = data.skillSelected;
     this.data.preData.malignantInfluence = data.malignantInfluence;
     this.data.preData.unofficialGrimoire = data.unofficialGrimoire;
-    this.data.preData.ingredientMode = data.ingredientMode;
+    this.data.preData.ingredientMode = data.ingredientMode ?? "none";
 
     this.data.context.channelUntilSuccess = data.channelUntilSuccess
 

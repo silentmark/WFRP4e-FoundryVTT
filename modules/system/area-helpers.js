@@ -204,6 +204,7 @@ export default class AreaHelpers
     // Perhaps this is expensive to run on every token update
     // but works for now
     static async checkAreas(scene) {
+        await new Promise(resolve => setTimeout(resolve, 500));
         await AreaHelpers.SEMAPHORE.add(AreaHelpers.checkAreasThreadSafe, scene);
     }
 }

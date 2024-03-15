@@ -168,6 +168,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     items.mutations = sheetData.actor.getItemTypes("mutation")
     items.psychologies = sheetData.actor.getItemTypes("psychology")
     items.traits = sheetData.actor.getItemTypes("trait")
+    items.talents = sheetData.actor.getItemTypes("talent")
     items.extendedTests = sheetData.actor.getItemTypes("extendedTest")
     items.vehicleMods = sheetData.actor.getItemTypes("vehicleMod")
 
@@ -2180,7 +2181,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     html.on("mousedown", '.aoe-template', ev => {
 
       let actorId = ev.target.dataset["actorId"]
-      let itemId = ev.target.dataset["itemId"]
+      let itemId = ev.target.dataset["id"]
 
       AbilityTemplate.fromString(ev.target.text, actorId, itemId, false).drawPreview(ev);
       this.minimize();

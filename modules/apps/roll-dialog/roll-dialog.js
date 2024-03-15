@@ -155,9 +155,9 @@ export default class RollDialog extends Application {
         mergeObject(this.fields, this.userEntry);
 
         // calling tooltips.start/finish between the merge object caused issues
-        this.tooltips.addModifier(this.userEntry.modifier, "User Entry");
-        this.tooltips.addSLBonus(this.userEntry.slBonus, "User Entry");
-        this.tooltips.addSuccessBonus(this.userEntry.successBonus, "User Entry");
+        this.tooltips.addModifier(this.userEntry.modifier, "Modyfikacja Gracza");
+        this.tooltips.addSLBonus(this.userEntry.slBonus, "Modyfikacja Gracza");
+        this.tooltips.addSuccessBonus(this.userEntry.successBonus, "Modyfikacja Gracza");
 
         // For some reason cloning the scripts doesn't prevent isActive and isHidden from persisisting
         // So for now, just reset them manually
@@ -217,6 +217,14 @@ export default class RollDialog extends Application {
             else 
             {
                 existing.scriptCount++;
+            }
+        }
+        for (let script of consolidated)
+        {
+            script.FullLabel = script.Label;
+            if (script.context?.item?.tests?.value) 
+            {
+                script.FullLabel = script.Label + ` (${script.context.item.tests.value})`;
             }
         }
 
@@ -289,7 +297,12 @@ export default class RollDialog extends Application {
                 {
                     await script.execute(this);
                 }
-                this.tooltips.finish(this, script.Label);
+                let label = script.Label;
+                if (script.context?.item?.tests?.value) 
+                {
+                    label += ` (${script.context.item.tests.value})`
+                }
+                this.tooltips.finish(this, label);
             }
         }
     }

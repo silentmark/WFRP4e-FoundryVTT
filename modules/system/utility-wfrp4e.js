@@ -1224,13 +1224,19 @@ export default class WFRP_Utility {
    * @param {Object} document Document whose owner is being found
    * @returns 
    */
-    static getActiveDocumentOwner(document)
+    static getActiveDocumentOwner(document, gmOnly = false)
     {
         // let document = fromUuidSync(uuid);
         if (document.documentName == "Item" && document.isOwned)
         {
             document = document.actor;
         }
+        if (gmOnly) 
+        {
+            return game.users.contents.filter(u => u.active).find(u => u.isGM);
+        }
+
+
         let activePlayers = game.users.contents.filter(u => u.active && u.role <= 2 && u.name != "Stream"); // Not assistant or GM 
         let owningUser;
 

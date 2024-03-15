@@ -72,6 +72,10 @@ export class StandardActorModel extends BaseActorModel {
         const inContainers = []; // inContainers is the temporary storage for items within a container
         for (let i of this.parent.items) {
             i.prepareOwnedData()
+            if (i.location && i.location.value == "0") 
+            {
+                i.location.value = 0;
+            }
             
             if (i.location && i.location.value && i.type != "critical" && i.type != "injury") 
             {
@@ -102,10 +106,10 @@ export class StandardActorModel extends BaseActorModel {
 
     computeDerived(items, flags) {
         this.parent.runScripts("prePrepareItems", {actor : this.parent })
+        this.characteristics.compute();
         this.computeItems();
         super.computeDerived(items, flags);
         // Recompute bonuses as active effects may have changed it
-        this.characteristics.compute();
         this.runScripts("computeCharacteristics", this.parent);
         if (this.checkWounds())
         {
