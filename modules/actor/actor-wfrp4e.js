@@ -346,7 +346,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     options.extended = item.id;
     options.rollMode = defaultRollMode;
     options.hitLocation = false;
-    options.absolute = {difficulty : item.system.difficulty.value || "challenging"}
+    options.fields = {difficulty : item.system.difficulty.value || "challenging"}
 
     let characteristic = WFRP_Utility.findKey(item.test.value, game.wfrp4e.config.characteristics)
     if (characteristic) {
@@ -470,7 +470,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     let newWounds = actor.status.wounds.value;
     let applyAP = (damageType == game.wfrp4e.config.DAMAGE_TYPE.IGNORE_TB || damageType == game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
     let applyTB = (damageType == game.wfrp4e.config.DAMAGE_TYPE.IGNORE_AP || damageType == game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
-    let AP = actor.status.armour[opposedTest.result.hitloc.value];
+    let AP = foundry.utils.deepClone(actor.status.armour[opposedTest.result.hitloc.value]);
     let ward = actor.status.ward.value;
     let wardRoll = Math.ceil(CONFIG.Dice.randomUniform() * 10);
     let abort = false
@@ -487,6 +487,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
         ignored : 0,
         metal : 0, // Not used here, but convenient for scripts
         nonmetal : 0, // Not used here, but convenient for scripts
+        magical : 0, // Not used here, but convenient for scripts
         shield : 0,
         details : []
       },
@@ -534,7 +535,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
     // Determine its qualities/flaws to be used for damage calculation
     penetrating = weaponProperties?.qualities?.penetrating
-    undamaging = weaponProperties?.flaws?.undamaging
+    undamaging = weaponProperties?.flaws?.undamaging && !opposedTest.result.damaging;
     hack = weaponProperties?.qualities?.hack
     impale = weaponProperties?.qualities?.impale
     pummel = weaponProperties?.qualities?.pummel
@@ -548,21 +549,24 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     // Mitigate damage with armor one layer at a time
     for (let layer of AP.layers) {
       modifiers.ap.value += layer.value;
-      let zzapIgnored = zzap ? 1 : 0 // start zzap out at 1
+      zzapIgnored = zzap ? 1 : 0 // start zzap out at 1
 
       if (ignoreWeakpoints && layer.weakpoints) {
         modifiers.ap.details.push(`Weakpoints - Ignore ${layer.value} (${layer.source.name})`)
         modifiers.ap.ignored += layer.value
+        layer.ignored = true;
       }
       else if (ignorePartial && layer.partial) {
         modifiers.ap.details.push(`Partial - Ignore ${layer.value} (${layer.source.name})`)
         modifiers.ap.ignored += layer.value;
+        layer.ignored = true;
       }
       else if (zzap && layer.metal) // ignore 1 AP and all metal AP 
       {
           zzapIgnored += layer.value;
+          layer.ignored = true;
       }
-      else if (penetrating) // If penetrating - ignore 1 or all armor depending on material
+      else if (penetrating && layer.source?.type == "armour") // If penetrating - ignore 1 or all armor depending on material
       {
         if (!game.settings.get("wfrp4e", "mooPenetrating"))
         {
@@ -572,6 +576,14 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
           if (layer.metal)
           {
             modifiers.ap.metal += layer.value - 1
+            if (layer.magical)
+            {
+              modifiers.ap.magical += layer.value - 1
+            }
+          }
+          else 
+          {
+            layer.ignored = true;
           }
         }
       }
@@ -584,6 +596,11 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
         else 
         {
           modifiers.ap.nonmetal += layer.value;
+        }
+
+        if (layer.magical)
+        {
+          modifiers.ap.magical += layer.value;
         }
       }
       // if (opposedTest.attackerTest.result.roll % 2 != 0 && layer.impenetrable) {
@@ -643,9 +660,9 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     await Promise.all(opposedTest.attackerTest.item?.runScripts("computeApplyDamageModifiers", args))
 
     modifiers.ap.used = Math.max(0, modifiers.ap.value - modifiers.ap.ignored)
-    if (undamaging)
+    if (undamaging && modifiers.ap.used)
     {
-      modifiers.ap.details.push(`Undamaging - ${modifiers.ap.used} AP * 2 = ${modifiers.ap.used * 2}`)
+      modifiers.ap.details.push(`<strong>Tępa</strong>: ${modifiers.ap.used} AP * 2 = ${modifiers.ap.used * 2}`)
       modifiers.ap.used *= 2;
     }
 
@@ -696,17 +713,18 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     }
     catch (e) { WFRP_Utility.log("Sound Context Error: " + e, true) } // Ignore sound errors
 
-    let scriptArgs = { actor, opposedTest, totalWoundLoss, AP, applyAP, applyTB, damageType, updateMsg, messageElements, ward, wardRoll, attacker, extraMessages, abort }
+    let scriptArgs = { actor, opposedTest, totalWoundLoss, AP, applyAP, applyTB, damageType, updateMsg, messageElements, modifiers, ward, wardRoll, attacker, extraMessages, abort }
     await Promise.all(actor.runScripts("takeDamage", scriptArgs))
     await Promise.all(attacker.runScripts("applyDamage", scriptArgs))
     await Promise.all(opposedTest.attackerTest.item?.runScripts("applyDamage", scriptArgs))
     Hooks.call("wfrp4e:applyDamage", scriptArgs)
-
+    ward = scriptArgs.ward
+    abort = scriptArgs.abort
     totalWoundLoss = scriptArgs.totalWoundLoss
 
     if (abort)
     {
-      return `<p>${abort}</p>`
+      return `${abort}`
     }
 
     newWounds -= totalWoundLoss
@@ -881,13 +899,13 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
    * @param {Number} damage Amount of damage
    * @param {Object} options Type of damage, minimum 1
    */
-  async applyBasicDamage(damage, { damageType = game.wfrp4e.config.DAMAGE_TYPE.NORMAL, minimumOne = true, loc = "body", suppressMsg = false } = {}) 
+  async applyBasicDamage(damage, { damageType = game.wfrp4e.config.DAMAGE_TYPE.NORMAL, minimumOne = true, loc = "body", suppressMsg = false, hideDSN=false } = {}) 
   {
     let owningUser = game.wfrp4e.utility.getActiveDocumentOwner(this);
 
     if (owningUser?.id != game.user.id)
     {
-        return game.wfrp4e.socket.executeOnOwnerAndWait(this, "applyDamage", {damage, options : {damageType, minimumOne, loc, suppressMsg}, actorUuid : this.uuid});
+        return game.wfrp4e.socket.executeOnOwnerAndWait(this, "applyDamage", {damage, options : {damageType, minimumOne, loc, suppressMsg, hideDSN}, actorUuid : this.uuid});
     }
 
     let newWounds = this.status.wounds.value;
@@ -899,12 +917,12 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
     if (loc == "roll")
     {
-      loc = (await game.wfrp4e.tables.rollTable("hitloc")).result
+      loc = (await game.wfrp4e.tables.rollTable("hitloc", {hideDSN})).result
     }
 
     if (applyAP) {
       modifiedDamage -= this.status.armour[loc].value
-      msg += ` (${this.status.armour[loc].value} ${game.i18n.localize("AP")}`
+      msg += ` (${this.status.armour[loc].value} ${game.wfrp4e.config.locations[loc]} ${game.i18n.localize("AP")}`
       if (!applyTB)
         msg += ")"
       else
@@ -1252,9 +1270,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     let corruption = Math.trunc(this.status.corruption.value) + 1;
     html += `<b>${game.i18n.localize("Corruption")}: </b>${corruption}/${this.status.corruption.max}`;
     ChatMessage.create(WFRP_Utility.chatDataSetup(html));
-    this.update({ "system.status.corruption.value": corruption }).then(() => {
-      this.checkCorruption();
-    });
+    this.update({ "system.status.corruption.value": corruption });
 
     let test = message.getTest()
     test.reroll()
@@ -1581,23 +1597,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     return disease;
   }
 
-
-  async checkCorruption() {
-
-    let test;
-    if (this.status.corruption.value > this.status.corruption.max) {
-      let skill = this.has(game.i18n.localize("NAME.Endurance"), "skill")
-      if (skill) 
-      {
-        test = await this.setupSkill(skill, { title: game.i18n.format("DIALOG.MutateTitle", { test: skill.name }), mutate: true })
-      }
-      else {
-        test = await this.setupCharacteristic("t", { title: game.i18n.format("DIALOG.MutateTitle", { test: game.wfrp4e.config.characteristics["t"] }), mutate: true })
-      }
-      await test.roll();
-    }
-  }
-
   async checkReloadExtendedTest(weapon) {
 
     if (!weapon.loading)
@@ -1686,7 +1685,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
   }
 
 
-  async addCondition(effect, value = 1, flags) {
+  async addCondition(effect, value = 1, mergeData={}) {
     if (value == 0)
     {
       return;
@@ -1713,7 +1712,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       await existing.setFlag("wfrp4e", "value", existing.conditionValue + value)
       existing._displayScrollingStatus(true);
       if (flags) {
-        await existing.setFlag("wfrp4e", "extra", flags);
+        await existing.setFlag("wfrp4e", "extra", mergeData);
       }
       return existing;
     }
@@ -1735,7 +1734,9 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       }
       if (effect.id == "unconscious") {
         await this.addCondition("prone")
-      }
+
+      mergeObject(effect, mergeData);
+
       delete effect.id
       return this.createEmbeddedDocuments("ActiveEffect", [effect], {condition: true})
     }
@@ -1993,6 +1994,26 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
   async clearOpposed() {
     return (await this.update({ "flags.-=oppose": null }));
+  }
+
+  sameSideAs(actor)
+  {
+      if (this.hasPlayerOwner && actor.hasPlayerOwner) // If both are owned by players, probably the same side
+      {
+          return true;
+      }
+      else if (this.hasPlayerOwner) // If this actor is owned by a player, and the other is friendly, probably the same side
+      {
+          return actor.prototypeToken.disposition == CONST.TOKEN_DISPOSITIONS.FRIENDLY; 
+      }
+      else if (actor.hasPlayerOwner) // If this actor is friendly, and the other is owned by a player, probably the same side
+      {
+          return this.prototypeToken.disposition == CONST.TOKEN_DISPOSITIONS.FRIENDLY;
+      }
+      else // If neither are owned by a player, only same side if they have the same disposition
+      {
+          return this.prototypeToken.disposition == actor.prototypeToken.disposition;
+      }
   }
 
   // @@@@@@@@ BOOLEAN GETTERS

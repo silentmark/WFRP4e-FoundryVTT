@@ -7,7 +7,6 @@ export default class ChannelTest extends TestWFRP {
     if (!data)
       return
 
-    this.preData.skillSelected = data.skillSelected;
     this.data.preData.malignantInfluence = data.malignantInfluence;
     this.data.preData.unofficialGrimoire = data.unofficialGrimoire;
     this.data.preData.ingredientMode = data.ingredientMode ?? "none";
@@ -15,13 +14,12 @@ export default class ChannelTest extends TestWFRP {
     this.data.context.channelUntilSuccess = data.channelUntilSuccess
 
     this.computeTargetNumber();
-    this.preData.skillSelected = data.skillSelected instanceof Item ? data.skillSelected.name : data.skillSelected;
   }
 
   computeTargetNumber() {
-    let skill = this.item.skillToUse
+    let skill = this.preData.skill
     if (!skill)
-      this.result.target = this.actor.characteristics.wp.value
+      this.result.target = this.actor.system.characteristics[this.characteristicKey].value
     else
       this.result.target = skill.total.value
 
@@ -279,17 +277,6 @@ export default class ChannelTest extends TestWFRP {
 
   get spell() {
     return this.item
-  }
-
-  get characteristicKey() {
-    if (this.preData.skillSelected?.char)
-      return this.preData.skillSelected.key
-
-    else {
-      let skill = this.actor.getItemTypes("skill").find(s => s.name == this.preData.skillSelected)
-      if (skill)
-        return skill.characteristic.key
-    }
   }
 
   // WoM channelling updates all items of the lore channelled

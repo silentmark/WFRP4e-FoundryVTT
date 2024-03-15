@@ -591,7 +591,7 @@ export default class ChatWFRP {
 
     let test = game.messages.get(messageId).getTest()
     let radius
-    if (test?.result.overcast.usage.target)
+    if (test?.result.overcast?.usage.target)
     {
       radius = test.result.overcast.usage.target.current;
     }
@@ -620,7 +620,11 @@ export default class ChatWFRP {
 
   static _onApplyCondition(event) {
     let actors = canvas.tokens.controlled.concat(Array.from(game.user.targets).filter(i => !canvas.tokens.controlled.includes(i))).map(a => a.actor);
-
+    if (canvas.scene) { 
+      game.user.updateTokenTargets([]);
+      game.user.broadcastActivity({targets: []});
+    }
+    
     if (actors.length == 0)
     {
       actors.push(game.user.character);
