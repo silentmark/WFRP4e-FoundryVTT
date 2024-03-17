@@ -7,9 +7,9 @@ export default class ChannelTest extends TestWFRP {
     if (!data)
       return
 
-    this.data.preData.malignantInfluence = data.malignantInfluence;
-    this.data.preData.unofficialGrimoire = data.unofficialGrimoire;
-    this.data.preData.ingredientMode = data.ingredientMode ?? "none";
+    this.preData.malignantInfluence = data.malignantInfluence;
+    this.preData.unofficialGrimoire = data.unofficialGrimoire;
+    this.preData.ingredientMode = data.ingredientMode ?? "none";
 
     this.data.context.channelUntilSuccess = data.channelUntilSuccess
 

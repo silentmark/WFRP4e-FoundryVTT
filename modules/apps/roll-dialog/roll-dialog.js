@@ -8,8 +8,6 @@ export default class RollDialog extends Application {
     chatTemplate = ""
     selectedScripts = [];
     unselectedScripts = [];
-    selectedTalents = [];
-    unselectedTalents = [];
     testClass = null;
     #onKeyPress;
 
@@ -30,8 +28,7 @@ export default class RollDialog extends Application {
     {
       return "systems/wfrp4e/templates/dialog/base-dialog.hbs";
     }
-    
-    
+
     constructor(fields, data, resolve, options)
     {
         super(options);
@@ -50,7 +47,6 @@ export default class RollDialog extends Application {
         this.flags = {};
 
         this.data.scripts = this._consolidateScripts(data.scripts);
-        this.data.talents = this._consolidateTalents();
 
         if (resolve)
         {
@@ -85,8 +81,7 @@ export default class RollDialog extends Application {
         // Listen on all elements with 'name' property
         html.find(Object.keys(new FormDataExtended(this.form).object).map(i => `[name='${i}']`).join(",")).change(this._onInputChanged.bind(this));
 
-        html.find(".dialog-modifiers .scripts .modifier").click(this._onScriptModifierClicked.bind(this));
-        html.find(".dialog-modifiers .talents .modifier").click(this._onTalentModifierClicked.bind(this));
+        html.find(".dialog-modifiers .modifier").click(this._onModifierClicked.bind(this));
 
         html.find("[name='advantage']").change(this._onAdvantageChanged.bind(this));
         
@@ -118,11 +113,6 @@ export default class RollDialog extends Application {
         if (this.resolve)
         {
             this.resolve(test);
-        }
-        if (game.canvas.scene)
-        {
-            game.user.updateTokenTargets([]);
-            game.user.broadcastActivity({ targets: [] });
         }
         this.close();
         if (canvas.scene)
@@ -177,33 +167,18 @@ export default class RollDialog extends Application {
             script.isHidden = false;
             script.isActive = false;
         });
-        this.data.talents.forEach(talent => talent.isActive = false);
         
         this._hideScripts();
         this._activateScripts();
-        this._activateTalents();
         await this.computeScripts();
-        this.computeTalents();
         await this.computeFields();
 
         return {
             data : this.data,
-            talents: this.talents,
             fields : this.fields,
             tooltips : this.tooltips,
             subTemplate : await this.getSubTemplate()
         };
-    }
-
-    _consolidateTalents() {
-        let talentItems = this.actor.getItemTypes("talent")
-        let consolidated = []
-        for (let talent of talentItems) {
-          let existing = consolidated.find(t => t.name == talent.name)
-          if (!existing)
-            consolidated.push(talent)
-        }
-        return consolidated
     }
 
     /**
@@ -228,14 +203,6 @@ export default class RollDialog extends Application {
             else 
             {
                 existing.scriptCount++;
-            }
-        }
-        for (let script of consolidated)
-        {
-            script.FullLabel = script.Label;
-            if (script.context?.item?.tests?.value) 
-            {
-                script.FullLabel = script.Label + ` (${script.context.item.tests.value})`;
             }
         }
 
@@ -263,17 +230,6 @@ export default class RollDialog extends Application {
             {
                 script.isHidden = script.hidden(this);
             }
-        });
-    }
-
-    _activateTalents() {
-        this.data.talents.forEach((talent, index) => {
-          if (this.selectedTalents.includes(index)) {
-            talent.isActive = true;
-          }
-          else if (this.unselectedTalents.includes(index)) {
-            talent.isActive = false;
-          }
         });
     }
 
@@ -308,25 +264,7 @@ export default class RollDialog extends Application {
                 {
                     await script.execute(this);
                 }
-                let label = script.Label;
-                if (script.context?.item?.tests?.value) 
-                {
-                    label += ` (${script.context.item.tests.value})`
-                }
-                this.tooltips.finish(this, label);
-            }
-        }
-    }
-
-    async computeTalents() 
-    {
-        for(let talent of this.data.talents)
-        {
-            if (talent.isActive)
-            {
-                this.tooltips.start(this);
-                this.prefillModifiers.successBonus += talent.Advances;
-                this.tooltips.finish(this, talent.name);
+                this.tooltips.finish(this, script.Label);
             }
         }
     }
@@ -413,7 +351,7 @@ export default class RollDialog extends Application {
         this.render(true);
     }
 
-    _onScriptModifierClicked(ev)
+    _onModifierClicked(ev)
     {
         let index = Number(ev.currentTarget.dataset.index);
         if (!ev.currentTarget.classList.contains("active"))
@@ -440,38 +378,6 @@ export default class RollDialog extends Application {
             else // If unselecting manually selected modifier
             {
                 this.selectedScripts = this.selectedScripts.filter(i => i != index);
-            }
-        }
-        this.render(true);
-    }
-    
-    _onTalentModifierClicked(ev)
-    {
-        let index = Number(ev.currentTarget.dataset.index);
-        if (!ev.currentTarget.classList.contains("active"))
-        {
-            // If modifier was unselected by the user (originally activated via its script)
-            // it can be assumed that the script will still be activated by its script
-            if (this.unselectedTalents.includes(index))
-            {
-                this.unselectedTalents = this.unselectedTalents.filter(i => i != index);
-            }
-            else 
-            {
-                this.selectedTalents.push(index);
-            }
-        }
-        else 
-        {
-            // If this modifier was NOT selected by the user, it was activated via its script
-            // must be added to unselectedScripts instead
-            if (!this.selectedTalents.includes(index))
-            {
-                this.unselectedTalents.push(index);
-            }
-            else // If unselecting manually selected modifier
-            {
-                this.selectedTalents = this.selectedTalents.filter(i => i != index);
             }
         }
         this.render(true);

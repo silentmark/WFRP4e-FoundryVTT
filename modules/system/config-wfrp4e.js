@@ -1718,7 +1718,7 @@ WFRP4E.PrepareSystemItems = function() {
                             {
                                 let test = await actor.setupSkill(game.i18n.localize("NAME.Endurance"));
                                 await test.roll();
-                                if (test.result.outcome == "failure")d
+                                if (test.result.outcome == "failure")
                                 {
                                     await actor.addCondition("unconscious")
                                     msg += "<br>" + game.i18n.format("BleedUnc", {name: actor.prototypeToken.name })

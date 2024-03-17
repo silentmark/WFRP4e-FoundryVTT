@@ -493,35 +493,6 @@ export default class TestWFRP {
       await oppose.computeOpposeResult();
       await this.actor.clearOpposed();
       await this.updateMessageFlags();
-
-      let test = oppose.attacker.getFlag("wfrp4e", "offHandData");
-      if (test) {
-        await oppose.attacker.update({ "flags.wfrp4e.-=offHandData": null });
-        test = game.wfrp4e.rolls.TestWFRP.recreate(test.data);
-        if (oppose.opposeResult.winner == "attacker") {
-          let offhandWeapon = oppose.attacker.getItemTypes("weapon").find(w => w.offhand.value);
-
-          let userOwner = WFRP_Utility.getActiveDocumentOwner(oppose.attacker);
-          let targetId = game.canvas.tokens.placeables.find(x => x.actor.id == oppose.defender.id).id;
-          userOwner.updateTokenTargets([targetId]);
-          userOwner.broadcastActivity({targets: [targetId]});
-         
-          await WFRP_Utility.sleep(1000);
-          let offHandReverseRoll;
-          if (test.result.roll % 11 == 0 || test.result.roll == 100) {
-            offHandReverseRoll = undefined;
-          } else {
-            let offhandRoll = test.result.roll.toString();
-            if (offhandRoll.length == 1)
-              offhandRoll = offhandRoll[0] + "0"
-            else
-              offhandRoll = offhandRoll[1] + offhandRoll[0]
-              offHandReverseRoll = Number(offhandRoll);
-          }
-          test = await oppose.attacker.setupWeapon(offhandWeapon, {gmTargets: [targetId], appendTitle: ` (${game.i18n.localize("SHEET.Offhand")})`, offhand: true, offhandReverse: offHandReverseRoll });
-          await test.roll();
-        }
-      }
     }
     else // if actor is attacking - rerolling old test. 
     {

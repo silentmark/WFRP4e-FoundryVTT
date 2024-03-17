@@ -9,10 +9,10 @@ export default class CastTest extends TestWFRP {
       return
 
     this.preData.itemData = data.itemData || this.item.toObject() // Store item data to avoid rerolls being affected by changed channeled SL
-    this.data.preData.malignantInfluence = data.malignantInfluence;
-    this.data.preData.unofficialGrimoire = data.unofficialGrimoire;
-    this.data.preData.overchannelling = data.overchannelling;
-    this.data.preData.ingredientMode = data.ingredientMode ?? "none";
+    this.preData.malignantInfluence = data.malignantInfluence;
+    this.preData.unofficialGrimoire = data.unofficialGrimoire;
+    this.preData.overchannelling = data.overchannelling;
+    this.preData.ingredientMode = data.ingredientMode ?? "none";
 
     this.data.context.templates = data.templates || [];
 
