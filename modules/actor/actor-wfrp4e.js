@@ -1707,11 +1707,13 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       return existing
     }
     else if (existing) {
-      await existing.setFlag("wfrp4e", "value", existing.conditionValue + value)
+      mergeData.flags = mergeData.flags || {};
+      mergeData.flags.wfrp4e = mergeData.flags.wfrp4e || {};
+      mergeData.flags.wfrp4e.value = existing.conditionValue + value;
+
+      //await existing.setFlag("wfrp4e", "value", existing.conditionValue + value)
+      await existing.update(mergeData);
       existing._displayScrollingStatus(true);
-      if (flags) {
-        await existing.setFlag("wfrp4e", "extra", mergeData);
-      }
       return existing;
     }
     else if (!existing) {
@@ -1722,9 +1724,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
       if (Number.isNumeric(effect.flags.wfrp4e.value)) {
         effect.flags.wfrp4e.value = value;
-      }
-      if (flags) {
-        effect.flags.wfrp4e.extra = flags;
       }
       
       effect["statuses"] = [effect.id];

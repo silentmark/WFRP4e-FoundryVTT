@@ -2,6 +2,7 @@ import { BaseActorModel } from "./base";
 import { CharacteristicsModel } from "./components/characteristics";
 import { StandardStatusModel } from "./components/status";
 import { StandardDetailsModel } from "./components/details";
+import EffectWfrp4e from "../../system/effect-wfrp4e.js";
 import WFRP_Utility from "../../system/utility-wfrp4e";
 let fields = foundry.data.fields;
 
@@ -111,18 +112,19 @@ export class StandardActorModel extends BaseActorModel {
         this.computeItems();
         super.computeDerived(items, flags);
         this.runScripts("computeCharacteristics", this.parent);
+        this.computeAdvantage();
+        this.computeMove();
+        this.computeSize();
         if (this.checkWounds())
         {
             return;
         }
-        this.computeAdvantage();
-        this.computeMove();
-        this.computeSize();
         this.computeEncumbranceMax();
         this.runScripts("computeEncumbrance", this.parent);
         this.computeEncumbranceState();
         this.computeArmour();
-        this.computeMount()
+        this.computeMount();
+        this.computeWeaponStatuses();
 
         this.parent.runScripts("prepareData", { actor: this.parent })
     }
@@ -202,6 +204,42 @@ export class StandardActorModel extends BaseActorModel {
         this.parent.getItemTypes("weapon").filter(i => i.properties.qualities.shield && i.isEquipped).forEach(i => this.status.addShieldItem(i))
         
         this.parent.runScripts("APCalc", args);
+    }
+
+    computeWeaponStatuses() {
+        let actor = this.parent;
+        for(let e of actor.effects.map(x=>x)) {
+            if (e.flags?.wfrp4e?.weapon) {
+                actor.effects.delete(e.id);
+            }
+        }
+        
+        for (let item of actor.itemTypes.weapon) {
+            if (item.equipped) {
+                let weaponEffect = new EffectWfrp4e({
+                    _id: item.id,
+                    name: item.name,
+                    icon: item.img,
+                    transfer: false,
+                    origin: item.uuid,
+                    isTemporary: 1,
+                    flags: {
+                        wfrp4e: {
+                            value: item.twohanded.value ? "\uD83D\uDC50" : (item.offhand.value ? "\uD83D\uDC48" : "\uD83D\uDC49"),
+                            weapon: item.id
+                        },
+                        core: {
+                            statusId: item.name
+                        }
+                    }, 
+                    duration: {
+                        startTime: 87136335184
+                    }
+                }, { parent: actor });
+                actor.effects.set(item.id, weaponEffect);
+                actor.temporaryEffects.push(weaponEffect);
+            }
+        }
     }
 
     /**

@@ -1914,16 +1914,6 @@ WFRP4E.PrepareSystemItems = function() {
                     },
                     scriptData: [
                         {
-                            trigger: "dialog",
-                            label : "Penalty to all Tests",
-                            script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
-                            options : {
-                                dialog : {
-                                    activateScript : "return true"
-                                }
-                            }
-                        },
-                        {
                             trigger: "manual", 
                             label: "@effect.name", 
                             script: `
@@ -1966,6 +1956,16 @@ WFRP4E.PrepareSystemItems = function() {
                         },
                         {
                             trigger: "dialog",
+                            label : "Penalty to all Tests",
+                            script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
+                            options : {
+                                dialog : {
+                                    activateScript : "return true"
+                                }
+                            }
+                        },
+                        {
+                            trigger: "dialog",
                             label : "Bonus to Melee Attacks",
                             script : `args.fields.slBonus += 1`,
                             options : {
@@ -1994,16 +1994,6 @@ WFRP4E.PrepareSystemItems = function() {
                     },
                     scriptData: [
                         {
-                            trigger: "dialog",
-                            label : "Tests related to movement of any kind",
-                            script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
-                            options : {
-                                dialog : {
-                                    activateScript : "return ['ws', 'bs', 'ag'].includes(args.characteristic)"
-                                }
-                            }
-                        },
-                        {
                             trigger: "manual",
                             label: "@effect.name",
                             script: `
@@ -2025,11 +2015,12 @@ WFRP4E.PrepareSystemItems = function() {
                                     if (test.result.SL - opponentSl > 0)
                                     {
                                         await actor.removeCondition("entangled", Math.min(test.result.SL - opponentSl, conditionValue));
-                                        msg += "Test Przeciwstawny: " + opponentSl + "(" + roll.total + " vs " + conditionStrength + ")"<br/>";
+                                        msg += "Punkty sukcesu z Testu Przeciwstawnego: " + opponentSl + " (" + roll.total + " vs " + conditionStrength + ")<br/>";
                                         msg += "Liczba usuniętych stanów Pochwycenie: " + Math.min(test.result.SL - opponentSl, conditionValue);
                                     } 
                                     else 
                                     {
+                                        msg += "Punkty sukcesu z Testu Przeciwstawnego: " + opponentSl + " (" + roll.total + " vs " + conditionStrength + ")<br/>";
                                         msg += "Nie udało się usunąć stanu Pochwycenie";
                                     }
                                 } 
@@ -2060,6 +2051,16 @@ WFRP4E.PrepareSystemItems = function() {
                                     return this.script.scriptMessage(msg)
                                 }
                             `
+                        },
+                        {
+                            trigger: "dialog",
+                            label : "Tests related to movement of any kind",
+                            script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
+                            options : {
+                                dialog : {
+                                    activateScript : "return ['ws', 'bs', 'ag'].includes(args.characteristic)"
+                                }
+                            }
                         }
                     ]
                 }
@@ -2139,16 +2140,6 @@ WFRP4E.PrepareSystemItems = function() {
                     },
                     scriptData: [
                         {
-                            trigger: "dialog",
-                            label : "Penalty to all Tests not involving running and hiding.",
-                            script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
-                            options : {
-                                dialog : {
-                                    activateScript : "return !args.skill?.name?.includes(game.i18n.localize('NAME.Stealth')) && args.skill?.name != game.i18n.localize('NAME.Athletics')"
-                                }
-                            }
-                        },
-                        {
                             trigger: "manual",
                             label: "@effect.name",
                             script: 
@@ -2185,6 +2176,16 @@ WFRP4E.PrepareSystemItems = function() {
                                     return this.script.scriptMessage(msg)
                                 }
                             `
+                        },
+                        {
+                            trigger: "dialog",
+                            label : "Penalty to all Tests not involving running and hiding.",
+                            script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
+                            options : {
+                                dialog : {
+                                    activateScript : "return !args.skill?.name?.includes(game.i18n.localize('NAME.Stealth')) && args.skill?.name != game.i18n.localize('NAME.Athletics')"
+                                }
+                            }
                         }
                     ]
                 }
