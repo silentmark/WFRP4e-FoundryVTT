@@ -168,7 +168,6 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     items.mutations = sheetData.actor.getItemTypes("mutation")
     items.psychologies = sheetData.actor.getItemTypes("psychology")
     items.traits = sheetData.actor.getItemTypes("trait")
-    items.talents = sheetData.actor.getItemTypes("talent")
     items.extendedTests = sheetData.actor.getItemTypes("extendedTest")
     items.vehicleMods = sheetData.actor.getItemTypes("vehicleMod")
 
@@ -188,6 +187,8 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     }
 
     items.inventory = this.constructInventory(sheetData)
+
+    items.talents = this._consolidateTalents()
 
     this._sortItemLists(items)
 
@@ -425,6 +426,17 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     for (let effect of consolidated) {
       let count = effects.filter(e => e.name == effect.name).length
       effect.count = count
+    }
+    return consolidated
+  }
+
+  _consolidateTalents() {
+    let talents = this.actor.getItemTypes("talent")
+    let consolidated = []
+    for (let talent of talents) {
+      let existing = consolidated.find(t => t.name == talent.name)
+      if (!existing)
+        consolidated.push(talent)
     }
     return consolidated
   }
