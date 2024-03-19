@@ -221,6 +221,7 @@
     "SHEET.GroupAdvantage" : "Group Advantage",
     "SHEET.Expand" : "Expand",
     "SHEET.Collapse" : "Collapse",
+    "SHEET.TemporaryEffectHint" : "These Active Effects come from the owning Actor. To interact with it, do so through the Actor's sheet",
 
     "LOG.MemorizedSpell" : "Memorized {name}",
     "LOG.GainPrayer" : "Gained {name}",
@@ -1630,6 +1631,10 @@
     "EffectApplication.AreaTypeSustained" : "Sustained",
     "EffectApplication.TargetedAura" : "Targeted Aura",
     "EffectApplication.TargetedAuraHint" : "Apply this Aura to a creature instead of constantly to self",
+    "EffectApplication.RenderAura" : "Render Aura",
+    "EffectApplication.RenderAuraHint" : "Render the aura on the Canvas as a Measured Template",
+    "EffectApplication.TemplateData" : "Template Data",
+    "EffectApplication.TemplateDataHint" : "Configure template data, such as color or texture",
     "EffectApplication.Keep" : "Keep",
     "EffectApplication.KeepHint" : "Prevents removing the effect upon leaving the Area",
     "EffectApplication.Radius" : "Radius",

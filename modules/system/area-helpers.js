@@ -106,86 +106,73 @@ export default class AreaHelpers
         return tokens.filter(t => AreaHelpers.isInTemplate(t, template));
     }
 
-    static auraEffectToTemplateData(effect, token) {
-        let template = {
+    static auraEffectToTemplate(effect, token) {
+        let messageId = effect.flags.wfrp4e.sourceTest?.data.context.messageId;
+        let token = effect.actor.getActiveTokens()[0];
+        let template = new MeasuredTemplate(new CONFIG.MeasuredTemplate.documentClass(mergeObject({
             t: "circle",
+            _id : effect.id,
             user: game.user.id,
-            distance: effect.applicationData.radius,
+            distance: effect.radius,
             direction: 0,
-            x: token.center.x,
-            y: token.center.y,
+            x: token.center.x, // Using the token x/y will double the template's coordinates, as it's already a child of the token
+            y: token.center.y, // However, this is necessary to get tho correct grid highlighting. The template's position is corrected when it's rendered (see renderAura)
+            fillColor: game.user.color,
             flags: {
                 wfrp4e: {
                     effectUuid: effect.uuid,
                     auraToken: token.document.uuid,
-                    round: game.combat?.round ?? -1
+                    round: game.combat?.round ?? -1,
+                    messageId: messageId
                 }
             }
-        };
-        if (effect.flags.wfrp4e.sourceTest?.data.context.messageId) {
-            template.flags.wfrp4e.messageId = effect.flags.wfrp4e.sourceTest.data.context.messageId;
-        }
-        return template
+        }, effect.flags.wfrp4e?.applicationData?.templateData || {}), {parent : canvas.scene}));
+
+        // For some reason, these temporary templates have 0,0 as their coordinates
+        // instead of the ones provided by the document, so set them manually
+        template.x = template.document.x;
+        template.y = template.document.y;
+        template.auraEffect = effect;
+        return template;
     }
 
     static async checkAreasThreadSafe(scene) {
         let tokens = scene.tokens;
-        let templates = scene.templates.contents.map(t => t);
+        let templates = scene.templates.contents.map(t => t.object).concat(await this.aurasInScene(scene));
 
         for (let template of templates) {
-            let auraTokenUuid = template.getFlag("wfrp4e", "auraToken");
-            let effectUuid = template.getFlag("wfrp4e", "effectUuid");
+            let auraTokenUuid = template.document.getFlag("wfrp4e", "auraToken");
+            let effectUuid = template.document.getFlag("wfrp4e", "effectUuid");
             if (!effectUuid) continue;
+            if (auraTokenUuid) continue;
             let effect = await fromUuid(effectUuid);
             if (!effect) {
-                await template.delete();
-            }
-            if (!auraTokenUuid) continue;
-            let token = await fromUuid(auraTokenUuid);
-            if (!token) {
-                await template.delete();
-            }
-        }
-
-        for (let token of tokens) {
-            //check auras and create templates if needed
-            let auraEffects = token.actor.auras;
-            for (let auraEffect of auraEffects) {
-                    if (auraEffect.applicationData.radius) {
-                    let existingTemplate = templates
-                        .find(t => t.getFlag("wfrp4e", "effectUuid") == auraEffect.uuid && t.getFlag("wfrp4e", "auraToken") == token.uuid);
-                    if (!existingTemplate) { // create template
-                        let templateData = AreaHelpers.auraEffectToTemplateData(auraEffect, token.object);
-                        existingTemplate = await token.object.scene.createEmbeddedDocuments("MeasuredTemplate", [templateData]);
-                        templates.push(existingTemplate[0]);
-                    } else { // move template to token
-                        const updates = { _id: existingTemplate._id, flags: {wfrp4e: {preventRecursive: Date.now()}}, ...token.object.center };
-                        await token.object.scene.updateEmbeddedDocuments("MeasuredTemplate", [updates]);
-                    }
-                }
+                await template.document.delete();
             }
         }
 
         for (let token of tokens) {
             for (let template of templates) {
-                let effectUuid = template.getFlag("wfrp4e", "effectUuid");
-                let auraTokenUuid = template.getFlag("wfrp4e", "auraToken");
+                // An area could be a template, but could be an effect (aura)
+                let areaUuid = (template.id ? template?.uuid : template.flags.wfrp4e.effectUuid);
+                let effectUuid = template.document.getFlag("wfrp4e", "effectUuid");
+                let auraTokenUuid = template.document.getFlag("wfrp4e", "auraToken");
                 if (!effectUuid) continue;
 
-                let existingEffect = token.actor.currentAreaEffects.find(effect => effect.getFlag("wfrp4e", "fromArea") == template.uuid && !effect.applicationData.keep)
-                                    ?? token.actor.auras.find(effect => effect.uuid == effectUuid);
-                let inTemplate = AreaHelpers.isInTemplate(token, template)
+                let existingEffect = token.actor.currentAreaEffects.find(effect => effect.getFlag("wfrp4e", "fromArea") == areaUuid && !effect.applicationData.keep)
+                              //      ?? token.actor.auras.find(effect => effect.uuid == effectUuid);
+                let inTemplate = AreaHelpers.isInTemplate(token, template.document)
                 if (inTemplate && !existingEffect) {
-                    let effect = template.areaEffect();
+                    let effect = template.document.areaEffect() || template.auraEffect;
                     if (effect && auraTokenUuid != token.uuid) {// Specifically don't apply auras to self
                         // if template was placed from a test
-                        let messageId = template.getFlag("wfrp4e", "messageId")
+                        let messageId = template.document.getFlag("wfrp4e", "messageId")
                         let effectData = effect.convertToApplied(game.messages.get(messageId)?.getTest());
                         setProperty(effectData, "flags.wfrp4e.fromArea", template.uuid);
                         // Can't just send UUID because we need to include fromArea flags
                         await token.actor.applyEffect({effectData : [effectData], messageId});
                     }
-                } else if (!inTemplate && existingEffect && auraTokenUuid != token.uuid) {// If not in template, remove all effects originating from that template
+                } else if (!inTemplate && existingEffect && !template.document.getFlag("wfrp4e", "instantaneous") && auraTokenUuid != token.uuid) {// If not in template, remove all effects originating from that template
                     await existingEffect.delete();
                 }
             }
@@ -201,6 +188,23 @@ export default class AreaHelpers
         }
     }
 
+
+    // Create temporary MeasuredTemplates so that auras can
+    // be processed the same way as normal Area effects
+    static aurasInScene(scene) {
+        let templates = [];
+        for (let token of scene.tokens) {
+            if (!token.actor)
+                continue;
+
+            let auraEffects = token.actor.auras;
+            for (let effect of auraEffects) {
+                templates.push(this.auraEffectToTemplate(effect, token));
+            }
+        }
+        return Promise.all(templates);
+    }
+ 
     // Perhaps this is expensive to run on every token update
     // but works for now
     static async checkAreas(scene) {
