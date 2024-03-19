@@ -108,7 +108,6 @@ export default class AreaHelpers
 
     static auraEffectToTemplate(effect, token) {
         let messageId = effect.flags.wfrp4e.sourceTest?.data.context.messageId;
-        let token = effect.actor.getActiveTokens()[0];
         let template = new MeasuredTemplate(new CONFIG.MeasuredTemplate.documentClass(mergeObject({
             t: "circle",
             _id : effect.id,
