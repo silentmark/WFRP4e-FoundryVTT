@@ -180,7 +180,10 @@ export default function () {
 
     if (this.isVisible)
     {
-      this.auras = actor.auras.filter(auraEffect => auraEffect.applicationData.renderAura).map(aura => {
+      this.auras = actor.auras.map(aura => {
+        Hooks.callAll("wfrp4e:renderTokenAura", this, aura, game.user.id);
+
+        if (!aura.applicationData.renderAura) return null;
         let template = AreaHelpers.auraEffectToTemplate(aura, this)
         let child = this.addChild(template)
         child.draw().then(t => {
@@ -190,7 +193,7 @@ export default function () {
           t.template.y -= this.document.y;
         });
         return child;
-      })
+      }).filter(auraTemplate => auraTemplate !== null);
     }
   }
   
