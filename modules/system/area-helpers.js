@@ -8,15 +8,15 @@ export default class AreaHelpers
      * @param {Template} template Template object being tested
      * @returns
      */
-    static isInTemplate(tokenDocument, templateDocument) {
+    static isInTemplate(tokenDocument, templateObject) {
         let collisionMethod = game.settings.get("wfrp4e", "templateCollisionMethod");
         let minimalRatio = 0.25;
         if (collisionMethod == "centerPoint") {
             let point = tokenDocument.object.center;
-            return templateDocument.object.shape.contains(point.x - templateDocument.x, point.y - templateDocument.y);
+            return templateObject.shape.contains(point.x - templateObject.x, point.y - templateObject.y);
         } else if (collisionMethod == "grid") {
             let points = this.getTokenGridCenterPoints(tokenDocument);
-            const containedCount = points.reduce((counter, p) => (counter += templateDocument.object.shape.contains(p.x - templateDocument.x, p.y - templateDocument.y) ? 1 : 0), 0);
+            const containedCount = points.reduce((counter, p) => (counter += templateObject.shape.contains(p.x - templateObject.x, p.y - templateObject.y) ? 1 : 0), 0);
             return containedCount / points.length >= minimalRatio; // if more than 25% of the centers of grid cells taken by token is in the template, return true
         } else if (collisionMethod == "area") {
 
@@ -24,11 +24,11 @@ export default class AreaHelpers
             const tokenRectanglePolygon = new PIXI.Rectangle(tokenDocument.x, tokenDocument.y, tokenDocument.width * size, tokenDocument.height * size).toPolygon();
             let templatePoly;
 
-            switch (templateDocument.object.shape.type) {
+            switch (templateObject.shape.type) {
                 case 0: // generic poly
-                    let x = templateDocument.x * 100;
-                    let y = templateDocument.y * 100;
-                    const clipperPolygon = templateDocument.object.shape.toClipperPoints();
+                    let x = templateObject.x * 100;
+                    let y = templateObject.y * 100;
+                    const clipperPolygon = templateObject.shape.toClipperPoints();
                     clipperPolygon.forEach((p) => {
                         p.X += x;
                         p.Y += y;
@@ -37,9 +37,9 @@ export default class AreaHelpers
                     break;
                 case 1: // rect
                 case 2: // circle
-                    const shapeCopy = templateDocument.object.shape.clone();
-                    shapeCopy.x += templateDocument.x;
-                    shapeCopy.y += templateDocument.y;
+                    const shapeCopy = templateObject.shape.clone();
+                    shapeCopy.x += templateObject.x;
+                    shapeCopy.y += templateObject.y;
                     templatePoly = shapeCopy.toPolygon();
                     break;
             }
@@ -86,7 +86,7 @@ export default class AreaHelpers
                 // ByTokens generate for collision are not relative to a 0,0 origin and instead the token's actual x,y
                 // position on the grid, shifting the test points isn't required
                 const [testX, testY] = [gx + hx, gy + hy];
-                const contains = (r === 0 && c === 0 && isCenter) || grid._testShape(testX, testY, tokenRectangle);
+                const contains = (r === 0 && c === 0 && isCenter) || this.testShape(testX, testY, tokenRectangle);
                 if (!contains) continue;
                 // original saves top-left of grid space, save center of space instead
                 positions.push({ x: testX, y: testY });
@@ -95,24 +95,41 @@ export default class AreaHelpers
         return positions;
     }
 
+    static testShape(x, y, shape) {
+        for (let dx = -0.5; dx <= 0.5; dx += 0.5) {
+            for (let dy = -0.5; dy <= 0.5; dy += 0.5) {
+                if (shape.contains(x + dx, y + dy)) return true;
+            }
+        }
+    }
+
     /**
      * Get all Tokens inside template
      *
      * @returns
      */
-    static tokensInTemplate(template) {
-        let scene = template.scene;
+    static tokensInTemplate(templateObject) {
+        let scene = templateObject.document.scene;
         let tokens = scene.tokens.contents;
-        return tokens.filter(t => AreaHelpers.isInTemplate(t, template));
+        return tokens.filter(t => AreaHelpers.isInTemplate(t, templateObject));
     }
 
     static auraEffectToTemplate(effect, token) {
         let messageId = effect.flags.wfrp4e.sourceTest?.data.context.messageId;
+        let radius = 1;
+        try {
+            radius = effect.radius;
+        } catch (e) {
+            console.warn("Error getting radius for aura effect", effect, e);
+        }
+
+        //token.children.filter(x=>x.constructor.name === 'MeasuredTemplate')
+
         let template = new MeasuredTemplate(new CONFIG.MeasuredTemplate.documentClass(mergeObject({
             t: "circle",
             _id : effect.id,
             user: game.user.id,
-            distance: effect.radius,
+            distance: radius,
             direction: 0,
             x: token.center.x, // Using the token x/y will double the template's coordinates, as it's already a child of the token
             y: token.center.y, // However, this is necessary to get tho correct grid highlighting. The template's position is corrected when it's rendered (see renderAura)
@@ -137,7 +154,8 @@ export default class AreaHelpers
 
     static async checkAreasThreadSafe(scene) {
         let tokens = scene.tokens;
-        let templates = scene.templates.contents.map(t => t.object).concat(await this.aurasInScene(scene));
+        let auras = await AreaHelpers.aurasInScene(scene);
+        let templates = scene.templates.contents.map(t => t.object).concat(auras);
 
         for (let template of templates) {
             let auraTokenUuid = template.document.getFlag("wfrp4e", "auraToken");
@@ -160,7 +178,7 @@ export default class AreaHelpers
 
                 let existingEffect = token.actor.currentAreaEffects.find(effect => effect.getFlag("wfrp4e", "fromArea") == areaUuid && !effect.applicationData.keep)
                               //      ?? token.actor.auras.find(effect => effect.uuid == effectUuid);
-                let inTemplate = AreaHelpers.isInTemplate(token, template.document)
+                let inTemplate = AreaHelpers.isInTemplate(token, template)
                 if (inTemplate && !existingEffect) {
                     let effect = template.document.areaEffect() || template.auraEffect;
                     if (effect && auraTokenUuid != token.uuid) {// Specifically don't apply auras to self
@@ -198,7 +216,7 @@ export default class AreaHelpers
 
             let auraEffects = token.actor.auras;
             for (let effect of auraEffects) {
-                templates.push(this.auraEffectToTemplate(effect, token));
+                templates.push(this.auraEffectToTemplate(effect, token.object));
             }
         }
         return Promise.all(templates);

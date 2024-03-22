@@ -2068,12 +2068,15 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
   get currentAreas()
   {
       let token = this.getActiveTokens()[0];
-      return canvas.templates.placeables.filter(t => AreaHelpers.isInTemplate(token.center, t));
+      return canvas.templates.placeables.filter(t => AreaHelpers.isInTemplate(token.center, t.object));
   }
 
   get auras() 
   {
-    return this.items.reduce((acc, item) => acc.concat(item.effects.contents), []).concat(this.effects.contents).filter(e => e.applicationData.type == "aura" && (e.applicationData.targetedAura == "target" || e.applicationData.targetedAura == "all"));
+    let itemEffects = this.items.reduce((acc, item) => acc.concat(item.effects.contents), []).filter(e => e.applicationData.type == "aura" && e.applicationData.documentType == "Actor" && (e.applicationData.targetedAura == "target" || e.applicationData.targetedAura == "all"));
+    let actorEffects = this.effects.contents.filter(e => e.applicationData.type == "aura" && (e.applicationData.targetedAura == "target" || e.applicationData.targetedAura == "all"));
+    let effects = itemEffects.concat(actorEffects);
+    return effects;
   }
 
   /**
