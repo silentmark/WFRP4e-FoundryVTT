@@ -358,15 +358,28 @@ export default class EffectWfrp4e extends ActiveEffect
     // Convert type to document, as applying should always affect the document being applied
     // Set the origin as the actor's uuid
     // convert name to status so it shows up on the token
-    convertToApplied(test)
+    convertToApplied(test, targetActor)
     {
         let effect = this.toObject();
 
         // An applied targeted aura should stay as an aura type, but it is no longer targeted
-        if (effect.flags.wfrp4e.applicationData.type == "aura" && (effect.flags.wfrp4e.applicationData.targetedAura == "target" || effect.flags.wfrp4e.applicationData.targetedAura == "all"))
+        if (effect.flags.wfrp4e.applicationData.type == "aura")
         {
-            effect.flags.wfrp4e.applicationData.radius = effect.flags.wfrp4e.applicationData.radius || test.result.overcast.usage.target.current?.toString();
-            effect.flags.wfrp4e.applicationData.targetedAura = false;
+            if (effect.flags.wfrp4e.applicationData.targetedAura == "target")
+            {
+                effect.flags.wfrp4e.applicationData.radius = effect.flags.wfrp4e.applicationData.radius || test.result.overcast.usage.target.current?.toString();
+                effect.flags.wfrp4e.applicationData.targetedAura = false;
+            }
+            else if (effect.flags.wfrp4e.applicationData.targetedAura == "all" && this.actor.id == targetActor?.id) 
+            {
+                effect.flags.wfrp4e.applicationData.radius = effect.flags.wfrp4e.applicationData.radius || test.result.overcast.usage.target.current?.toString();
+                effect.flags.wfrp4e.applicationData.targetedAura = false;
+            }
+            else 
+            {
+                delete effect.flags.autoanimations;
+                effect.flags.wfrp4e.applicationData.type = "document";
+            }
         }
         else 
         {

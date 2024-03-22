@@ -1023,7 +1023,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
         {
             let effect = fromUuidSync(uuid);
             let message = game.messages.get(messageId);
-            let data = effect.convertToApplied(message?.getTest());
+            let data = effect.convertToApplied(message?.getTest(), this);
             effectData.push(data);
         }
 
