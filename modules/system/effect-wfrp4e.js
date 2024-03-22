@@ -365,19 +365,14 @@ export default class EffectWfrp4e extends ActiveEffect
         // An applied targeted aura should stay as an aura type, but it is no longer targeted
         if (effect.flags.wfrp4e.applicationData.type == "aura")
         {
-            if (effect.flags.wfrp4e.applicationData.targetedAura == "target")
-            {
-                effect.flags.wfrp4e.applicationData.radius = effect.flags.wfrp4e.applicationData.radius || test.result.overcast.usage.target.current?.toString();
-                effect.flags.wfrp4e.applicationData.targetedAura = false;
-            }
-            else if (effect.flags.wfrp4e.applicationData.targetedAura == "all" && this.actor.id == targetActor?.id) 
+            if ((effect.flags.wfrp4e.applicationData.targetedAura == "target" || effect.flags.wfrp4e.applicationData.targetedAura == "all") && this.actor.id == targetActor?.id)
             {
                 effect.flags.wfrp4e.applicationData.radius = effect.flags.wfrp4e.applicationData.radius || test.result.overcast.usage.target.current?.toString();
                 effect.flags.wfrp4e.applicationData.targetedAura = false;
             }
             else 
             {
-                delete effect.flags.autoanimations;
+                // delete effect.flags.autoanimations;
                 effect.flags.wfrp4e.applicationData.type = "document";
             }
         }
@@ -611,9 +606,13 @@ export default class EffectWfrp4e extends ActiveEffect
         {
             return test;
         }
+        else if (test.data)
+        {
+            return TestWFRP.recreate(test.data);
+        }
         else 
         {
-            return test.data;
+            return null;
         }
     }
 

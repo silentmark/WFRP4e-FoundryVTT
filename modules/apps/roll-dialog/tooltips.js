@@ -133,7 +133,7 @@ export class DialogTooltips
         }
         if (difficultyDiff)
         {
-            this._difficulty.push({label});
+            this._difficulty.push({value: this._difficulty2, label});
         }
     }
 
