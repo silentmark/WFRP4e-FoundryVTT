@@ -115,18 +115,24 @@ export default class CombatHelpers {
                 canvas.tokens.cycleTokens(1, true);
             }
 
-            let msgContent = ""
             let startTurnConditions = combatant.actor.effects.contents.filter(e => e.applicationData?.conditionTrigger == "startTurn")
             for (let cond of startTurnConditions) {
-                    let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
-                    if (Number.isNumeric(cond.flags.wfrp4e.value))
-                        conditionName += ` ${cond.flags.wfrp4e.value}`
-                    msgContent = `
-                <h2>${conditionName}</h2>
-                <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
-                    await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
+                let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
+                if (Number.isNumeric(cond.flags.wfrp4e.value))
+                    conditionName += ` ${cond.flags.wfrp4e.value}`
+                let i = 0;
+                for (let script of cond.scripts) {
+                    if (script.trigger == "manual") {
+                        let label = script.Label
+                        let msgContent = `
+                            <h2>${conditionName}</h2>
+                            <a class="condition-script" data-combatant-id="${combatant.id}" data-script-id="${i}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: label })}</a>
+                        `
+                        await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
+                        i++;
+                    }
+                }
             }
-
         }
         WFRP_Audio.PlayContextAudio({ item: { type: 'round' }, action: "change" })
     }

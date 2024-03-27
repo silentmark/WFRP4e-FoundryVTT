@@ -46,7 +46,7 @@ export default class RollDialog extends Application {
         // A specific object is needed as it must be cleared every render when scripts run again
         this.flags = {};
 
-        this.data.scripts = this._consolidateScripts(data.scripts);
+        this.data.scripts = this._consolidate(data.scripts);
 
         if (resolve)
         {
@@ -148,10 +148,14 @@ export default class RollDialog extends Application {
         // Reset values so they don't accumulate 
         this.tooltips.clear();
         this.flags = {};
-        this.fields = this._defaultFields();
 
         this.tooltips.start(this);
-        mergeObject(this.fields, this.initialFields);
+        
+        this.fields.slBonus = this.initialFields.slBonus;
+        this.fields.modifier = this.initialFields.modifier;
+        this.fields.successBonus = this.initialFields.successBonus;
+        this.fields.difficulty = this.initialFields.difficulty;
+
         this.tooltips.finish(this, this.options.initialTooltip || "Initial")
 
         this.tooltips.start(this);
@@ -191,7 +195,7 @@ export default class RollDialog extends Application {
      * same. When executed, execute it the number of times there are scripts
      * 
      */
-    _consolidateScripts(scripts)
+    _consolidate(scripts)
     {
         let consolidated = []
 
@@ -350,6 +354,9 @@ export default class RollDialog extends Application {
         }
 
         this.userEntry[ev.currentTarget.name] = value;
+        if (!["modifier", "slBonus", "successBonus", "difficulty"].includes(ev.currentTarget.name)) {
+            this.fields[ev.currentTarget.name] = this.userEntry[ev.currentTarget.name];
+        }
 
         this.render(true);
     }

@@ -293,6 +293,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       },    
       options : options || {}         // Application/optional properties
     }
+    dialogData.fields.ingredientMode = 'none';
     return this._setupTest(dialogData, CastDialog)
   }
 
@@ -317,6 +318,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       },    
       options : options || {}         // Application/optional properties
     }
+    dialogData.fields.ingredientMode = 'none';
     return this._setupTest(dialogData, ChannellingDialog)
   }
 
@@ -2093,8 +2095,8 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
   get auras() 
   {
-    let itemEffects = this.items.reduce((acc, item) => acc.concat(item.effects.contents), []).filter(e => e.applicationData.type == "aura" && e.applicationData.documentType == "Actor" && (e.applicationData.targetedAura == "target" || e.applicationData.targetedAura == "all"));
-    let actorEffects = this.effects.contents.filter(e => e.applicationData.type == "aura" && (e.applicationData.targetedAura == "target" || e.applicationData.targetedAura == "all"));
+    let itemEffects = this.items.reduce((acc, item) => acc.concat(item.effects.contents), []).filter(e => e.applicationData.type == "aura" && e.applicationData.documentType == "Actor" && e.applicationData.targetedAura != "self");
+    let actorEffects = this.effects.contents.filter(e => e.applicationData.type == "aura" && e.applicationData.targetedAura != "self");
     let effects = itemEffects.concat(actorEffects);
     return effects;
   }

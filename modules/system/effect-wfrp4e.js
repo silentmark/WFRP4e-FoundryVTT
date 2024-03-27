@@ -345,6 +345,7 @@ export default class EffectWfrp4e extends ActiveEffect
         let application = this.applicationData;
 
         let allowed = (application.type == "document" && application.documentType == "Actor");
+        allowed = allowed || (application.type == "aura" && application.documentType == "Actor" && application.targetedAura == "all");
 
         if (this.parent.documentName == "Item" && this.parent.type != "base")
         {
@@ -365,10 +366,10 @@ export default class EffectWfrp4e extends ActiveEffect
         // An applied targeted aura should stay as an aura type, but it is no longer targeted
         if (effect.flags.wfrp4e.applicationData.type == "aura")
         {
-            if ((effect.flags.wfrp4e.applicationData.targetedAura == "target" || effect.flags.wfrp4e.applicationData.targetedAura == "all") && this.actor.id == targetActor?.id)
+            if (effect.flags.wfrp4e.applicationData.targetedAura != "self" && this.actor.id == targetActor?.id)
             {
-                effect.flags.wfrp4e.applicationData.radius = effect.flags.wfrp4e.applicationData.radius || test.result.overcast.usage.target.current?.toString();
-                effect.flags.wfrp4e.applicationData.targetedAura = false;
+                effect.flags.wfrp4e.applicationData.radius = test?.result?.overcast?.usage?.target?.current.toString() || effect.flags.wfrp4e.applicationData.radius;
+                effect.flags.wfrp4e.applicationData.targetedAura = "self";
             }
             else 
             {
@@ -590,7 +591,7 @@ export default class EffectWfrp4e extends ActiveEffect
 
     get isTargetApplied()
     {
-        return this.applicationData.type == "target" || (this.applicationData.type == "aura" && (this.applicationData.targetedAura == "target" || this.applicationData.targetedAura == "all"))
+        return this.applicationData.type == "target" || (this.applicationData.type == "aura" && this.applicationData.targetedAura != "self")
     }
 
     get isAreaApplied()
@@ -606,7 +607,7 @@ export default class EffectWfrp4e extends ActiveEffect
         {
             return test;
         }
-        else if (test.data)
+        else if (test?.data)
         {
             return TestWFRP.recreate(test.data);
         }
