@@ -37,7 +37,7 @@ export default class RollDialog extends Application {
 
         this.initialFields = mergeObject(this._defaultFields(), fields);
         this.fields = this._defaultFields();
-        this.userEntry = this._defaultFields();
+        this.userEntry = {};
 
         // If an effect deems this dialog cannot be rolled, it can switch this property to true and the dialog will close
         this.abort = false;
@@ -159,13 +159,18 @@ export default class RollDialog extends Application {
         this.tooltips.finish(this, this.options.initialTooltip || "Initial")
 
         this.tooltips.start(this);
-        this.fields.modifier += this.userEntry.modifier
-        this.fields.slBonus += this.userEntry.slBonus
-        this.fields.successBonus += this.userEntry.successBonus
-        if (this.userEntry.difficulty) {
-            this.fields.difficulty = this.userEntry.difficulty;
+        for(let key in this.userEntry)
+        {
+            if (["string", "boolean"].includes(typeof this.userEntry[key]))
+            {
+                this.fields[key] = this.userEntry[key]
+            }
+            else if (Number.isNumeric(this.userEntry[key]))
+            {
+                this.fields[key] += this.userEntry[key];
+            }
         }
-        this.tooltips.finish(this, "Modyfikacja Ręczna")
+        this.tooltips.finish(this, "Modyfikacja Ręczna");
 
         // For some reason cloning the scripts doesn't prevent isActive and isHidden from persisisting
         // So for now, just reset them manually
@@ -354,9 +359,6 @@ export default class RollDialog extends Application {
         }
 
         this.userEntry[ev.currentTarget.name] = value;
-        if (!["modifier", "slBonus", "successBonus", "difficulty"].includes(ev.currentTarget.name)) {
-            this.fields[ev.currentTarget.name] = this.userEntry[ev.currentTarget.name];
-        }
 
         this.render(true);
     }
