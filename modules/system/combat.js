@@ -105,6 +105,10 @@ export default class CombatHelpers {
                 await combatant.actor.removeSystemEffect("dualwielder");
             }
 
+            if (combatant.actor.hasCondition("defensive")) {
+                await combatant.actor.removeCondition("defensive");
+            }
+
             if (game.settings.get("wfrp4e", "statusOnTurnStart")) {
                 let nameOverride =  combat.combatant.hidden ? "???" : combatant.name;
                 combatant.actor.displayStatus(combat.round, nameOverride);

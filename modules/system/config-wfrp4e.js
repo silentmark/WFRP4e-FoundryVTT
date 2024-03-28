@@ -717,6 +717,7 @@ WFRP4E.conditions = {
     "grappling": "WFRP4E.ConditionName.Grappling",
     "fear": "WFRP4E.ConditionName.Fear",
     "engaged": "WFRP4E.ConditionName.Engaged",
+    "defensive": "Pozycja Obronna",
     "defeated": "WFRP4E.ConditionName.Defeated"
 }
 
@@ -1575,29 +1576,6 @@ WFRP4E.PrepareSystemItems = function() {
                 }
             }
         },
-        "defensive" : {
-            name: game.i18n.localize("EFFECT.OnDefensive"),
-            icon: "",
-            statuses : ["defensive"],
-            flags : {
-                wfrp4e : {
-                    applicationData : {},
-                    scriptData : [
-                        {
-                            label : "@effect.name",
-                            trigger : "dialog",
-                            script : `args.prefillModifiers.modifier += 20`,
-                            options : {
-                                dialog : {
-                                    hideScript : "return !this.actor.isOpposing",
-                                    activateScript : `this.actor.isOpposing`
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        },
         "dualwielder" : {
             name: game.i18n.localize("EFFECT.DualWielder"),
             icon: "modules/wfrp4e-core/icons/talents/dual-wielder.png",
@@ -2152,7 +2130,6 @@ WFRP4E.PrepareSystemItems = function() {
             flags: {
                 wfrp4e: {
                     value: 1,
-                    trigger: "endRound",
                     applicationData : {
                         conditionTrigger : "startTurn"
                     },
@@ -2332,6 +2309,31 @@ WFRP4E.PrepareSystemItems = function() {
             flags: {
                 wfrp4e: {
                     "value": null
+                }
+            }
+        },
+        {
+            icon: "icons/svg/shield.svg",
+            id: "defensive",
+            statuses : ["defensive"],
+            name: "Pozycja obronna",
+            flags : {
+                wfrp4e : {
+                    value: null,
+                    applicationData : {},
+                    scriptData : [
+                        {
+                            label : "Pozycja obronna",
+                            trigger : "dialog",
+                            script : `args.prefillModifiers.modifier += 20`,
+                            options : {
+                                dialog : {
+                                    hideScript : "return !this.actor.isOpposing",
+                                    activateScript : `return this.actor.isOpposing`
+                                }
+                            }
+                        }
+                    ]
                 }
             }
         },

@@ -853,19 +853,19 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       let armour = actor.items.filter(x => (x.type =="weapon" && x.properties.qualities.shield && x.equipped) || 
                                            (x.type == "armour" && x.worn && (!x.isMagical || isMagical)));
       let protectingArmour = armour.filter(x => x.currentAP && x.currentAP[APlocation] > 0);
-      let armourToDamage = null;
-      if (protectingArmour.find(x => x.system.special.value?.indexOf("Warstwa Zewnętrzna") != -1))  {
-        armourToDamage = protectingArmour.find(x=>x.system.special.value?.indexOf("Warstwa Zewnętrzna") != -1);
-      } else if (protectingArmour.find(x => x.system.special.value?.indexOf("Warstwa Uzupełniająca") != -1)) {
-        armourToDamage = protectingArmour.find(x=>x.system.special.value?.indexOf("Warstwa Uzupełniająca") != -1);
-      } else if (protectingArmour.length > 0) {
-        armourToDamage = protectingArmour[0];
-      } else {
+      let armourToDamage = protectingArmour.find(x => x.properties.qualities.outer);
+      if (!armourToDamage) {
+        armourToDamage = protectingArmour.find(x => x.properties.qualities.complementary);
+      }
+      if (!armourToDamage) {
+        armourToDamage = protectingArmour.find(x => x.properties.qualities.inner);
+      }
+      if (!armourToDamage) {
         armourToDamage = armour.find(x => x.type =="weapon" && x.properties.qualities.shield && x.equipped)
       }
 
       if (armourToDamage) {
-        let itemData = armourToDamage.toObject()
+        let itemData = armourToDamage.toObject();
         if (armourToDamage.AP) {
           let maxDamageAtLocation = armourToDamage.AP[APlocation] + Number(armourToDamage.properties.qualities.durable?.value || 0)
           itemData.system.APdamage[APlocation] = Math.min(maxDamageAtLocation, itemData.system.APdamage[APlocation] + 1);
