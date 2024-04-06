@@ -44,7 +44,7 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
 
 
     // @@@@ _onHook Listeners @@@@
-    _onCreate(data, options, user) {
+    async _onCreate(data, options, user) {
         if (game.user.id != user) {
             return;
         }
@@ -56,19 +56,20 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
         }
     }
 
-    _onUpdate(data, options, user) {
+    async _onUpdate(data, options, user) {
         if (game.user.id != user) {
             return;
         }
 
-        super._onUpdate(data, options, user);
+        await super._onUpdate(data, options, user);
         let update = this.system.updateChecks(data, options, user)
         if (!foundry.utils.isEmpty(update)) {
-            this.update(update);
+            await this.update(update);
         }
+        await Promise.all(this.runScripts("update", {data, options, user}))
     }
 
-    _onDelete(options, user) {
+    async _onDelete(options, user) {
         super._onDelete(options, user);
         this.system.deleteChecks(options, user);
     }

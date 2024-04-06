@@ -1952,7 +1952,7 @@ WFRP4E.PrepareSystemItems = function() {
                         },
                         {
                             trigger: "dialog",
-                            label : "@effect.name",
+                            label : "Kara do wszystkich testów (@effect.name)",
                             script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
                             options : {
                                 dialog : {
@@ -2074,7 +2074,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "dialog",
-                            label : "@effect.name - wszystkie testy",
+                            label : "Kara do wszystkich testów (@effect.name)",
                             script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
                             options : {
                                 dialog : {

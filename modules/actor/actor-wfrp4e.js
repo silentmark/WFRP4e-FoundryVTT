@@ -83,7 +83,6 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     }
 
     await super._onCreate(data, options, user);
-    await Promise.all(this.runScripts("update", {data, options, user}))
     // this.system.checkSize();
   }
 
@@ -105,7 +104,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     let effects;
     if (collection == "items")
     {
-      effects = documents.reduce((effects, item) => effects.concat(item.effects.map(x=>x)), []);
+      effects = documents.reduce((effects, item) => effects.concat(item.effects.contents), []);
     }
     else if (collection == "effects")
     {
@@ -171,7 +170,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     }
     if (dialogData.data.hitLoc)
     {
-      dialogData.fields.hitLocation = "roll", // Default a WS or BS test to have hit location;
+      dialogData.fields.hitLocation = dialogData.fields.hitLocation || "roll", // Default a WS or BS test to have hit location if not specified;
       dialogData.data.hitLocationTable = game.wfrp4e.tables.getHitLocTable(dialogData.data.targets[0]?.actor?.details?.hitLocationTable?.value || "hitloc");
     }
     else 
@@ -845,39 +844,11 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       else
         updateMsg += `<br><a class ="table-click critical-roll" data-table = "crit${opposedTest.result.hitloc.value}" ><i class='fas fa-list'></i> ${game.i18n.localize("Critical")}</a>`
     }
-    if (hack) {
-      let isMagical = opposedTest.attackerTest.item?.isMagical || false;
-      let APlocation = opposedTest.result.hitloc.value;
-      let armour = actor.items.filter(x => (x.type =="weapon" && x.properties.qualities.shield && x.equipped) || 
-                                           (x.type == "armour" && x.worn && (!x.isMagical || isMagical)));
-      let protectingArmour = armour.filter(x => x.currentAP && x.currentAP[APlocation] > 0);
-      let armourToDamage = protectingArmour.find(x => x.properties.qualities.outer);
-      if (!armourToDamage) {
-        armourToDamage = protectingArmour.find(x => x.properties.qualities.complementary);
-      }
-      if (!armourToDamage) {
-        armourToDamage = protectingArmour.find(x => x.properties.qualities.inner);
-      }
-      if (!armourToDamage) {
-        armourToDamage = armour.find(x => x.type =="weapon" && x.properties.qualities.shield && x.equipped)
-      }
-
-      if (armourToDamage) {
-        let itemData = armourToDamage.toObject();
-        if (armourToDamage.AP) {
-          let maxDamageAtLocation = armourToDamage.AP[APlocation] + Number(armourToDamage.properties.qualities.durable?.value || 0)
-          itemData.system.APdamage[APlocation] = Math.min(maxDamageAtLocation, itemData.system.APdamage[APlocation] + 1);
-          updateMsg += `<br>${game.i18n.localize("CHAT.DamageAP")} ${game.wfrp4e.config.locations[opposedTest.result.hitloc.value]} - ${armourToDamage.name}`
-        } else {
-          let currentSheild = armourToDamage.properties.qualities.shield.value - Math.max(0, armourToDamage.damageToItem.shield - Number(armourToDamage.properties.qualities.durable?.value || 0));
-          if (currentSheild > 0) {
-            itemData.system.damageToItem.shield += 1; 
-            updateMsg += `<br>${game.i18n.localize("CHAT.DamageAP")} ${game.wfrp4e.config.locations[opposedTest.result.hitloc.value]} - ${armourToDamage.name}`
-          }
-        }
-        await actor.updateEmbeddedDocuments("Item", [itemData]);
-      }
+    if (hack)
+    {
+      updateMsg += `<br><a class="apply-hack chat-button">${game.i18n.localize('CHAT.ApplyHack')}</a>`
     }
+
     if (newWounds <= 0)
       newWounds = 0; // Do not go below 0 wounds
 
