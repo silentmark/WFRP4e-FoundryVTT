@@ -162,6 +162,10 @@ export default class AreaHelpers
 
     static async checkAreasThreadSafe(scene) {
         scene = scene || canvas.scene;
+        if (!scene)
+        {
+            return;
+        }
         let tokens = scene.tokens;
         let auras = await AreaHelpers.aurasInScene(scene);
         let templates = scene.templates.contents.map(t => t.object).concat(auras);

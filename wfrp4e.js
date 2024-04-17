@@ -74,6 +74,7 @@ import { CargoModel } from "./modules/model/item/cargo.js";
 import WFRP4eActiveEffectConfig from "./modules/apps/effect-config.js";
 import EffectWfrp4e from "./modules/system/effect-wfrp4e.js";
 import SocketHandlers from "./modules/system/socket-handlers.js";
+import loadScripts from "./loadScripts.js"
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -186,3 +187,4 @@ Hooks.once("init", function () {
 });
 
 registerHooks()
+loadScripts();
