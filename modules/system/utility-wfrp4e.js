@@ -628,7 +628,7 @@ export default class WFRP_Utility {
    * @param {String} symptom  symptom name to be posted
    */
   static async postSymptom(symptom) {
-    let symkey = WFRP_Utility.findKey(symptom.split("(")[0].trim(), game.wfrp4e.config.symptoms)
+    let symkey = WFRP_Utility.findKey(symptom.trim(), game.wfrp4e.config.symptoms)
     let content = `<b>${symptom}</b>: ${game.wfrp4e.config.symptomDescriptions[symkey]}`;
     let chatOptions = {
       user: game.user.id,
