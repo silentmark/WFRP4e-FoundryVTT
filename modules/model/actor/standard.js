@@ -112,13 +112,13 @@ export class StandardActorModel extends BaseActorModel {
         this.computeItems();
         super.computeDerived(items, flags);
         this.runScripts("computeCharacteristics", this.parent);
-        this.computeAdvantage();
-        this.computeMove();
         this.computeSize();
         if (this.checkWounds())
         {
             return;
         }
+        this.computeAdvantage();
+        this.computeMove();
         this.computeEncumbranceMax();
         this.runScripts("computeEncumbrance", this.parent);
         this.computeEncumbranceState();
@@ -155,7 +155,7 @@ export class StandardActorModel extends BaseActorModel {
         let items = this.parent.itemTypes;
         // Find size based on Traits/Talents
         let size;
-        let trait = items.trait.find(i => i.name == game.i18n.localize("NAME.Size"))
+        let trait = items.trait.find(i => i.name == game.i18n.localize("NAME.Size") && i.system.enabled)
         if (trait)
             size = WFRP_Utility.findKey(trait.specification.value, game.wfrp4e.config.actorSizes);
         if (!size) // Could not find specialization

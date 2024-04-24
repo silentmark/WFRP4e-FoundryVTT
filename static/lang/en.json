@@ -642,6 +642,8 @@
     "CHARGEN.Details.LongTermAmbitions" : "Long Term Ambition",
     "CHARGEN.Details.Eyes" : "Eyes",
     "CHARGEN.Details.Hair" : "Hair",
+    "CHARGEN.Details.Male" : "Male",
+    "CHARGEN.Details.Female" : "Female",
 
     "CHARGEN.Message.Start" : "<p><b>{user}</b> has started character generation!</p>",
     "CHARGEN.Message.Rolled" : "<p>Rolled: <b>{rolled}</b>!</p>",
@@ -1607,7 +1609,7 @@
     "EFFECT.ShootingAtEngagedTarget": "Target engaged in melee",
     "EFFECT.Applying": "Applying {name}",
     "EFFECT.NotSelf" : "Don't apply to Self",
-    "EFFECT.DeletingItems" : "Deleting Items: {items}",
+    "EFFECT.DeletingEffectItems" : "Deleting Effect Items: {items}",
     "EFFECT.PromptItem" : "Prompt Item",
     "EFFECT.ItemFilters" : "Item Filters",
     "EFFECT.ItemChoice" : "Item Choice",
@@ -1768,6 +1770,7 @@
     "BUGREPORT.Settled" : "SETTLED",
     "BUGREPORT.APiLimitReached" : "You have reached GitHub's API usage limit. You will need to either wait an hour before submitting or submit it manually on the Github website.",
     "BUGREPORT.LoadingIssues" : "Loading Issues",
+    "BUGREPORT.Troubleshooting" : "Before submitting a report, please consult the <a href='https://moo-man.github.io/WFRP4e-FoundryVTT/pages/troubleshooting.html'>Troubleshooting</a> page.",
     
     "UpdaterTitle": "Update {title} Content",
     "Updater1": "This process will import new documents and overwrite previously imported documents with their content from the Compendium.",

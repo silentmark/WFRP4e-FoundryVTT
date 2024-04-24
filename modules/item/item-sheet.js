@@ -391,11 +391,7 @@ export default class ItemSheetWfrp4e extends WFRP4eSheetMixin(ItemSheet)
     let symptoms = event.target.value.split(",").map(i => i.trim());
 
     // Extract just the name (with no severity)
-    let symtomNames = symptoms.map(s => {
-      if (s.includes("("))
-        return s.substring(0, s.indexOf("(") - 1)
-      else return s
-    })
+    let symtomNames = symptoms.map(s => s);
 
     // take those names and lookup the associated symptom key
     let symptomKeys = symtomNames.map(s => game.wfrp4e.utility.findKey(s, game.wfrp4e.config.symptoms))

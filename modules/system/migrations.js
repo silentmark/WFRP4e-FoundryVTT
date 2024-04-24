@@ -465,6 +465,11 @@ export default class Migration {
       }
     }
 
+    if (item.type == "trait")
+    {
+      updateData["system.disabled"] = item.actor?.system?.excludedTraits?.includes(item.id) || false;
+    }
+
     
     let newDescription = this._migrateV10Links(item.system.description.value);
     let newGMDescription = this._migrateV10Links(item.system.gmdescription.value);
@@ -599,7 +604,7 @@ export default class Migration {
   {
     try 
     {
-      if (!html) return 
+      if (!html) return html
       
       for(let key in this.v10Conversions)
       {
