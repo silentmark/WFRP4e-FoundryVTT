@@ -1698,7 +1698,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
   }
 
 
-  async addCondition(effect, value = 1, mergeData={}) {
+  async addCondition(effect, value = 1, mergeData={}, item = null) {
     if (value == 0) {
       return;
     }
@@ -1714,6 +1714,12 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     if (!effect.id)
       return "Conditions require an id field"
 
+    let args = { actor: this, effect, value, mergeData, abort: false, item }
+    await Promise.all(this.runScripts("preAddCondition", args));
+    if (args.abort) {
+      return;
+    }
+    
     let existing = this.hasCondition(effect.id)
 
     if (existing && !existing.isNumberedCondition) {
@@ -1771,6 +1777,12 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     }
     if (typeof value == "string") {
       value = parseInt(value)
+    }
+
+    let args = { actor: this, effect, value, abort: false }
+    await Promise.all(this.runScripts("preDeleteCondition", args));
+    if (args.abort) {
+      return;
     }
 
     let existing = this.hasCondition(effect.id);
