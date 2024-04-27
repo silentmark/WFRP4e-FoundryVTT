@@ -194,6 +194,8 @@ export default class OpposedTest {
           this.findHitLocation();
         }
 
+        opposeResult.breakdown.formatted = this.formatBreakdown();
+
         try // SOUND
         {
           if (attackerTest.weapon.weaponGroup.value === "bow"
@@ -248,7 +250,6 @@ export default class OpposedTest {
 
       Hooks.call("wfrp4e:opposedTestResult", this, attackerTest, defenderTest)
       WFRP_Audio.PlayContextAudio(soundContext)
-      opposeResult.breakdown.formatted = this.formatBreakdown();
       return opposeResult
     }
     catch (err) {
@@ -429,21 +430,21 @@ export default class OpposedTest {
       let breakdown = this.result.breakdown;
       let accumulator = Number(breakdown.base);
 
-      string += `<p><strong>Attacker Base</strong>: ${breakdown.base}</p>`;
+      string += `<p><strong>${game.i18n.localize("BREAKDOWN.AttackerBase")</strong>: ${breakdown.base}</p>`;
       if (breakdown.damaging) 
       {
         accumulator += Number(breakdown.damaging);
-        string += `<p><strong>Damaging</strong>: +${breakdown.damaging} (${accumulator})</p>`;
+        string += `<p><strong>${game.i18n.localize("PROPERTY.Damaging")}</strong>: +${breakdown.damaging} (${accumulator})</p>`;
       }
       else if (breakdown.opposedSL) 
       {
         accumulator += Number(breakdown.opposedSL);
-        string += `<p><strong>Opposed SL</strong>: +${breakdown.opposedSL} (${accumulator})</p>`;
+        string += `<p><strong>${game.i18n.localize("BREAKDOWN.OpposedSL")}</strong>: +${breakdown.opposedSL} (${accumulator})</p>`;
       }
       if (breakdown.impact) 
       {
         accumulator += Number(breakdown.impact);
-        string += `<p><strong>Impact</strong>: +${breakdown.impact} (${accumulator})</p>`;
+        string += `<p><strong>${game.i18n.localize("PROPERTY.Impact")}</strong>: +${breakdown.impact} (${accumulator})</p>`;
       }
 
       for (let source of breakdown.other) 
@@ -455,7 +456,7 @@ export default class OpposedTest {
       if (breakdown.multiplier > 1) 
       {
         accumulator *= breakdown.multiplier
-        string += `<p><strong>Multiplier</strong>: ×${breakdown.multiplier} (${accumulator})</p>`
+        string += `<p><strong>${game.i18n.localize("BREAKDOWN.Multiplier")}</strong>: ×${breakdown.multiplier} (${accumulator})</p>`
       }
     }
     catch (e) 

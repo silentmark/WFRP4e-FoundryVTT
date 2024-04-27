@@ -1062,7 +1062,7 @@ export default class TestWFRP {
           }
           else if (breakdown.slBonus < 0)
           {
-            SLstring += ` - ${breakdown.slBonus}`;
+            SLstring += ` - ${Math.abs(breakdown.slBonus)}`;
           }
           SLstring += ` (${game.i18n.localize("DIALOG.SLBonus")})`;
         }
@@ -1075,7 +1075,7 @@ export default class TestWFRP {
           }
           else if (breakdown.successBonus < 0)
           {
-            SLstring += ` - ${breakdown.successBonus}`;
+            SLstring += `- ${Math.abs(breakdown.successBonus)}`;
           }
           SLstring += ` (${game.i18n.localize("DIALOG.SuccessBonus")})`;
         }
@@ -1091,7 +1091,7 @@ export default class TestWFRP {
       // @@@@@@@@@@@@@@@@@@ Damage @@@@@@@@@@@@@@@@@@@@
       let damageBreakdown = "";
 
-      damageBreakdown += `<p><strong>Base</strong>: ${breakdown.damage.base}</p>`;
+      damageBreakdown += `<p><strong>${game.i18n.localize("BREAKDOWN.Base")}</strong>: ${breakdown.damage.base}</p>`;
       if (breakdown.damage.item)
       {
         damageBreakdown += `<p><strong>${game.i18n.localize(CONFIG.Item.typeLabels[this.item?.type])}</strong>: ${breakdown.damage.item}</p>`;

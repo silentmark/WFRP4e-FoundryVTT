@@ -571,6 +571,7 @@ export default class ChatWFRP {
     if (lore)
     {
       applyData = {effectData : [item.system.lore.effect.toObject()]}
+      effect = item.system.lore.effect;
     }
     else if (uuid)
     {

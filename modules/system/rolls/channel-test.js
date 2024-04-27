@@ -10,14 +10,14 @@ export default class ChannelTest extends TestWFRP {
     this.preData.malignantInfluence = data.malignantInfluence;
     this.preData.unofficialGrimoire = game.settings.get("wfrp4e", "unofficialgrimoire");
     this.preData.ingredientMode = data.ingredientMode ?? "none";
-
+    this.data.preData.skill = data.skill.id;
     this.data.context.channelUntilSuccess = data.channelUntilSuccess
 
     this.computeTargetNumber();
   }
 
   computeTargetNumber() {
-    let skill = this.preData.skill
+    let skill = this.actor.items.get(this.preData.skill);
     if (!skill)
       this.result.target = this.actor.system.characteristics[this.characteristicKey].value
     else
