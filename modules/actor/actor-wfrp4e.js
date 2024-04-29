@@ -67,12 +67,19 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
 
   async _onUpdate(data, options, user) {
-    if (game.user.id != user) {
-      return
+    await super._onUpdate(data, options, user);
+
+    if (options.deltaWounds) {
+      this._displayScrollingChange(options.deltaWounds > 0 ? "+" + options.deltaWounds : options.deltaWounds);
+    }
+    if (options.deltaAdv) {
+        this._displayScrollingChange(options.deltaAdv, { advantage: true });
     }
 
-
-    await super._onUpdate(data, options, user);
+    if (game.user.id != user) 
+    {
+      return
+    }
     await Promise.all(this.runScripts("update", {data, options, user}))
     // this.system.checkSize();
   }
@@ -999,7 +1006,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
         for (let uuid of effectUuids)
         {
-            let effect = fromUuidSync(uuid);
+            let effect = await fromUuid(uuid);
             let message = game.messages.get(messageId);
             let data = effect.convertToApplied(message?.getTest(), this);
             effectData.push(data);

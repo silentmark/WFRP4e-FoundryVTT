@@ -1436,7 +1436,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData : [
                         {
                             label : "@effect.name",
-                            trigger : "mantual",
+                            trigger : "manual",
                             script : `
                             let tb = this.actor.characteristics.t.bonus
                             let damage = (await new Roll("1d10").roll()).total

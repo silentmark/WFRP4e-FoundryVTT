@@ -9,7 +9,7 @@ export default class WeaponTest extends AttackTest {
       return
     this.preData.ammoId = data.ammo?.id // TODO vehicle shit
     this.preData.charging = data.charging || false;
-    this.preData.infighter = data.infighter || false;
+    this.preData.infighter = data.infighter || !!actor?.has(game.i18n.localize("NAME.Infighter"), "talent"); // I don't like this but it's really awkward to implement with scripts
     this.preData.resolute = data.resolute || 0;
     this.preData.dualWielding = data.dualWielding || false;
 
@@ -76,7 +76,7 @@ export default class WeaponTest extends AttackTest {
       {
         let damageMod = (Math.floor(this.targetModifiers / 10) || 0)
         this.result.damage -= damageMod
-        this.context.breakdown.damage.other.push({label : ${game.i18n.localize("BREAKDOWN.Moo")}, value : -damageMod});
+        this.context.breakdown.damage.other.push({label : game.i18n.localize("BREAKDOWN.Moo"), value : -damageMod});
         if (this.result.damage < 0)
           this.result.damage = 0
       }

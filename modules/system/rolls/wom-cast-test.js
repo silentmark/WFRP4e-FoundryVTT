@@ -55,7 +55,7 @@ export default class WomCastTest extends CastTest {
         if (this.result.overcast.usage.damage && this.result.overcast.usage.damage.count > 0) {
           let overcastDamage = overCastTable.damage[this.result.overcast.usage.damage.count - 1].value
           this.result.additionalDamage += overcastDamage
-          damageBreakdown.other.push({label : ${game.i18n.localize("Overcast")}, value : overcastDamage});
+          damageBreakdown.other.push({label : game.i18n.localize("Overcast"), value : overcastDamage});
           this.result.damage += this.result.additionalDamage
         }
       }
@@ -64,7 +64,7 @@ export default class WomCastTest extends CastTest {
         this.result.diceDamage = { value: roll.total, formula: roll.formula };
         this.preData.diceDamage = this.result.diceDamage
         this.result.additionalDamage += roll.total;
-        damageBreakdown.other.push({label : ${game.i18n.localize("Dice")}, value : roll.total});
+        damageBreakdown.other.push({label : game.i18n.localize("Dice"), value : roll.total});
         this.preData.additionalDamage = this.result.additionalDamage;
       }
     }
@@ -198,7 +198,8 @@ export default class WomCastTest extends CastTest {
       }
 
       // Subtract SL by the amount spent on overcasts
-      this.data.result.SL = `+${overcastData.originalSL - (overcastData.total - overcastData.available)}`
+      // Math.max is for preventing negative SL, this occurs with Dhar overcast rules from, which don't really work well with WoM overcast
+      this.data.result.SL = `+${Math.max(0, overcastData.originalSL - (overcastData.total - overcastData.available))}`
       await this.calculateDamage()
       await this.updateMessageFlags();
       this.renderRollCard()
