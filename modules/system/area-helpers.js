@@ -189,8 +189,8 @@ export default class AreaHelpers
                 let auraTokenUuid = template.document.getFlag("wfrp4e", "auraToken");
                 if (!effectUuid) continue;
 
-                let existingEffect = token.actor.currentAreaEffects.find(effect => effect.getFlag("wfrp4e", "fromArea") == areaUuid && !effect.applicationData.keep)
-                                    ?? token.actor.auras.find(effect => effect.uuid == effectUuid);
+                let existingEffect = token.actor?.currentAreaEffects.find(effect => effect.getFlag("wfrp4e", "fromArea") == areaUuid && !effect.applicationData.keep)
+                                    ?? token.actor?.auras.find(effect => effect.uuid == effectUuid);
                 let inTemplate = AreaHelpers.isInTemplate(token, template)
                 if (inTemplate && !existingEffect) {
                     let effect = template.document.areaEffect() || template.auraEffect;
@@ -200,7 +200,7 @@ export default class AreaHelpers
                         let effectData = effect.convertToApplied(game.messages.get(messageId)?.getTest(), token.actor);
                         setProperty(effectData, "flags.wfrp4e.fromArea", areaUuid);
                         // Can't just send UUID because we need to include fromArea flags
-                        await token.actor.applyEffect({effectData : [effectData], messageId});
+                        token.actor?.applyEffect({effectData : [effectData], messageId});
                     }
                 } else if (!inTemplate && existingEffect && !template.document.getFlag("wfrp4e", "instantaneous") && auraTokenUuid != token.uuid) {// If not in template, remove all effects originating from that template
                     await existingEffect.delete();
@@ -228,7 +228,7 @@ export default class AreaHelpers
             if (!token.actor)
                 continue;
 
-            let auraEffects = token.actor.auras;
+            let auraEffects = token.actor?.auras;
             for (let effect of auraEffects) {
                 templates.push(this.auraEffectToTemplate(effect, token.object));
             }
