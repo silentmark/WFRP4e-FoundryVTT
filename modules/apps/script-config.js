@@ -59,8 +59,7 @@ export default class ScriptConfig extends FormApplication
                 keyboardHandler : "ace/mode/vscode",
                 printMargin : 0,
                 maxLines: 999999,
-                indentedSoftWrap: false,
-                esVersion: 13,
+                indentedSoftWrap: false
             }));
             this.editor.session.on('changeMode', function(e, session){
                 if ("ace/mode/javascript" === session.getMode().$id) {

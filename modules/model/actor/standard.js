@@ -63,6 +63,7 @@ export class StandardActorModel extends BaseActorModel {
     computeItems()
     {
         const inContainers = []; // inContainers is the temporary storage for items within a container
+        this.status.encumbrance.current = 0;
         for (let i of this.parent.items) {
             i.prepareOwnedData()
             if (i.location && i.location.value == "0") 

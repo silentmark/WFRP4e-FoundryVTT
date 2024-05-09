@@ -1225,7 +1225,7 @@ WFRP4E.PrepareSystemItems = function() {
                                     }
                                 },
                                 {
-                                    label : "@effect.name",
+                                    label : game.i18n.localize("NAME.Fear"),
                                     trigger : "immediate",
                                     script : `
                                     let name = this.item?.flags?.wfrp4e?.fearName
@@ -1248,7 +1248,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("NAME.Terror"),
                             trigger : "immediate",
                             script : `
                             let terror = this.effect.flags.wfrp4e.terrorValue;
@@ -1280,7 +1280,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("EFFECT.Encumbrance") + " 1",
                             trigger : "prePrepareData",
                             script : `
                             args.actor.characteristics.ag.modifier -= 10;
@@ -1306,7 +1306,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("EFFECT.Encumbrance") + " 2",
                             trigger : "prePrepareData",
                             script : `
                             args.actor.characteristics.ag.modifier -= 20;
@@ -1331,7 +1331,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("EFFECT.Encumbrance") + " 3",
                             trigger : "prePrepareData",
                             script : "args.actor.details.move.value = 0;"
                         }
@@ -1378,7 +1378,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("EFFECT.ColdExposure") + " 3",
                             trigger : "manual",
                             script : `
                             let tb = this.actor.characteristics.t.bonus
@@ -1435,7 +1435,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("EFFECT.HeatExposure") + " 3",
                             trigger : "manual",
                             script : `
                             let tb = this.actor.characteristics.t.bonus
@@ -1487,7 +1487,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("EFFECT.Thirst") + " 2+",
                             trigger : "manual",
                             script : `
                             let tb = this.actor.characteristics.t.bonus
@@ -1539,7 +1539,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label :  game.i18n.localize("EFFECT.Starvation") + " 2",
                             trigger : "manual",
                             script : `
                             let tb = this.actor.characteristics.t.bonus
@@ -1565,7 +1565,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("EFFECT.Infighting"),
                             trigger : "prePrepareItem",
                             script : `
                             if (args.item.type == "weapon" && args.item.isEquipped)
@@ -1599,7 +1599,7 @@ WFRP4E.PrepareSystemItems = function() {
                     applicationData : {},
                     scriptData : [
                         {
-                            label : "@effect.name",
+                            label : game.i18n.localize("EFFECT.DualWielder"),
                             trigger : "dialog",
                             script : `args.prefillModifiers.modifier -= 10`,
                             options : {
@@ -1657,7 +1657,7 @@ WFRP4E.PrepareSystemItems = function() {
                 applicationData : {},
                 scriptData : [
                     {
-                        label : "@effect.name",
+                        label : game.i18n.localize("EFFECT.MarienburghersCourage"),
                         trigger : "dialog",
                         script : `args.prefillModifiers.modifier += 20`,
                         options : {
@@ -1687,7 +1687,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "manual",
-                            label : "@effect.name",
+                            label : "Krwawienie",
                             script : `
                             
                             let actor = this.actor;
@@ -1766,7 +1766,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "manual",
-                            label : "@effect.name - Obrażenia",
+                            label : "Zatrucie - Obrażenia",
                             script : `
                             let actor = this.actor;
                             let effect = this.effect;
@@ -1797,7 +1797,7 @@ WFRP4E.PrepareSystemItems = function() {
                         },
                         {
                             trigger: "manual",
-                            label : "@effect.name - Odporność",
+                            label : "Zatrucie - Odporność",
                             script : `
                             let actor = this.actor;
                             let effect = this.effect;
@@ -1828,7 +1828,7 @@ WFRP4E.PrepareSystemItems = function() {
                         },
                         {
                             trigger: "dialog",
-                            label : "@effect.name",
+                            label : "Zatrucie",
                             script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
                             options : {
                                 dialog : {
@@ -1855,7 +1855,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "manual",
-                            label : "@effect.name",
+                            label : "Podpalenie",
                             script : `let leastProtectedLoc;
                             let leastProtectedValue = 999;
                             for (let loc in this.actor.status.armour)
@@ -1931,7 +1931,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "manual", 
-                            label: "@effect.name - Odporność", 
+                            label: "Oszołomienie - Odporność", 
                             script: `
                             let actor = this.actor;
                             let effect = this.effect;
@@ -1971,7 +1971,7 @@ WFRP4E.PrepareSystemItems = function() {
                         },
                         {
                             trigger: "dialog",
-                            label : "Kara do wszystkich testów (@effect.name)",
+                            label : "Kara do wszystkich testów (Oszołomienie)",
                             script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
                             options : {
                                 dialog : {
@@ -1981,7 +1981,7 @@ WFRP4E.PrepareSystemItems = function() {
                         },
                         {
                             trigger: "dialog",
-                            label : "@effect.name - Bonus do testów Ataku",
+                            label : "Oszołomienie - Bonus do testów Ataku",
                             script : `args.fields.slBonus += 1`,
                             options : {
                                 dialog : {
@@ -2010,7 +2010,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "manual",
-                            label: "@effect.name",
+                            label: "Pochwycenie",
                             script: `
                                 let actor = this.actor;
                                 let effect = this.effect;
@@ -2069,7 +2069,7 @@ WFRP4E.PrepareSystemItems = function() {
                         },
                         {
                             trigger: "dialog",
-                            label : "@effect.name - Testy związane z ruchem",
+                            label : "Pochwycenie - Testy związane z ruchem",
                             script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
                             options : {
                                 dialog : {
@@ -2093,7 +2093,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "dialog",
-                            label : "Kara do wszystkich testów (@effect.name)",
+                            label : "Kara do wszystkich testów (Zmęczenie)",
                             script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
                             options : {
                                 dialog : {
@@ -2117,7 +2117,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "dialog",
-                            label : "@effect.name - Testy związane ze wzrokiem",
+                            label : "Oślepienie - Testy związane ze wzrokiem",
                             script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
                             options : {
                                 dialog : {
@@ -2155,7 +2155,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "manual",
-                            label: "@effect.name",
+                            label: "Panika",
                             script: 
                             `
                                 let actor = this.actor;
@@ -2193,7 +2193,7 @@ WFRP4E.PrepareSystemItems = function() {
                         },
                         {
                             trigger: "dialog",
-                            label : "@effect.name - Wszystkie testy nie związane z ucieczką i ukrywaniem się.",
+                            label : "Panika - Wszystkie testy nie związane z ucieczką i ukrywaniem się.",
                             script : `args.fields.modifier -= 10 * this.effect.conditionValue`,
                             options : {
                                 dialog : {
@@ -2261,7 +2261,7 @@ WFRP4E.PrepareSystemItems = function() {
                             }
                         },
                         {
-                            label : "@effect.name",
+                            label : "Strach",
                             trigger : "immediate",
                             script : `
                             let name = this.item?.flags?.wfrp4e?.fearName
@@ -2330,7 +2330,7 @@ WFRP4E.PrepareSystemItems = function() {
                     scriptData: [
                         {
                             trigger: "dialog",
-                            label : "@effect.name",
+                            label : "Związany Walką",
                             script : `args.abort = true
                             ui.notifications.error(game.i18n.localize("EFFECT.ShooterEngagedError"))`,
                             options : {
