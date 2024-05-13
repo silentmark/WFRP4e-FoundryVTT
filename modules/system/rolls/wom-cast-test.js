@@ -7,7 +7,7 @@ export default class WomCastTest extends CastTest {
   // If not, it is not available
   _calculateOverCast(slOver) {
 
-    this.result.overcasts = Math.max(0, slOver);    
+    this.result.overcasts = Math.max(0, slOver) + (this.result.totalPower ? parseInt(Math.floor(this.result.roll / 10)) : 0);    
     this.result.overcast.total = this.result.overcasts;
     this.result.overcast.available = this.result.overcasts;
     let overCastTable = game.wfrp4e.config.overCastTable;
@@ -40,6 +40,7 @@ export default class WomCastTest extends CastTest {
   }
 
   async calculateDamage() {
+    let damageBreakdown = this.result.breakdown.damage;
     this.result.additionalDamage = this.preData.additionalDamage || 0
     let overCastTable = game.wfrp4e.config.overCastTable;
     if (game.wfrp4e.config.magicWind[this.spell.lore.value] == "Dhar") {
@@ -49,8 +50,12 @@ export default class WomCastTest extends CastTest {
     try {
       if (this.item.Damage && this.result.castOutcome == "success") {
         this.result.damage = Number(this.item.Damage)
+        damageBreakdown.base = `${this.item.Damage} (${game.i18n.localize("Spell")})`
+
         if (this.result.overcast.usage.damage && this.result.overcast.usage.damage.count > 0) {
-          this.result.additionalDamage += overCastTable.damage[this.result.overcast.usage.damage.count - 1].value
+          let overcastDamage = overCastTable.damage[this.result.overcast.usage.damage.count - 1].value
+          this.result.additionalDamage += overcastDamage
+          damageBreakdown.other.push({label : game.i18n.localize("Overcast"), value : overcastDamage});
           this.result.damage += this.result.additionalDamage
         }
       }
@@ -59,6 +64,7 @@ export default class WomCastTest extends CastTest {
         this.result.diceDamage = { value: roll.total, formula: roll.formula };
         this.preData.diceDamage = this.result.diceDamage
         this.result.additionalDamage += roll.total;
+        damageBreakdown.other.push({label : game.i18n.localize("Dice"), value : roll.total});
         this.preData.additionalDamage = this.result.additionalDamage;
       }
     }
@@ -73,6 +79,7 @@ export default class WomCastTest extends CastTest {
     if (!game.settings.get("wfrp4e", "useWoMOvercast")) {
       await super._overcast(choice);
     } else {
+      let otherCost = 2;
       const overcastData = this.result.overcast
 
       if (!overcastData.available)
@@ -96,12 +103,18 @@ export default class WomCastTest extends CastTest {
       } 
       // Other options are not in the table, so assume cost is 2 per original rules
       else if (choice == "other") {
+        if (overcastData.valuePerOvercast.cost) {
+          otherCost = parseInt(eval(overcastData.valuePerOvercast.cost
+                          .replace("{{current}}", overcastData.usage[choice].current)
+                          .replace("{{count}}", overcastData.usage[choice].count)));
+        }
         if (game.wfrp4e.config.magicWind[this.spell.lore.value] == "Dhar") {
-          if (1 > overcastData.available) {
+          otherCost = Math.min(otherCost - 1, 1);
+          if (otherCost > overcastData.available) {
             return overcastData
           }
         } else {
-          if (2 > overcastData.available) {
+          if (otherCost > overcastData.available) {
             return overcastData
           }
         }
@@ -144,7 +157,7 @@ export default class WomCastTest extends CastTest {
           if (overcastData.valuePerOvercast.type == "value")
             overcastData.usage[choice].current += overcastData.valuePerOvercast.value
           else if (overcastData.valuePerOvercast.type == "SL")
-            overcastData.usage[choice].current += (parseInt(this.result.SL) + (parseInt(this.item.computeSpellPrayerFormula(undefined, false, overcastData.valuePerOvercast.additional)) || 0))
+            overcastData.usage[choice].current += (parseInt(this.result.SL) + (parseInt(this.item.system.computeSpellPrayerFormula(undefined, false, overcastData.valuePerOvercast.additional)) || 0))
           else if (overcastData.valuePerOvercast.type == "characteristic")
             overcastData.usage[choice].current += (overcastData.usage[choice].increment || 0) // Increment is specialized storage for characteristic data so we don't have to look it up
           break
@@ -154,13 +167,13 @@ export default class WomCastTest extends CastTest {
       // Subtract cost of overcasting from available SL
       // AoE is separate column from target, so must be tested separately 
       if (choice == "target" && overcastData.usage.target.AoE) {
-        overcastData.available = overcastData.available - overCastTable["AoE"][count].cost
+        overcastData.available = overcastData.available - overCastTable["AoE"][count].cost;
       } 
       else if (choice == "other") {
-        overcastData.available = overcastData.available - 2
+        overcastData.available = overcastData.available - otherCost;
       }
       else {
-        overcastData.available = overcastData.available - overCastTable[choice][count].cost
+        overcastData.available = overcastData.available - overCastTable[choice][count].cost;
       }
 
       overcastData.usage[choice].count++;
@@ -185,7 +198,8 @@ export default class WomCastTest extends CastTest {
       }
 
       // Subtract SL by the amount spent on overcasts
-      this.data.result.SL = `+${overcastData.originalSL - (overcastData.total - overcastData.available)}`
+      // Math.max is for preventing negative SL, this occurs with Dhar overcast rules from, which don't really work well with WoM overcast
+      this.data.result.SL = `+${Math.max(0, overcastData.originalSL - (overcastData.total - overcastData.available))}`
       await this.calculateDamage()
       await this.updateMessageFlags();
       this.renderRollCard()

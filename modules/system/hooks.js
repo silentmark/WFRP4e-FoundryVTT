@@ -2,6 +2,7 @@ import controlButtons from "../hooks/getSceneControlButtons.js"
 import keepId from "../hooks/keepId.js"
 import settings from "../hooks/settings.js"
 import notes from "../hooks/note.js"
+import activeEffects from "../hooks/activeEffect.js"
 import WFRP_Utility from "./utility-wfrp4e.js"
 import i18n from "../hooks/i18n.js"
 import init from "../hooks/init.js"
@@ -10,15 +11,13 @@ import canvas from "../hooks/canvas.js"
 import chat from "../hooks/chat.js"
 import combat from "../hooks/combat.js"
 import hotbarDrop from "../hooks/hotbarDrop.js"
-import actor from "../hooks/actor.js"
-import item from "../hooks/item.js"
-import activeEffects from "../hooks/activeEffects.js"
 import journal from "../hooks/journal.js"
 import sidebar from "../hooks/sidebar.js"
 import rolltable from "../hooks/rolltable.js"
 import entryContext from "../hooks/entryContext.js"
 import token from "../hooks/token.js"
 import handlebars from "../hooks/handlebars.js"
+import templates from "../hooks/templates.js"
 
 export default function registerHooks() {
     init()
@@ -28,9 +27,6 @@ export default function registerHooks() {
     combat()
     controlButtons()
     hotbarDrop()
-    actor()
-    item()
-    activeEffects()
     journal()
     sidebar()
     rolltable()
@@ -40,8 +36,9 @@ export default function registerHooks() {
     i18n();
     settings();
     keepId();
+    templates();
     notes();
-
+    activeEffects();
 
     // #if _ENV === "development"
     Hooks.on("renderApplication", (app, html, data) => {

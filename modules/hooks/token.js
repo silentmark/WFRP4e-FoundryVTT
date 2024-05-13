@@ -1,6 +1,5 @@
-import WFRP_Utility from "../system/utility-wfrp4e.js";
-import AbilityTemplate from "../system/aoe.js";
 import passengerRender from "../system/passengerRender.js"
+import AreaHelpers from "../system/area-helpers.js";
 
 export default function() {
   // Adds tooltips to conditions in the condition menu
@@ -12,9 +11,14 @@ export default function() {
     }
   })
 
+  Hooks.on("preUpdateToken", (token, data) => 
+  {
+      // AreaHelpers.checkTokenUpdate(token, data, canvas.templates.placeables);
+  });
 
 
-  Hooks.on("createToken", async (token) => {
+
+  Hooks.on("createToken", async (token, data, user) => {
 
     if(game.user.isUniqueGM) // Prevents multiple mount tokens
     {
@@ -44,11 +48,18 @@ export default function() {
               scene : scene._id,
               token : mountToken._id
             }
-          token.actor.update({"system.status.mount.isToken" : true, "system.status.mount.tokenData" : tokenData})
+          await token.actor.update({"system.status.mount.isToken" : true, "system.status.mount.tokenData" : tokenData})
         }
       }
+
+      token.object.renderAuras();
+      AreaHelpers.checkAreas(scene);
     }
 
+    if (game.user.id == user)
+    {
+      await Promise.all(token.actor.runScripts("createToken", token));
+    }
   })
 
   Hooks.on("updateToken", (token, updateData, options) => {
@@ -70,8 +81,22 @@ export default function() {
 
           }
         }
+        if (updateData.x || updateData.y)
+        {
+          AreaHelpers.checkAreas(scene)
+        }
       }
-  })
+      // Empty resolve for when there's no token animation
+      (token.object._animation || Promise.resolve()).then(() => {
+        token.object.renderAuras();
+      })
+    })
+
+
+    // If deleted token has an aura, need to check areas
+    Hooks.on("deleteToken", async (token, data, user) => {
+      AreaHelpers.checkAreas(token.parent)
+    })
 
   Hooks.on('renderTokenHUD', (hud, html) => {
     _addMountButton(hud, html)
@@ -83,7 +108,11 @@ export default function() {
       token.passengers?.destroy();
     else
       passengerRender(token);
-  })
+    })
+    
+
+
+
   
   function _addMountButton(hud, html)
   {
@@ -158,5 +187,4 @@ export default function() {
       html.find('.col.right').append(button);
 
   }
-
 }

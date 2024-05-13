@@ -7,14 +7,14 @@ export default class CombatHelpers {
     static scripts = {
         startCombat: [CombatHelpers.checkFearTerror],
         endCombat: [CombatHelpers.clearCombatantAdvantage, CombatHelpers.checkCorruption, CombatHelpers.checkInfection, CombatHelpers.checkDiseases],
-        startTurn: [CombatHelpers.startTurnChecks],
-        endTurn: [CombatHelpers.endTurnChecks],
+        startTurn: [CombatHelpers.checkStartTurnConditions],
+        endTurn: [CombatHelpers.checkEndTurnConditions],
         endRound: [CombatHelpers.checkEndRoundConditions, CombatHelpers.fearReminders]
     }
 
     static async preUpdateCombat(combat, updateData, context) {
-        const previousId = combat.combatant?.id;
-        const path = "wfrp4e.previousCombatant";
+        const previousId = getProperty(context, "wfrp4e-pl-addons.pc") ?? combat.combatant?.id;
+        const path = "wfrp4e.previousCombatant";     
         foundry.utils.setProperty(context, path, previousId);
     
         const prevPath = "wfrp4e.previousTR";
@@ -33,6 +33,10 @@ export default class CombatHelpers {
 
         for (let script of CombatHelpers.scripts.startCombat) {
             await script(combat);
+        }
+        for (let turn of combat.turns) {
+            await Promise.all(turn.actor.runScripts("startCombat", {combat}, true));
+            Hooks.callAll("wfrp4e:startCombat", combat);
         }
     }
 
@@ -68,6 +72,11 @@ export default class CombatHelpers {
                 for (let script of CombatHelpers.scripts.endRound) {
                     await script(combat);
                 }
+                
+                for (let turn of combat.turns) {
+                    await Promise.all(turn.actor.runScripts("endRound", {combat}, true));
+                    Hooks.callAll("wfrp4e:endRound", combat);
+                }
             }
         }
         
@@ -75,21 +84,30 @@ export default class CombatHelpers {
             for (let script of CombatHelpers.scripts.endTurn) {
                 await script(combat, previousCombatant);
             }
+            await Promise.all(previousCombatant.actor.runScripts("endTurn", {combat, previousCombatant}, true));
+            Hooks.callAll("wfrp4e:endTurn", combat, previousCombatant);
         }
         if (currentCombatant) {
             for (let script of CombatHelpers.scripts.startTurn) {
                 await script(combat, currentCombatant);
             }
+            await Promise.all(currentCombatant.actor.runScripts("startTurn", {combat, currentCombatant}, true));
+            Hooks.callAll("wfrp4e:startTurn", combat, currentCombatant);
         }
     }
 
-    static async startTurnChecks(combat, combatant) {
+    static async checkStartTurnConditions(combat, combatant) {
         if (!game.user.isUniqueGM)
             return
 
         if (combatant) {
-            if (combatant.actor.hasSystemEffect("dualwielder"))
+            if (combatant.actor.hasSystemEffect("dualwielder")) {
                 await combatant.actor.removeSystemEffect("dualwielder");
+            }
+
+            if (combatant.actor.hasCondition("defensive")) {
+                await combatant.actor.removeCondition("defensive");
+            }
 
             if (game.settings.get("wfrp4e", "statusOnTurnStart")) {
                 let nameOverride =  combat.combatant.hidden ? "???" : combatant.name;
@@ -101,34 +119,36 @@ export default class CombatHelpers {
                 canvas.tokens.cycleTokens(1, true);
             }
 
-            let msgContent = ""
-            let startTurnConditions = combatant.actor.actorEffects.filter(e => e.conditionTrigger == "startTurn")
+            let startTurnConditions = combatant.actor.effects.contents.filter(e => e.applicationData?.conditionTrigger == "startTurn")
             for (let cond of startTurnConditions) {
-                if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
-                    let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
-                    if (Number.isNumeric(cond.flags.wfrp4e.value))
-                        conditionName += ` ${cond.flags.wfrp4e.value}`
-                    msgContent = `
-                <h2>${conditionName}</h2>
-                <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
-                    await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
+                let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
+                if (Number.isNumeric(cond.flags.wfrp4e.value))
+                    conditionName += ` ${cond.flags.wfrp4e.value}`
+                let i = 0;
+                for (let script of cond.scripts) {
+                    if (script.trigger == "manual") {
+                        let label = script.Label
+                        let msgContent = `
+                            <h2>${conditionName}</h2>
+                            <a class="condition-script" data-combatant-id="${combatant.id}" data-script-id="${i}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: label })}</a>
+                        `
+                        await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
+                        i++;
+                    }
                 }
             }
-
-            await combatant.actor.runEffects("startTurn", combat)
         }
         WFRP_Audio.PlayContextAudio({ item: { type: 'round' }, action: "change" })
     }
-    
-    static async endTurnChecks(combat, combatant) {
+
+    static async checkEndTurnConditions(combat, combatant) {
         if (!game.user.isUniqueGM)
             return
 
         if (combatant) {
             let msgContent = ""
-            let endTurnConditions = combatant.actor.actorEffects.filter(e => e.conditionTrigger == "endTurn")
+            let endTurnConditions = combatant.actor.effects.contents.filter(e => e.applicationData?.conditionTrigger == "endTurn")
             for (let cond of endTurnConditions) {
-                if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
                     let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
                     if (Number.isNumeric(cond.flags.wfrp4e.value))
                         conditionName += ` ${cond.flags.wfrp4e.value}`
@@ -136,9 +156,7 @@ export default class CombatHelpers {
                 <h2>${conditionName}</h2>
                 <a class="condition-script" data-combatant-id="${combatant.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
                     await ChatMessage.create({ content: msgContent, speaker: { alias: combatant.token.name } })
-                }
             }
-            await combatant.actor.runEffects("endTurn", combat)
         }
     }
 
@@ -157,6 +175,10 @@ export default class CombatHelpers {
         if (content) {
             content = `<h2>${game.i18n.localize("CHAT.EndCombat")}</h3>` + content;
             ChatMessage.create({ content, whisper: ChatMessage.getWhisperRecipients("GM") })
+        }
+        for (let turn of combat.turns) {
+            await Promise.all(turn.actor.runScripts("endCombat", {combat}, true));
+            Hooks.callAll("wfrp4e:endCombat", combat);
         }
     }
 
@@ -244,10 +266,13 @@ export default class CombatHelpers {
             if (smallerBy[6].length)
                 msg += game.i18n.format("CHAT.CausesFear", { fear: `@Terror[${6}, ${actor}]`, actor: actor, target: smallerBy[6].join(", ")});
 
-            if (Object.values(smallerBy).some(list => list.length))
+            if (Object.values(smallerBy).some(list => list.length)) {
                 msg += "<br>"
+            }
         }
-        if (msg) msg = `<br><h2>${game.i18n.localize("Size")}</h2>${msg}`
+        if (msg) {
+            msg = `<br><h2>${game.i18n.localize("Size")}</h2>${msg}`
+        }
         return msg
     }
 
@@ -331,35 +356,18 @@ export default class CombatHelpers {
         let removedConditions = []
         let msgContent = ""
         for (let turn of combat.turns) {
-            if (turn.actor.status.wounds.value == 0) {
-                if (turn.actor.status.roundsToPassOut.value < turn.actor.status.roundsToPassOut.max) {
-                    turn.actor.status.roundsToPassOut.value++;
-                    await turn.actor.update({ "system.status.roundsToPassOut.value": turn.actor.status.roundsToPassOut.value })
-                    if (turn.actor.status.roundsToPassOut.value == turn.actor.status.roundsToPassOut.max) {
-                        await turn.actor.addCondition("unconscious")
-                    }
-                }
-            } else {
-                turn.actor.status.roundsToPassOut.value = 0;
-                await turn.actor.update({ "system.status.roundsToPassOut.value": 0 })
-            }
-        }
-
-        for (let turn of combat.turns) {
-            let endRoundConditions = turn.actor.actorEffects.filter(e => e.conditionTrigger == "endRound")
+            let endRoundConditions = turn.actor.effects.contents.filter(e => e.applicationData?.conditionTrigger == "endRound")
             for (let cond of endRoundConditions) {
-                if (game.wfrp4e.config.conditionScripts[cond.conditionId]) {
-                    let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
-                    if (Number.isNumeric(cond.flags.wfrp4e.value))
-                        conditionName += ` ${cond.flags.wfrp4e.value}`
-                    msgContent = `
-              <h2>${conditionName}</h2>
-              <a class="condition-script" data-combatant-id="${turn.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
-                    await ChatMessage.create({ content: msgContent, speaker: { alias: turn.token.name } });
-                }
+                let conditionName = game.i18n.localize(game.wfrp4e.config.conditions[cond.conditionId])
+                if (Number.isNumeric(cond.flags.wfrp4e.value))
+                    conditionName += ` ${cond.flags.wfrp4e.value}`
+                msgContent = `
+            <h2>${conditionName}</h2>
+            <a class="condition-script" data-combatant-id="${turn.id}" data-cond-id="${cond.conditionId}">${game.i18n.format("CONDITION.Apply", { condition: conditionName })}</a>`
+                await ChatMessage.create({ content: msgContent, speaker: { alias: turn.token.name } });
             }
 
-            let conditions = turn.actor.actorEffects.filter(e => e.isCondition)
+            let conditions = turn.actor.effects.contents.filter(e => e.isCondition)
             for (let cond of conditions) {
                 // I swear to god whoever thought it was a good idea for these conditions to reduce every *other* round...
                 if (cond.conditionId == "deafened" || cond.conditionId == "blinded" && Number.isNumeric(cond.flags.wfrp4e.roundReceived)) {
@@ -373,8 +381,6 @@ export default class CombatHelpers {
                     }
                 }
             }
-            await turn.actor.runEffects("endRound", combat, {async: true})
-
         }
         if (removedConditions.length)
             await ChatMessage.create({ content: removedConditions.join("<br>") })
@@ -408,7 +414,6 @@ export default class CombatHelpers {
             if (!game.settings.get("wfrp4e","useGroupAdvantage")) {
                 await turn.actor.update({ "system.status.advantage.value": 0 }, {skipGroupAdvantage: true})
             }
-            await turn.actor.runEffects("endCombat", combat)
         }
     }
 }

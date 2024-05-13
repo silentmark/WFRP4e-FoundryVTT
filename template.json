@@ -339,8 +339,7 @@
         "characteristics",
         "status",
         "details"
-      ],
-      "excludedTraits": []
+      ]
     },
     "vehicle": {
       "characteristics": {
@@ -600,8 +599,7 @@
         "value": ""
       },
       "currentAmmo": {
-        "type": "Number",
-        "value": 0
+        "value": ""
       },
       "consumesAmmo" : {
         "value" : true
@@ -823,7 +821,7 @@
       "tests": {
         "type": "String",
         "label": "Tests",
-        "value": null
+        "value": ""
       }
     },
     "skill": {
@@ -974,7 +972,8 @@
         "type": "String",
         "label": "Target",
         "value": "",
-        "aoe": false
+        "aoe": false,
+        "extendableAoE": false
       },
       "damage": {
         "type": "String",
