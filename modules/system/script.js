@@ -11,30 +11,62 @@ export default class WFRP4eScript
         this.context.script = this;
     }
 
-    _handleScriptId(string)
+    _handleScriptId(string, async = false)
     {
         let script;
         let regex = /\[Script.([a-zA-Z0-9]{16})\]/gm;
         let id = Array.from(string.matchAll(regex))[0]?.[1];
         if (id)
         {
-            script = game.wfrp4e.config.effectScripts[id];
-            if (!script)
+            if (async)
             {
-                console.warn(`Script ID ${id} not found`, this);
+                return fetch("/systems/wfrp4e/scripts/" + id + ".js")
+                    .then(response => 
+                        response.text()
+                    )
+                    .then(data => {
+                        return data 
+                    });
+            }
+            else 
+            {
+                script = game.wfrp4e.config.effectScripts[id];
+                if (!script)
+                {
+                    console.warn(`Script ID ${id} not found`, this);
+                }
             }
         }
-        return script || string;
+        if (async) 
+        {
+            return new Promise(resolve => resolve(script || string));
+        } 
+        else 
+        {
+            return script || string;
+        }
     }
 
     execute(args)
     {
         try 
         {
-            let script = this._handleScriptId(this.script);
-            let scriptFunction =this.async ? Object.getPrototypeOf(async function () { }).constructor : Function;
-            game.wfrp4e.utility.log("Running Script > " + this.Label);
-            return (new scriptFunction("args",`${CONFIG.debug.scripts ? "debugger;" : ""}` + script)).bind(this.context)(args);
+            let script;
+            if (CONFIG.debug.scripts && this.async)
+            {
+                this._handleScriptId(this.script, true).then(script => {
+                    let scriptFunction = this.async ? Object.getPrototypeOf(async function () { }).constructor : Function;
+                    game.wfrp4e.utility.log("Running Script > " + this.Label);
+                    return (new scriptFunction("args", script)).bind(this.context)(args);
+                });
+            }
+            else
+            {
+                script = this._handleScriptId(this.script, false);
+                let scriptFunction = this.async ? Object.getPrototypeOf(async function () { }).constructor : Function;
+                game.wfrp4e.utility.log("Running Script > " + this.Label);
+                return (new scriptFunction("args", script)).bind(this.context)(args);
+            }
         }
         catch(e)
         {
@@ -96,7 +128,7 @@ export default class WFRP4eScript
     {
         try 
         {
-            script = this._handleScriptId(script);
+            script = this._handleScriptId(script, false);
             game.wfrp4e.utility.log("Running Script > " + this.Label);
             return new Function("args",`${CONFIG.debug.scripts ? "debugger;" : ""}` + script).bind(this.context)(args);
         }
