@@ -2331,18 +2331,23 @@
         text-align-last: center;
         box-shadow: none;
       }
-      .app.window-app.wfrp4e.actor.vehicle-sheet .inventory-list .role-actor {
+      .app.window-app.wfrp4e.actor.vehicle-sheet .inventory-list .item-actor {
         padding-top: 5px
       }
-      .app.window-app.wfrp4e.actor.vehicle-sheet .role-name,
-        .app.window-app.wfrp4e.actor.vehicle-sheet .role-skill,
-        .app.window-app.wfrp4e.actor.vehicle-sheet .role-actor {
+      .app.window-app.wfrp4e.actor.vehicle-sheet .item-name,
+        .app.window-app.wfrp4e.actor.vehicle-sheet .item-skill,
+        .app.window-app.wfrp4e.actor.vehicle-sheet .item-actor {
         flex: 1;
         text-align: center
       }
 
-      .app.window-app.wfrp4e.actor.vehicle-sheet .inventory-list .role-skill {
+      .app.window-app.wfrp4e.actor.vehicle-sheet .inventory-list .item-skill {
         line-height: 30px;
+      }
+
+      .app.window-app.wfrp4e.actor.vehicle-sheet .inventory-list .crew-test {
+        line-height: 16px;
+        margin-top: 3px;    
       }
 
       .app.window-app.wfrp4e.actor.vehicle-sheet .mod-type,
@@ -4450,6 +4455,7 @@
         }
 
   /* ================== 4. CAREER LIST ======================== */
+    .app.window-app.sheet.wfrp4e.actor .morale-log,
     .app.window-app.sheet.wfrp4e.actor .exp-log,
       .app.window-app.sheet.wfrp4e.actor .career-list {
       width: 100%;
@@ -4466,6 +4472,7 @@
     .app.window-app.sheet.wfrp4e.actor.npc-sheet .career-list {
       height: calc(100% - 30px);
     }
+    .app.window-app.sheet.wfrp4e.actor .morale-log .inventory-header,
     .app.window-app.sheet.wfrp4e.actor .exp-log .inventory-header,
     .app.window-app.sheet.wfrp4e.actor .career-list .inventory-header {
       width: 100%;
@@ -4505,6 +4512,44 @@
     .app.window-app.sheet.wfrp4e.actor .exp-log .exp-spent .exp-divisor {
       margin: 0px 5px 0px 5px;
     }
+
+    .app.window-app.sheet.wfrp4e.actor.vehicle-sheet .main .morale-log .inventory-list .content, 
+      .app.window-app.sheet.wfrp4e.actor.vehicle-sheet .main .morale-log .inventory-header{
+      padding: 0px 12px 0px 6px;
+    }
+
+    .app.window-app.sheet.wfrp4e.actor.vehicle-sheet .main .morale-log .inventory-list{
+      overflow: hidden;
+    }
+
+    .app.window-app.sheet.wfrp4e.actor .morale-log .value,
+    .app.window-app.sheet.wfrp4e.actor .morale-log .total {
+      text-align: center;
+    }
+
+    .app.window-app.sheet.wfrp4e.actor .morale-log .label
+    {
+      flex: 1;
+      text-align: left;
+    }
+
+    .app.window-app.sheet.wfrp4e.actor .morale-log .value,
+    .app.window-app.sheet.wfrp4e.actor .morale-log .total {
+      flex: 0 0 100px;
+    }
+
+
+    .app.window-app.sheet.wfrp4e.actor .morale-log a {
+      flex: 0 0 20px;
+      opacity: 0.7;
+      font-size: var(--font-size-14)
+    }
+
+    .app.window-app.sheet.wfrp4e.actor .morale-log .morale-entry::marker {
+      flex: 0 0 20px;
+    }
+
+
 
 
     .app.window-app.sheet.wfrp4e.actor .sort-items {
@@ -4553,6 +4598,7 @@
         text-align: center;
       }
       
+    .app.window-app.sheet.wfrp4e.actor .morale-log .inventory-list,
     .app.window-app.sheet.wfrp4e.actor .exp-log .inventory-list,
     .app.window-app.sheet.wfrp4e.actor .career-list .inventory-list {
       width: 100%;
@@ -4569,6 +4615,7 @@
       border-top: none;
       /* background: var(--debug-background-color-green); */
     }
+    .app.window-app.sheet.wfrp4e.actor .morale-log .inventory-list .item,
     .app.window-app.sheet.wfrp4e.actor .exp-log .inventory-list .item,
     .app.window-app.sheet.wfrp4e.actor .career-list .inventory-list .item {
       width: 100%;
@@ -4587,6 +4634,7 @@
       justify-content: space-between;
       /* background: var(--debug-background-color-green); */
     }
+    .app.window-app.sheet.wfrp4e.actor .morale-log .inventory-list .item .content,
     .app.window-app.sheet.wfrp4e.actor .exp-log .inventory-list .item .content,
     .app.window-app.sheet.wfrp4e.actor .career-list .inventory-list .item .content {
         width: 100%;
@@ -6668,7 +6716,7 @@
     margin-left: 0px;
   }
 
-  .app.window-app.sheet.wfrp4e.actor  .inventory-list.sheet-list.role-list .item .content .list-controls {
+  .app.window-app.sheet.wfrp4e.actor  .inventory-list.sheet-list.item-list .item .content .list-controls {
     padding: 6px 0px 0px 0px;
     font-size: var(--font-size-13);
     max-width: 50px;    
@@ -10240,6 +10288,11 @@
         margin: 0px;
         padding: 5px 0px 0px 0px;
         text-align: center;
+      }
+      .app.window-app.sheet.wfrp4e.actor  .main-row .movement.row-section .move-value > a {
+        width: 100%;
+        text-align: center;
+        line-height: 23px;
       }
       .app.window-app.sheet.wfrp4e.actor  .main-row .movement.row-section .move-value > a {
         width: 100%;
@@ -14530,6 +14583,7 @@ nav.tjs-context-menu > ol.tjs-context-menu-items[role="menu"] > li.tjs-context-m
   color: #CCC;
 }
 
+.message-content .opposed-options > a,
 .chat-button,
 .apply-damage,
 .apply-target-effect,
@@ -14815,10 +14869,17 @@ input.card-edit {
   border-color: red;
 }
 
-.message-content .unopposed-button {
-  text-align: right;
-  height: 0px;
-  margin-bottom:15px
+.message-content .opposed-options {
+  display: flex;
+  justify-content: right;
+  padding-right: 8px;
+}
+
+.message-content .opposed-options > a 
+{
+  flex : 0 0 12px;
+  margin: 4px;
+  font-size: 12px;
 }
 
 .message-content h3 .center{
@@ -17774,6 +17835,148 @@ li.message.flexcol.whisper:has(div > p.requestmessage) {
   display: none;
 }
 
+
+.vehicle-move h2{
+  text-align: center;
+}
+
+.vehicle-move .disabled {
+  opacity:  0.5;
+  pointer-events: none;
+}
+
+.vehicle-modifiers .source {
+  display: flex;
+  align-items: center;
+}
+
+.vehicle-modifiers .sources {
+  overflow-y: scroll
+}
+
+.vehicle-modifiers input {
+  text-align: center;
+
+  padding: 1px 3px;
+    margin: 0;
+    font-family: var(--actor-input-font-family);
+    font-size: var(--actor-input-font-size);
+    font-weight: var(--actor-input-font-weight);
+    color: #d6d6d6;
+    border: 1px solid #736953a6;
+    border-left: none;
+    box-shadow: 0px 0px 10px inset black;
+    background: #352516;
+}
+
+.vehicle-modifiers ul {
+  padding: 0px;
+}
+
+.vehicle-modifiers .source {
+  margin: 5px;
+}
+
+.vehicle-modifiers .source input[type="checkbox"] {
+  margin-right: 10px;
+}
+
+.vehicle-modifiers .remove,
+  .vehicle-modifiers input[name="active"] {
+  flex: 0 0 20px;
+  text-align: center;
+
+}
+
+.vehicle-modifiers input[name="description"] {
+  flex: 1;
+  text-align: left
+}
+
+.vehicle-modifiers input[name="formula"] {
+  flex: 0 0 100px;
+}
+
+.vehicle-modifiers .window-content {
+  overflow: hidden
+}
+
+
+
+
+.vehicle-crew form
+{
+  display: flex;
+  flex-direction: column;
+}
+
+.vehicle-crew .role-section 
+{
+  text-align: center;
+}
+
+.vehicle-crew .role-section .role-list
+{
+  display: flex;
+  justify-content: space-around;
+  flex-wrap: wrap;
+  border: 2px solid #CCC;
+  border-radius: 10px;
+  padding: 5px;
+  flex: 1;
+}
+
+.vehicle-crew .role-section .role-list .role
+{
+  border: 1px dashed #CCC;
+  border-radius: 10px;
+  text-align: center;
+  padding: 5px;
+  margin: 5px;
+}
+
+
+.vehicle-crew .passenger-section 
+{
+  flex: 1;
+}
+.vehicle-crew .passenger-section .passenger-list
+{
+  display: flex;
+  justify-content: space-around;
+  height: 100%;
+  flex-wrap: wrap;
+}
+
+.vehicle-crew .passenger-section .passenger-list .passenger
+{
+  flex: 1 0 80px;
+  margin: 5px 10px;
+}
+.vehicle-crew .passenger-section .passenger-list .passenger .passenger-header 
+{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.vehicle-crew .passenger-section .passenger-list .passenger .passenger-header img 
+{
+  object-fit: contain;
+}
+
+.vehicle-crew .passenger-section .passenger-list .passenger .passenger-roles
+{
+  display: flex;
+  flex-direction: column;
+  min-height: 100px;
+  border: 1px dashed #CCC;
+  border-radius: 10px;
+  height: calc(100% - 80px);
+  text-align: center;
+  padding: 5px;
+}
 .ce-image-wrapper {
   position: relative;
   width: 48px;

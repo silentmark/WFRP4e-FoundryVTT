@@ -11,6 +11,8 @@ let fields = foundry.data.fields;
  * Encompasses player characters and NPCs
  */
 export class StandardActorModel extends BaseActorModel {
+    static preventItemTypes = ["vehicleMod", "vehicleRole", "vehicleTest"];
+
     static defineSchema() {
         let schema = super.defineSchema();
         schema.characteristics = new fields.EmbeddedDataField(CharacteristicsModel);
@@ -53,10 +55,25 @@ export class StandardActorModel extends BaseActorModel {
 
     }
 
-    updateChecks(data, options) {        
-        let update = super.updateChecks(data, options);
+    updateChecks(data, options, user) {        
+        let update = super.updateChecks(data, options, user);
         // return mergeObject(update, this.checkWounds());
         return update;
+    }
+
+    itemIsAllowed(item) {
+        let allowed = super.itemIsAllowed(item);
+
+        // Prevent vehicle traits
+        if (allowed && item.type == "trait")
+        {
+            allowed = allowed && item.system.category == "standard";
+            if (!allowed)
+            {
+                ui.notifications.error("ERROR.VehicleTraitsOnStandard");
+            }
+        }
+        return allowed
     }
 
     

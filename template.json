@@ -450,6 +450,8 @@
       "weapon",
       "extendedTest",
       "vehicleMod",
+      "vehicleRole",
+      "vehicleTest",
       "cargo"
     ],
     "templates": {

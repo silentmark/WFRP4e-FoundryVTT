@@ -96,7 +96,8 @@ export default class ChatWFRP {
     html.on("mousedown", '.overcast-button', this._onOvercastButtonClick.bind(this))
     html.on("mousedown", '.overcast-reset', this._onOvercastResetClicked.bind(this))
     html.on("click", '.vortex-movement', this._onMoveVortex.bind(this))
-    html.on("click", '.unopposed-button', this._onUnopposedButtonClicked.bind(this))
+    html.on("click", '.unopposed', this._onUnopposedButtonClicked.bind(this))
+    html.on("click", '.oppose', this._onOpposedButtonClicked.bind(this))
     html.on("click", '.market-button', this._onMarketButtonClicked.bind(this))
     html.on("click", ".haggle", this._onHaggleClicked.bind(this))
     html.on("click", ".corrupt-button", this._onCorruptButtonClicked.bind(this))
@@ -110,6 +111,7 @@ export default class ChatWFRP {
     html.on("click", ".apply-condition", this._onApplyCondition.bind(this));
     html.on("click", ".apply-damage", this._onApplyDamageClick.bind(this))
     html.on("click", ".apply-hack", this._onApplyHackClick.bind(this))
+    html.on("click", ".crew-test", this._onCrewTestClick.bind(this))
 
     // Respond to template button clicks
     html.on("click", '.aoe-template', event => {
@@ -311,13 +313,52 @@ export default class ChatWFRP {
 
   }
 
+  static async _onCrewTestClick(event)
+  {
+    let messageId = ($(event.currentTarget).parents('.message').attr("data-message-id"));
+    let uuid = event.currentTarget.dataset.uuid;
+    let vital = event.currentTarget.dataset.vital == "true";
+    let role = await fromUuid(uuid);
+    if (role)
+    {
+      let ownedActors = role.system.assignments.map(i => i.actor).filter(i => i.isOwner);
+      let chosenActor;
+      if (ownedActors.length > 0)
+      {
+        if (ownedActors.length == 1)
+        {
+          chosenActor = ownedActors[0]
+        }
+        else 
+        {
+          chosenActor = (await ItemDialog.create(ownedActors, 1, game.i18n.localize("DIALOG.ChooseActor")))[0]
+        }
+        if (chosenActor)
+        {
+          chosenActor.setupSkill(role.system.test, {appendTitle : ` - ${vital ? game.i18n.localize("CHAT.CrewTestVital") : game.i18n.localize("CHAT.CrewTest")}`, skipTargets : true, crewTest : messageId, roleVital : vital, roleId : role.id}).then(test => test.roll());
+        }
+      }
+      else
+      {
+        ui.notifications.error("ERROR.NoOwnedCrew", {localize : true})
+      }
+    }
+  }
+
   // Proceed with an opposed test as unopposed
   static _onUnopposedButtonClicked(event) {
     event.preventDefault()
     let messageId = $(event.currentTarget).parents('.message').attr("data-message-id");
-
     let oppose = game.messages.get(messageId).getOppose();
     oppose.resolveUnopposed();
+  }
+
+  static _onOpposedButtonClicked(event)
+  {
+    let id = event.currentTarget.dataset.itemId;
+    let messageId = $(event.currentTarget).parents('.message').attr("data-message-id");
+    let oppose = game.messages.get(messageId).getOppose();
+    oppose.resolveOpposed(id);
   }
 
   // Click on botton related to the market/pay system
@@ -496,24 +537,28 @@ export default class ChatWFRP {
     let amount = parseInt($(event.currentTarget).attr("data-amount"));
     let reason = $(event.currentTarget).attr("data-reason");
     let msg = game.messages.get($(event.currentTarget).parents('.message').attr("data-message-id"));
-    let alreadyAwarded = duplicate(msg.getFlag("wfrp4e", "experienceAwarded") || [])
+    let alreadyAwarded = msg.getFlag("wfrp4e", "experienceAwarded") || [];
 
 
-    if (game.user.isGM) {
+    if (game.user.isGM) 
+    {
       if (!game.user.targets.size)
+      {
         return ui.notifications.warn(game.i18n.localize("ErrorExp"))
-      game.user.targets.forEach(t => {
-        if (!alreadyAwarded.includes(t.actor.id)) {
-          t.actor.awardExp(amount, reason)
-          alreadyAwarded.push(t.actor.id)
+      }
+      game.user.targets.forEach(t => 
+      {
+        if (!alreadyAwarded.includes(t.actor.id)) 
+        {
+          t.actor.awardExp(amount, reason, msg.id)
         }
         else
+        {
           ui.notifications.notify(`${t.actor.name} already received this reward.`)
+        }
       })
-      msg.unsetFlag("wfrp4e", "experienceAwarded").then(m => {
-        msg.setFlag("wfrp4e", "experienceAwarded", alreadyAwarded)
-      })
-      if (canvas.scene){ 
+      if (canvas.scene)
+      { 
         game.user.updateTokenTargets([]);
         game.user.broadcastActivity({ targets: [] });
       }
@@ -524,9 +569,8 @@ export default class ChatWFRP {
       if (alreadyAwarded.includes(game.user.character.id))
         return ui.notifications.notify(`${game.user.character.name} already received this reward.`)
 
-      alreadyAwarded.push(game.user.character.id)
-      game.socket.emit("system.wfrp4e", { type: "updateMsg", payload: { id: msg.id, updateData: { "flags.wfrp4e.experienceAwarded": alreadyAwarded } } })
-      game.user.character.awardExp(amount, reason)
+      setProperty(msg, "flags.wfrp4e.experienceAwarded", alreadyAwarded.concat(game.user.character.id)); // Add locally to handle fast clicking or no GM 
+      game.user.character.awardExp(amount, reason, msg.id)
     }
   }
 

@@ -31,7 +31,7 @@ export class CareerStage extends ChargenStage {
   }
 
 
-  async rollCareers(event) {
+  async onRollCareer(event) {
     this.context.step++;
 
     // First step, roll 1 career
@@ -51,6 +51,20 @@ export class CareerStage extends ChargenStage {
       this.context.exp = 0;
       await this.addCareerChoice();
     }
+  }
+
+  // Career selected, move on to the next step
+  async onSelectCareer(ev) {
+    let careerItem = await this.findT1Careers(ev.currentTarget.dataset.career);
+    if (careerItem) {
+      this.context.career = careerItem[0];
+      this.updateMessage("Chosen", {chosen : this.context.career.name})
+
+    }
+    else {
+      throw new Error(gam.i18n.format("CHARGEN.ERROR.CareerItem", {career : ev.currentTarget.dataset.career}));
+    }
+    this.render(true);
   }
 
   _updateObject(event, formData) {
@@ -111,8 +125,12 @@ export class CareerStage extends ChargenStage {
   async addCareerChoice(number = 1) {
     let rollSpecies = this.data.species;
 
+    // If subspecies has defined specific table, and it's found, use that
+    let subspeciesCareerTable = this.data.subspecies && game.wfrp4e.config.subspecies[this.data.species][this.data.subspecies]?.careerTable || null;
+    if (subspeciesCareerTable && game.wfrp4e.tables.findTable("career", subspeciesCareerTable))
+      rollSpecies = game.wfrp4e.config.subspecies[this.data.species][this.data.subspecies]?.careerTable;
     // If subspecies table is found, use that
-    if (this.data.subspecies && game.wfrp4e.tables.findTable("career", rollSpecies + "-" + this.data.subspecies))
+    else if (this.data.subspecies && game.wfrp4e.tables.findTable("career", rollSpecies + "-" + this.data.subspecies))
       rollSpecies += "-" + this.data.subspecies;
     
 
@@ -124,15 +142,15 @@ export class CareerStage extends ChargenStage {
     }
 
     for (let i = 0; i < number; i++) {
-      let newCareerRolled = await game.wfrp4e.tables.rollTable("career", {}, rollSpecies);
-      let newCareerName = newCareerRolled.text;
+      let careerResult = await this.rollCareerTable(rollSpecies)
+      let careerName = careerResult.text;
 
       // Some books that add careers define replacement options, such as (If you roll career X you can use this new career Y (e.g. Soldier to Ironbreaker))
       // If there's a replacement option for a given career, add that replacement career too
-      let replacementOptions = game.wfrp4e.config.speciesCareerReplacements[this.data.species]?.[newCareerName] || []
-      replacementOptions = replacementOptions.concat(game.wfrp4e.config.speciesCareerReplacements[`${this.data.species}-${this.data.subspecies}`]?.[newCareerName] || [])
+      let replacementOptions = game.wfrp4e.config.speciesCareerReplacements[this.data.species]?.[careerName] || []
+      replacementOptions = replacementOptions.concat(game.wfrp4e.config.speciesCareerReplacements[`${this.data.species}-${this.data.subspecies}`]?.[careerName] || [])
 
-      let t1Careers = await this.findT1Careers(newCareerName)
+      let t1Careers = await this.findT1Careers(careerName)
       
       this.context.careers = this.context.careers.concat(t1Careers);
       if (replacementOptions.length > 0)
@@ -146,18 +164,16 @@ export class CareerStage extends ChargenStage {
     this.render(true);
   }
 
-  // Career selected, move on to the next step
-  async selectCareer(ev) {
-    let careerItem = await this.findT1Careers(ev.currentTarget.dataset.career);
-    if (careerItem) {
-      this.context.career = careerItem[0];
-      this.updateMessage("Chosen", {chosen : this.context.career.name})
-
-    }
-    else {
-      throw new Error(gam.i18n.format("CHARGEN.ERROR.CareerItem", {career : ev.currentTarget.dataset.career}));
-    }
-    this.render(true);
+  /**
+   * Rolls on a career table based on provided species
+   * Separated into its own function to cleanly overwrite in modules
+   * 
+   * @param {String} species Species table to roll on
+   * @returns 
+   */
+  async rollCareerTable(species)
+  {
+    return await game.wfrp4e.tables.rollTable("career", {}, species);
   }
 
   /**
