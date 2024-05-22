@@ -1079,6 +1079,7 @@ WFRP4E.actorSizeEncumbrance = {
 // For modules to add to these, they need to be merged
 WFRP4E.systemItems = {};
 WFRP4E.systemEffects = {}
+WFRP4E.vehicleSystemEffects = {}
 WFRP4E.groupAdvantageActions = [
     {
         cost: 1,
@@ -2428,6 +2429,7 @@ WFRP4E.effectApplications = {
     target : "EffectApplication.Type.Target",
     area : "EffectApplication.Type.Area",
     aura : "EffectApplication.Type.Aura",
+    crew : "EffectApplication.Type.Crew",
     other : "EffectApplication.Type.Other"
 }
 

@@ -131,9 +131,14 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     this.addConditionData(sheetData);
 
     sheetData.attacker = this.actor.attacker;
+    sheetData.vehicle = this.actor.system.vehicle;
 
     if (this.actor.type != "vehicle") {
       sheetData.effects.system = game.wfrp4e.utility.getSystemEffects();
+    }
+    else 
+    {
+      sheetData.effects.system = game.wfrp4e.utility.getSystemEffects(true);
     }
 
     sheetData.enrichment = await this._handleEnrichment()
@@ -392,7 +397,6 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     sheetData.effects.temporary = []
     sheetData.effects.passive = []
     sheetData.effects.disabled = []
-    sheetData.effects.targeted = []
 
     for (let e of Array.from(this.actor.allApplicableEffects(true)))
     {
@@ -686,6 +690,8 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     html.on('click', '.weapon-property .inactive', this._toggleWeaponProperty.bind(this))
     html.on('click', '.section-collapse', this._toggleSectionCollapse.bind(this))
     html.on('click', '.diagnosed', this._onDiagnoseToggle.bind(this));
+    html.on('click', '.open-vehicle', this._onVehicleClick.bind(this));
+    html.on('click', '.remove-vehicle', this._onVehicleRemove.bind(this));
 
     
     html.on("click", ".trigger-script", this._onTriggerScript.bind(this));
@@ -1205,9 +1211,10 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     return this.actor.update({ [`system.status.${type}.value`]: newValue })
   }
 
-  _onItemEdit(ev) {
+  async _onItemEdit(ev) {
     let itemId = this._getId(ev);
-    const item = this.actor.items.get(itemId)
+    let uuid = this._getUUID(ev);
+    const item = uuid ? await fromUuid(uuid) : this.actor.items.get(itemId)
     return item.sheet.render(true)
   }
 
@@ -1227,7 +1234,13 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   {
     let uuid = this._getUUID(ev);
     let effect = fromUuidSync(uuid)
-    return effect.update({disabled : !effect.disabled});
+    await effect.update({disabled : !effect.disabled});
+
+    // If disabling an effect that is not a descedent of this actor (like a vehicle effect applying to this actor), rerender the sheet
+    if (effect.actor.uuid != this.actor.uuid)
+    {
+      this.render(true);
+    }
   }
 
   _onAdvanceDisease(ev) {
@@ -1651,6 +1664,17 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     {
       item.update({"system.diagnosed" : !item.system.diagnosed})
     }
+  }
+
+  _onVehicleClick(ev)
+  {
+    this.actor.system.vehicle?.sheet.render(true);
+  }
+
+  async _onVehicleRemove(ev)
+  {
+    await this.actor.system.vehicle.update({"system.passengers.list" : this.actor.system.vehicle?.system.passengers.remove(this.actor.id)});
+    this.render(true);
   }
 
   async _onApplyTargetEffect(event) {

@@ -1451,6 +1451,13 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
         }
       }
     }
+    if (this.system.vehicle)
+    {
+      for(let effect of this.system.vehicle.system.crewEffects)
+      {
+        yield effect;
+      }    
+    }
   }
 
   /**
@@ -1915,7 +1922,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
 
 
   async addSystemEffect(key) {
-    let systemEffects = game.wfrp4e.utility.getSystemEffects()
+    let systemEffects = game.wfrp4e.utility.getSystemEffects(this.type == "vehicle")
     let effect = systemEffects[key];
     if (effect) {
       await this.createEmbeddedDocuments("ActiveEffect", [effect])
