@@ -247,7 +247,7 @@ export default class EffectWfrp4e extends ActiveEffect
         }
         else if (applicationData.avoidTest.value == "custom")
         {
-            options = {
+            let options = {
                 appendTitle : " - " + this.name,
                 skipTargets: true
             }

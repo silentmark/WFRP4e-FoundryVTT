@@ -191,9 +191,9 @@ export default class AreaHelpers
 
                 let existingEffect = token.actor?.currentAreaEffects.find(effect => effect.getFlag("wfrp4e", "fromArea") == areaUuid && !effect.applicationData.keep)
                                     ?? token.actor?.auras.find(effect => effect.uuid == effectUuid);
-                let inTemplate = AreaHelpers.isInTemplate(token, template)
+                let inTemplate = AreaHelpers.isInTemplate(token, template);
                 if (inTemplate && !existingEffect) {
-                    let effect = template.document.areaEffect() || template.auraEffect;
+                    let effect = await template.document.areaEffect() || template.auraEffect;
                     if (effect && auraTokenUuid != token.uuid) {// Specifically don't apply auras to self
                         // if template was placed from a test
                         let messageId = template.document.getFlag("wfrp4e", "messageId")
