@@ -132,6 +132,8 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
 
     sheetData.attacker = this.actor.attacker;
     sheetData.vehicle = this.actor.system.vehicle;
+    sheetData.portStayEvents = game.wfrp4e.tables.findTable("port-stay-events");
+    sheetData.shipboardEvents = game.wfrp4e.tables.findTable("shipboard-events");
 
     if (this.actor.type != "vehicle") {
       sheetData.effects.system = game.wfrp4e.utility.getSystemEffects();
@@ -708,6 +710,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     html.on('click', '.diagnosed', this._onDiagnoseToggle.bind(this));
     html.on('click', '.open-vehicle', this._onVehicleClick.bind(this));
     html.on('click', '.remove-vehicle', this._onVehicleRemove.bind(this));
+    html.on('click', '.aspect-use', this._onAspectClick.bind(this))
 
     
     html.on("click", ".trigger-script", this._onTriggerScript.bind(this));
@@ -1693,6 +1696,16 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
     this.render(true);
   }
 
+  async _onAspectClick(ev)
+  {
+    let itemId = this._getId(ev);
+    let aspect = this.actor.items.get(itemId);
+    if (aspect && aspect.system.usable)
+    {
+      aspect.system.use();
+    }
+  }
+
   async _onApplyTargetEffect(event) {
 
     let applyData = {};
@@ -2422,11 +2435,27 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
   async splitItem(itemId, amount) {
     let item = this.actor.items.get(itemId).toObject()
     let newItem = duplicate(item)
-    if (amount >= item.system.quantity.value)
+
+    let oldQuantity = item.system.quantity.value;
+
+    if (item.type == "cargo")
+    {
+      oldQuantity = item.system.encumbrance.value;
+    }
+
+    if (amount >= oldQuantity)
       return ui.notifications.notify(game.i18n.localize("Invalid Quantity"))
 
-    newItem.system.quantity.value = amount;
-    item.system.quantity.value -= amount;
+    if (item.type == "cargo")
+    {
+      newItem.system.encumbrance.value = amount;
+      item.system.encumbrance.value -= amount;
+    }
+    else 
+    {
+      newItem.system.quantity.value = amount;
+      item.system.quantity.value -= amount;
+    }
     await this.actor.createEmbeddedDocuments("Item", [newItem]);
     this.actor.updateEmbeddedDocuments("Item", [item]);
   }

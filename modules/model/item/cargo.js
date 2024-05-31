@@ -18,6 +18,7 @@ export class CargoModel extends PhysicalItemModel
         schema.quality = new fields.SchemaField({
             value: new fields.StringField({initial : "average"})
         });
+        schema.tradeType = new fields.StringField({})
         return schema;
     }
 
@@ -28,6 +29,14 @@ export class CargoModel extends PhysicalItemModel
         {
             this.quality.value = "average"
         }
+        if (this.tradeType == "river")
+        {
+          this.price.gc = this.unitPrice.value * this.encumbrance.value / 10;
+        }
+        else if (this.tradeType == "maritime")
+          {
+          this.price.gc = this.unitPrice.value * this.encumbrance.value;
+        }
     }
 
     async expandData(htmlOptions) {
@@ -36,8 +45,8 @@ export class CargoModel extends PhysicalItemModel
         if (this.origin.value)
           data.properties.push(`<b>${game.i18n.localize("ITEM.Origin")}</b>: ${this.origin.value}`)
     
-        if (game.wfrp4e.config.trade.cargoTypes)
-          data.properties.push(`<b>${game.i18n.localize("ITEM.CargoType")}</b>: ${game.wfrp4e.config.trade.cargoTypes[this.cargoType.value]}`)
+        if (game.wfrp4e.trade.cargoTypes)
+          data.properties.push(`<b>${game.i18n.localize("ITEM.CargoType")}</b>: ${game.wfrp4e.trade.cargoTypes[this.cargoType.value]}`)
     
         if (game.wfrp4e.config.trade.qualities && (this.cargoType.value == "wine" || this.cargoType.value == "brandy"))
           data.properties.push(`<b>${game.i18n.localize("ITEM.CargoQuality")}</b>: ${game.wfrp4e.config.trade.qualities[this.quality.value]}`)
@@ -51,8 +60,8 @@ export class CargoModel extends PhysicalItemModel
         if (this.origin.value)
           properties.push(`<b>${game.i18n.localize("ITEM.Origin")}</b>: ${this.origin.value}`)
     
-        if (game.wfrp4e.config.trade.cargoTypes)
-          properties.push(`<b>${game.i18n.localize("ITEM.CargoType")}</b>: ${game.wfrp4e.config.trade.cargoTypes[this.cargoType.value]}`)
+        if (game.wfrp4e.trade.cargoTypes)
+          properties.push(`<b>${game.i18n.localize("ITEM.CargoType")}</b>: ${game.wfrp4e.trade.cargoTypes[this.cargoType.value]}`)
     
         if (game.wfrp4e.config.trade.qualities && (this.cargoType.value == "wine" || this.cargoType.value == "brandy"))
           properties.push(`<b>${game.i18n.localize("ITEM.CargoQuality")}</b>: ${game.wfrp4e.config.trade.qualities[this.quality.value]}`)
