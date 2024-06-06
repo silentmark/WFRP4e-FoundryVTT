@@ -4,7 +4,7 @@
       <span class="attribute-label">{{localize "VEHICLE.Crew"}}</span>
       <div class="minmax-box">
         <div class="current value">
-          <input type="text" value="{{system.details.crew.current}}" name="system.details.crew.current">
+          <input type="text" value="{{system.details.crew.current}}" name="system.details.crew.current" readonly>
         </div>
         <div class="divisor">
           /
@@ -456,7 +456,7 @@
     <div class="content">
       <div class="item-name mod-name item-dropdown">
         <div class="image" style="background-image: url({{trait.img}})"></div>
-        <a class="name mod-title">{{trait.name}}</a>
+        <a class="name mod-title">{{trait.DisplayName}}</a>
       </div>
 
       {{#if ../document.isOwner}}
@@ -504,6 +504,7 @@
             {{/each}}
           </ol>
         </div>
+      {{#if (eq system.vehicleType "water")}}
           <div class="morale-log">
           <div class="inventory-header item">
             <span class="morale label">{{localize "VEHICLE.ManannsMood"}}: {{system.status.mood.value}} <a class="roll-mood"><i
@@ -542,4 +543,5 @@
           <a class="mood-events chat-button" data-key="shipboard-events">{{shipboardEvents.name}}</a>
           {{/if}}
         </div>
+      {{/if}}
       {{/if}}
