@@ -36,6 +36,21 @@ export class StandardDetailsModel extends foundry.abstract.DataModel {
         schema.hitLocationTable = new fields.SchemaField({
             value: new fields.StringField()
         });
+        schema.age = new fields.SchemaField({
+            value: new fields.StringField()
+        });
+        schema.height = new fields.SchemaField({
+            value: new fields.StringField()
+        });
+        schema.weight = new fields.SchemaField({
+            value: new fields.StringField()
+        });
+        schema.haircolour = new fields.SchemaField({
+            value: new fields.StringField()
+        });
+        schema.eyecolour = new fields.SchemaField({
+            value: new fields.StringField()
+        });
         schema.mainHand = new fields.StringField({initial : "r"})
         return schema;
     }
@@ -70,21 +85,6 @@ export class CharacterDetailsModel extends StandardDetailsModel {
             value: new fields.StringField()
         });
         schema.careerlevel = new fields.SchemaField({
-            value: new fields.StringField()
-        });
-        schema.age = new fields.SchemaField({
-            value: new fields.StringField()
-        });
-        schema.height = new fields.SchemaField({
-            value: new fields.StringField()
-        });
-        schema.weight = new fields.SchemaField({
-            value: new fields.StringField()
-        });
-        schema.haircolour = new fields.SchemaField({
-            value: new fields.StringField()
-        });
-        schema.eyecolour = new fields.SchemaField({
             value: new fields.StringField()
         });
         schema.distinguishingmark = new fields.SchemaField({
