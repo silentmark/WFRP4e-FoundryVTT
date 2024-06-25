@@ -2472,31 +2472,6 @@ WFRP4E.PrepareSystemItems = function() {
             }
         },
         {
-            icon: "icons/svg/shield.svg",
-            id: "defensive",
-            statuses : ["defensive"],
-            name: "Pozycja obronna",
-            flags : {
-                wfrp4e : {
-                    value: null,
-                    applicationData : {},
-                    scriptData : [
-                        {
-                            label : "Pozycja obronna",
-                            trigger : "dialog",
-                            script : `args.prefillModifiers.modifier += 20`,
-                            options : {
-                                dialog : {
-                                    hideScript : "return !this.actor.isOpposing",
-                                    activateScript : `return this.actor.isOpposing`
-                                }
-                            }
-                        }
-                    ]
-                }
-            }
-        },
-        {
             icon: "systems/wfrp4e/icons/defeated.png",
             id: "dead",
             statuses: ["dead"],

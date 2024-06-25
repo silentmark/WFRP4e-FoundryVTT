@@ -1191,7 +1191,7 @@ export default class WFRP_Utility {
   {
     if (!game.user.isGM)
     {
-      game.socket.emit("system.wfrp4e", {type : "changeGroupAdvantage", payload : {players, enemies}})
+      game.socket.emit("system.wfrp4e", { userId: game.users.activeGM.id, type : "changeGroupAdvantage", payload : {players, enemies}});
     }
     else if (game.user.isUniqueGM)
     {
@@ -1200,7 +1200,7 @@ export default class WFRP_Utility {
         advantage.players = players
       if (Number.isNumeric(enemies))
         advantage.enemies = enemies
-    
+     
       return game.settings.set("wfrp4e", "groupAdvantageValues", advantage)
     }
   }
@@ -1210,7 +1210,6 @@ export default class WFRP_Utility {
       console.log(`%cWFRP4e` + `%c | ${message}`, "color: gold", "color: unset", args || "");
   }
 
-  
   static logHomebrew(message) {
     this.log("Applying Homebrew Rule: " + message, true)
   }

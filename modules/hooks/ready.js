@@ -5,9 +5,7 @@ import OpposedWFRP from "../system/opposed-wfrp4e.js";
 import OpposedTest from "../system/opposed-test.js";
 
 export default function () {
-  Hooks.on("ready", async () => {
-
-
+  Hooks.on("setup" , () => {
     Object.defineProperty(game.user, "isUniqueGM", {
       get: function () { return game.user.id == game.users.find(u => u.active && u.isGM)?.id }
     })
@@ -38,7 +36,10 @@ export default function () {
         }
       }
     }
+  });
 
+  Hooks.on("ready", async () => {
+    
     //***** Change cursor styles if the setting is enabled *****
 
     if (game.settings.get('wfrp4e', 'customCursor')) {
@@ -98,9 +99,6 @@ export default function () {
       game.wfrp4e.migration.migrateWorld()
     }
     game.settings.set("wfrp4e", "systemMigrationVersion", MIGRATION_VERSION)
-
-
-
 
     // Some entities require other entities to be loaded to prepare correctly (vehicles and mounts)
     for (let e of game.wfrp4e.postReadyPrepare)

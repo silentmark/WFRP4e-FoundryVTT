@@ -15147,11 +15147,6 @@ textarea,
   flex-direction: column;
 }
 
-.script-config .ace-editor {
-  height: 100% !important;
-  flex: 1 1 auto;
-}
-
 .script-config textarea {
   height: 100px;
 }
