@@ -20,7 +20,7 @@ export class BaseActorModel extends foundry.abstract.DataModel {
 
         // Set wounds, advantage, and display name visibility
         if (!data.prototypeToken)
-            mergeObject(preCreateData,
+            foundry.utils.mergeObject(preCreateData,
                 {
                     "flags.wall-height.tokenHeight": 1.8,                                        // Default token height to 2
                     "prototypeToken.bar1": { "attribute": "status.wounds" },                 // Default Bar 1 to Wounds

@@ -25,7 +25,7 @@ export class StandardActorModel extends BaseActorModel {
     preCreateData(data, options) {
         let preCreateData = super.preCreateData(data, options);
         // Default auto calculation to true
-        mergeObject(preCreateData, {
+        foundry.utils.mergeObject(preCreateData, {
             "flags.autoCalcRun": data.flags?.autoCalcRun || true,
             "flags.autoCalcWalk": data.flags?.autoCalcWalk || true,
             "flags.autoCalcWounds": data.flags?.autoCalcWounds || true,
@@ -36,7 +36,7 @@ export class StandardActorModel extends BaseActorModel {
             "prototypeToken.actorLink": true,
             "prototypeToken.sight": { enabled: true }
         });
-        mergeObject(preCreateData, this.checkWounds(true));
+        foundry.utils.mergeObject(preCreateData, this.checkWounds(true));
         return preCreateData;
     }
 
@@ -57,7 +57,7 @@ export class StandardActorModel extends BaseActorModel {
 
     updateChecks(data, options, user) {        
         let update = super.updateChecks(data, options, user);
-        // return mergeObject(update, this.checkWounds());
+        // return foundry.utils.mergeObject(update, this.checkWounds());
         return update;
     }
 
@@ -346,7 +346,7 @@ export class StandardActorModel extends BaseActorModel {
 
 
     async _handleGroupAdvantage(data, options) {
-        if (!options.skipGroupAdvantage && hasProperty(data, "system.status.advantage.value") && game.settings.get("wfrp4e", "useGroupAdvantage")) {
+        if (!options.skipGroupAdvantage && foundry.utils.hasProperty(data, "system.status.advantage.value") && game.settings.get("wfrp4e", "useGroupAdvantage")) {
             let combatant = game.combat?.getCombatantByActor(this.parent);
 
             if (!combatant) {
@@ -362,7 +362,7 @@ export class StandardActorModel extends BaseActorModel {
 
     _handleWoundsUpdate(data, options) {
         // Prevent wounds from exceeding max
-        if (hasProperty(data, "system.status.wounds.value")) {
+        if (foundry.utils.hasProperty(data, "system.status.wounds.value")) {
             if (data.system.status.wounds.value > (getProperty(data, "system.status.wounds.max") || this.status.wounds.max)) {
                 data.system.status.wounds.value = this.status.wounds.max;
             }
@@ -372,7 +372,7 @@ export class StandardActorModel extends BaseActorModel {
     }
 
     _handleAdvantageUpdate(data, options) {
-        if (hasProperty(data, "system.status.advantage.value")) 
+        if (foundry.utils.hasProperty(data, "system.status.advantage.value")) 
         {
             if (!game.settings.get("wfrp4e", "useGroupAdvantage")) {
                 let maxAdvantage

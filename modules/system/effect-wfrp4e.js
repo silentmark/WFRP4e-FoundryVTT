@@ -17,7 +17,7 @@ export default class EffectWfrp4e extends ActiveEffect
     {
         await super._preCreate(data, options, user);
 
-        if (!hasProperty(data, "flags.wfrp4e.applicationData"))
+        if (!foundry.utils.hasProperty(data, "flags.wfrp4e.applicationData"))
         {
             this.updateSource({"flags.wfrp4e.applicationData" : this.constructor._defaultApplicationData()})            
         }
@@ -448,7 +448,7 @@ export default class EffectWfrp4e extends ActiveEffect
         // if (this.applicationData.avoidTest.value == "item")
         // {
         //     effect.flags.wfrp4e.applicationData.avoidTest.value = "custom";
-        //     mergeObject(effect.flags.wfrp4e.applicationData.avoidTest, this.item?.getTestData() || {});
+        //     foundry.utils.mergeObject(effect.flags.wfrp4e.applicationData.avoidTest, this.item?.getTestData() || {});
         // }
 
         return effect;
@@ -663,7 +663,7 @@ export default class EffectWfrp4e extends ActiveEffect
 
     get applicationData() 
     {
-        let applicationData = mergeObject(this.constructor._defaultApplicationData(), this.getFlag("wfrp4e", "applicationData"));
+        let applicationData = foundry.utils.mergeObject(this.constructor._defaultApplicationData(), this.getFlag("wfrp4e", "applicationData"));
 
         // // Delete non-relevant properties based on application type
         // if (applicationData.type == "document")
@@ -778,7 +778,7 @@ export default class EffectWfrp4e extends ActiveEffect
 
 function _migrateEffect(data, context)
 {
-    let flags = getProperty(data, "flags.wfrp4e");
+    let flags = foundry.utils.getProperty(data, "flags.wfrp4e");
 
     if (!flags || flags._legacyData || flags.scriptData || flags.applicationData)
     {
@@ -795,7 +795,7 @@ function _migrateEffect(data, context)
 
     if (flags.effectTrigger == "targetPrefillDialog")
     {
-        setProperty(newScript, "options.dialog.targeter", true);
+        foundry.utils.setProperty(newScript, "options.dialog.targeter", true);
     }
 
     if (flags.script)
@@ -815,7 +815,7 @@ function _migrateEffect(data, context)
         {
             // Old prefill triggers always ran for every dialog with conditional logic inside to add modifiers or not
             // To reflect that, migrated prefill tiggers need to always be active in the dialog
-            setProperty(newScript, "options.dialog.activateScript", "return true")
+            foundry.utils.setProperty(newScript, "options.dialog.activateScript", "return true")
         }
     }
     else if (flags.effectTrigger == "dialogChoice")

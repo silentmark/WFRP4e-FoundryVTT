@@ -15,7 +15,7 @@ let scriptLoader = `export default function()
 {
     Hooks.on("init", () => 
     {
-        mergeObject(game.wfrp4e.config.effectScripts, ${JSON.stringify(scriptObj, null, 4)});
+        foundry.utils.mergeObject(game.wfrp4e.config.effectScripts, ${JSON.stringify(scriptObj, null, 4)});
     });
 
 }`

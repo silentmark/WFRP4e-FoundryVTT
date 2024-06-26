@@ -136,7 +136,7 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
     //#region Condition Handling
     async addCondition(effect, value = 1) {
         if (typeof (effect) === "string")
-            effect = duplicate(game.wfrp4e.config.statusEffects.find(e => e.id == effect))
+            effect = foundry.utils.duplicate(game.wfrp4e.config.statusEffects.find(e => e.id == effect))
         if (!effect)
             return "No Effect Found"
 
@@ -149,7 +149,7 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
         if (existing && existing.flags.wfrp4e.value == null)
             return existing
         else if (existing) {
-            existing = duplicate(existing)
+            existing = foundry.utils.duplicate(existing)
             existing.flags.wfrp4e.value += value;
             return this.updateEmbeddedDocuments("ActiveEffect", [existing])
         }
@@ -164,7 +164,7 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
 
     async removeCondition(effect, value = 1) {
         if (typeof (effect) === "string")
-            effect = duplicate(game.wfrp4e.config.statusEffects.find(e => e.id == effect))
+            effect = foundry.utils.duplicate(game.wfrp4e.config.statusEffects.find(e => e.id == effect))
         if (!effect)
             return "No Effect Found"
 
