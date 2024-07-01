@@ -34,8 +34,9 @@ for(let file of scripts)
   count++;
 }
 
-scriptLoader = `Hooks.on("init", () => {
-    mergeObject(game.wfrp4e.config.effectScripts, ${JSON.stringify(scriptObj, null, 4)});
+scriptLoader = `Hooks.on("init", async () => {
+    await new Promise((() => {}), setTimeout(resolve, 250));
+    foundry.utils.mergeObject(game.wfrp4e.config.effectScripts, ${JSON.stringify(scriptObj, null, 4)});
 });`
 
 fs.writeFileSync("./load-scripts-pl.js", scriptLoader)
