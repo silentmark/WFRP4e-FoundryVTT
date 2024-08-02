@@ -1152,6 +1152,7 @@ export default class TestWFRP {
     }
     catch(e)
     {
+      oncustomerror(`Error generating formatted breakdown`, e);
       console.error(`Error generating formatted breakdown: ${e}`, this);
     }
 

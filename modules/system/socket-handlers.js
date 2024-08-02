@@ -113,6 +113,13 @@ export default class SocketHandlers  {
         return actor.id;        
     }
 
+    static async handleDualWielder({messageId}) {
+        let message = game.messages.get(messageId);
+        let test = message.getTest();
+        await test.handleDualWielder();
+        return true;
+    }
+
     /**
      * Not used by sockets directly, but is called when a socket handler should be executed by
      * the specific user which owns a document. Usually used to invoke tests from other users

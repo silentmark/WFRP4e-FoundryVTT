@@ -21,13 +21,17 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
 
     async _preUpdate(data, options, user) {
         await super._preUpdate(data, options, user)
-        await this.system.preUpdateChecks(data, options, user);
-        await Promise.all(this.runScripts("preUpdate", {data, options, user}))
+        if (this.type !== "base") {
+            await this.system.preUpdateChecks(data, options, user);
+            await Promise.all(this.runScripts("preUpdate", {data, options, user}))
+        }
 }
 
     async _preDelete(options, user) {
         await super._preDelete(options, user)
-        await this.system.preDeleteChecks(options, user);
+        if (this.type !== "base") {
+            await this.system?.preDeleteChecks(options, user);
+        }
     }
 
     _preUpdateDescendantDocuments(parent, collection, changes, options, userId) {
@@ -58,16 +62,18 @@ const WFRP4eDocumentMixin = (cls) => class extends cls {
 
     async _onUpdate(data, options, user) {
         await super._onUpdate(data, options, user);
-        let update = this.system.updateChecks(data, options, user)
-        
-        if (!foundry.utils.isEmpty(update) && user == game.user.id) {
-            await this.update(update);
-        }
+        if (this.type !== "base") {
+            let update = this.system.updateChecks(data, options, user);
+            
+            if (!foundry.utils.isEmpty(update) && user == game.user.id) {
+                await this.update(update);
+            }
 
-        if (game.user.id != user) {
-            return;
+            if (game.user.id != user) {
+                return;
+            }
+            await Promise.all(this.runScripts("update", {data, options, user}))
         }
-        await Promise.all(this.runScripts("update", {data, options, user}))
     }
 
     async _onDelete(options, user) {

@@ -69,6 +69,11 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
   async _onUpdate(data, options, user) {
     await super._onUpdate(data, options, user);
 
+    if (data.system?.details?.height?.value && parseInt(data.system.details.height.value)) {
+        let h = parseInt(data.system.details.height.value);
+        this.prototypeToken.setFlag('wall-height', 'tokenHeight', h / 100);
+    }
+
     if (options.deltaWounds) {
       this._displayScrollingChange(options.deltaWounds > 0 ? "+" + options.deltaWounds : options.deltaWounds);
     }
@@ -1198,7 +1203,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       await this.createEmbeddedDocuments("Item", [skillToAdd]);
     }
     catch (error) {
-      console.error("Something went wrong when adding skill " + skillName + ": " + error);
+      oncustomerror("Something went wrong when adding skill " + skillName + ": ", error);
       ui.notifications.error(game.i18n.format("CAREER.AddSkillError", { skill: skillName, error: error }));
     }
   }
@@ -1220,7 +1225,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       await this.createEmbeddedDocuments("Item", [talent.toObject()]);
     }
     catch (error) {
-      console.error("Something went wrong when adding talent " + talentName + ": " + error);
+      oncustomerror("Something went wrong when adding talent " + talentName + ": ", error);
       ui.notifications.error(game.i18n.format("CAREER.AddTalentError", { talent: talentName, error: error }));
     }
   }
@@ -1758,6 +1763,39 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     return false;
   }
 
+  //TODO: WTF
+  async toggleStatusEffect(statusId, {active, overlay=false}={}) {
+    const status = CONFIG.statusEffects.find(e => e.id === statusId);
+    if ( !status ) throw new Error(`Invalid status ID "${statusId}" provided to Actor#toggleStatusEffect`);
+    const existing = [];
+
+    // Find the effect with the static _id of the status effect
+    if ( status._id ) {
+      const effect = this.effects.get(status._id);
+      if ( effect ) existing.push(effect.id);
+    }
+
+    // If no static _id, find all single-status effects that have this status
+    else {
+      for ( const effect of this.effects ) {
+        const statuses = effect.statuses;
+        if ( (statuses.size === 1) && statuses.has(status.id) ) existing.push(effect.id);
+      }
+    }
+
+    // Remove the existing effects unless the status effect is forced active
+    if ( existing.length ) {
+      if ( active ) return true;
+      await this.deleteEmbeddedDocuments("ActiveEffect", existing);
+      return false;
+    }
+
+    // Create a new effect unless the status effect is forced inactive
+    if ( !active && (active !== undefined) ) return;
+    const effect = await ActiveEffect.implementation.fromStatusEffect(statusId);
+    if ( overlay ) effect.updateSource({"flags.core.overlay": true});
+    return ActiveEffect.implementation.create(effect, {parent: this, keepId: true});
+  }
 
   async addCondition(effect, value = 1, mergeData={}, item = null) {
     if (value == 0) {
@@ -1813,6 +1851,9 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       if (effect.id == "unconscious") {
         await this.addCondition("prone")
       }
+      if (effect.id == "prone") {
+        this.getActiveTokens().forEach(token => token.document.setFlag('wall-height', 'tokenHeight', parseInt(token.actor.details.height.value) / 250));
+      }
 
       foundry.utils.mergeObject(effect, mergeData, {overwrite: false});
 
@@ -1851,6 +1892,9 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
     if (existing && !existing.isNumberedCondition) {
       if (effect.id == "unconscious") {
         await this.addCondition("fatigued");
+      }
+      if (effect.id == "prone") {
+        this.getActiveTokens().forEach(token => token.document.setFlag('wall-height', 'tokenHeight', parseInt(token.actor.details.height.value) / 100));
       }
       return existing.delete();
     }
@@ -2283,7 +2327,7 @@ export default class ActorWfrp4e extends WFRP4eDocumentMixin(Actor)
       }
     }
     catch (e) {
-      console.error("Error finding attacker, removing flags." + e)
+      oncustomerror("Error finding attacker, removing flags.", e);
       this.update({ "flags.-=oppose": null })
     }
 

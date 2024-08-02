@@ -108,6 +108,11 @@ export default class OpposedWFRP {
     this.formatOpposedResult();
     await this.renderOpposedResult()
     await this.colorWinnerAndLoser()
+
+    if (this.opposedTest.attackerTest.handleDualWielder && this.opposedTest.opposeResult.winner == "attacker") {
+      let owner = game.wfrp4e.utility.getActiveDocumentOwner(this.opposedTest.attackerTest.actor);
+      game.wfrp4e.socket.executeOnUserAndWait(owner.id, "handleDualWielder", {messageId: this.attackerMessage.id}); //we dont want to await this one.
+    }
   }
 
   async renderOpposedStart() {

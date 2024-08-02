@@ -34,14 +34,14 @@ export default class AreaHelpers
 
             switch (templateObject.shape.type) {
                 case 0: // generic poly
-                    let x = templateObject.x * 100;
-                    let y = templateObject.y * 100;
+                    let x = templateObject.x;
+                    let y = templateObject.y;
                     const clipperPolygon = templateObject.shape.toClipperPoints();
                     clipperPolygon.forEach((p) => {
                         p.X += x;
                         p.Y += y;
                     });
-                    templatePoly = PIXI.Polygon.fromClipperPoints(clipperPolygon, options);
+                    templatePoly = PIXI.Polygon.fromClipperPoints(clipperPolygon);
                     break;
                 case 1: // rect
                 case 2: // circle

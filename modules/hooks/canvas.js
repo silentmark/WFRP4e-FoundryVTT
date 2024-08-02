@@ -12,7 +12,6 @@ export default function() {
 
       // Track the total number of diagonals
       let nDiagonal = 0;
-      const rule = this.parent.diagonalRule;
       const d = canvas.dimensions;
 
       // Iterate over measured segments

@@ -92,3 +92,55 @@ export default function () {
 
   FoundryOverrides();
 }
+
+
+window.onunhandledrejection = promiseRejectionEvent => {
+  let reason = promiseRejectionEvent.reason;
+  let stackTrace = promiseRejectionEvent.promise.__creationPoint;
+  if (promiseRejectionEvent.reason.message) {
+    reason = promiseRejectionEvent.reason.message;
+  } 
+  if (promiseRejectionEvent.reason.stack) {
+    stackTrace = promiseRejectionEvent.reason.stack;
+  }
+  console.error(reason + ": " + stackTrace);
+
+  let chatOptions = {  };
+  chatOptions["whisper"] = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
+  chatOptions["user"] = game.user.id
+
+  // Emit the HTML as a chat message
+  chatOptions["content"] = `<h2>Unhandled Promise Rejection</h2><p>${reason}</p><p>${stackTrace}</p>`
+  ChatMessage.create(chatOptions);
+};
+
+window.onerror = function(message, source, lineNumber, colno, error) {
+  console.error(error);
+  let stackTrace = error.stack;
+
+  let chatOptions = {  };
+  chatOptions["whisper"] = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
+  chatOptions["user"] = game.user.id
+
+  // Emit the HTML as a chat message
+  chatOptions["content"] = `<h2>Unhandled Error</h2><p>${message}</p><p>${stackTrace}</p><p>${source}</p><p><strong>Line Number:</strong> ${lineNumber}</p><p><strong>Column Number:</strong> ${colno}</p>`;
+  ChatMessage.create(chatOptions);
+};
+
+window.oncustomerror = function(customMessage, error) {
+  console.error(customMessage + ": " + error);
+  let stackTrace = error.stack;
+  let message = error.message;
+
+  let chatOptions = {  };
+  chatOptions["whisper"] = ChatMessage.getWhisperRecipients("GM").map(u => u.id);
+  chatOptions["user"] = game.user.id
+
+  // Emit the HTML as a chat message
+  chatOptions["content"] = `<h2>${customMessage}</h2><p>${message}</p><p>${stackTrace}</p>`;
+  ChatMessage.create(chatOptions);
+}
+
+Hooks.on("error", (location, error, data) => {
+  window.oncustomerror(`Error in ${location}`, error);
+});

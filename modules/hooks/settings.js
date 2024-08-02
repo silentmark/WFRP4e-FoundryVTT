@@ -7,14 +7,20 @@ export default function() {
         // Then, make sure that change is reflected in the counter on the combat tracker (if the update was made by a different user)
         if (setting.key == "wfrp4e.groupAdvantageValues")
         {
-            ui.notifications.notify(game.i18n.format("GroupAdvantageUpdated", {players : setting.value.players, enemies : setting.value.enemies}))
-            // Update counter values, can't just use ui.combat because there might be popped out combat trackers
-            [ui.combat].concat(Object.values(ui.windows).filter(w => w instanceof CombatTracker)).forEach(tracker => {
-                tracker.element.find(".advantage-group input").each((index, input) => {
-                    let group = input.dataset.group
-                    input.value = setting.value[group]
-                })
-            })
+            try {
+                let message = game.i18n.format("GroupAdvantageUpdated", {players : setting.value.players, enemies : setting.value.enemies});
+                ui.notifications.notify(message)
+                // Update counter values, can't just use ui.combat because there might be popped out combat trackers
+                let trackers = [ui.combat].concat(Object.values(ui.windows).filter(w => w instanceof CombatTracker));
+                for (let tracker of trackers) {
+                    tracker.element.find(".advantage-group input").each((index, input) => {
+                        let group = input.dataset.group
+                        input.value = setting.value[group]
+                    })
+                }
+            } catch (e) {
+                console.error(e)
+            }
         }
         
     })

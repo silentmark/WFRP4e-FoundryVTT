@@ -146,6 +146,18 @@ export default function () {
     //return this.object.toggleEffect(effect, {overlay});
   }
 
+  const baseActivateListeners = TokenHUD.prototype.activateListeners;
+  
+  TokenHUD.prototype.activateListeners = function(html) {
+    baseActivateListeners.call(this, html);    
+    const effectsTray = html.find(".status-effects");
+
+    effectsTray.off("click", ".effect-control");
+    effectsTray.off("contextmenu", ".effect-control");
+    
+    effectsTray.on("click", ".effect-control", this._onToggleEffect.bind(this));
+    effectsTray.on("contextmenu", ".effect-control", event => this._onToggleEffect(event, {overlay: true}));
+  }
 
   Token.prototype.incrementCondition = async function (effect, { active, overlay = false } = {}) {
     const existing = this.actor.hasCondition(effect.id);
@@ -155,7 +167,7 @@ export default function () {
       await this.actor.removeCondition(effect.id)
 
     // Update the Token HUD
-    if (this.hasActiveHUD) canvas.tokens.hud.refreshStatusIcons();
+    //if (this.hasActiveHUD) canvas.tokens.hud.refreshStatusIcons();
     return active;
   }
 
@@ -163,7 +175,7 @@ export default function () {
     await this.actor.removeCondition(effect.id)
 
     // Update the Token HUD
-    if (this.hasActiveHUD) canvas.tokens.hud.refreshStatusIcons();
+    //if (this.hasActiveHUD) canvas.tokens.hud.refreshStatusIcons();
     return active;
   }
 

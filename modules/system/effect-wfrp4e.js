@@ -481,6 +481,7 @@ export default class EffectWfrp4e extends ActiveEffect
             }
             catch(e)
             {
+                oncustomerror(`Error creating filter script`, e);
                 console.error("Error creating filter script: " + e);
                 return null;
             }

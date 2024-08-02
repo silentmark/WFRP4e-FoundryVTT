@@ -783,7 +783,7 @@
     "CHAT.DamageAppliedErrorTiring" : "Cannot automate damage (likely due to Tiring, or the weapon/trait is not setup correctly)",
     "CHAT.DamageApplied" : "Damage Applied",
     "CHAT.ApplyDamageBasic" : "@DAMAGE damage applied to <b>{name}</b>",
-    "CHAT.ApplyHack" : "Zniszcz Pancerz",
+    "CHAT.ApplyHack" : "Apply Hack",
     "CHAT.DamageShield" : "Shield",
     "CHAT.CriticalsNullified" : "Criticals Nullified",
     "CHAT.DamageAP" : "Damage 1 AP on",

@@ -407,6 +407,7 @@ export class WeaponModel extends PropertiesMixin(PhysicalItemModel) {
                 }
             } catch (error) {
                 ui.notifications.error(game.i18n.format("ERROR.AMMO_MODS", {type}));
+                oncustomerror(`applyAmmoMods from ${this.parent?.actor?.name} threw error: ${error}.\n Arguments: ${this.parent?.uuid}`, error);
                 console.error(error, {value, type, item: this, ammo: this.ammo});
             }
         }
@@ -447,6 +448,7 @@ export class WeaponModel extends PropertiesMixin(PhysicalItemModel) {
         }
         catch (e)
         {
+            oncustomerror(`computeWeaponFormula from ${this.parent?.actor?.name} threw error: ${e}.\n Arguments: ${this.parent?.uuid}`, e);
             console.error(`computeWeaponFormula from ${this.parent?.actor?.name} threw error: ${e}.\n Arguments:`, this, formula);
             return formula
         }

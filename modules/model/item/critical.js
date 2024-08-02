@@ -48,6 +48,7 @@ export class CriticalModel extends LocationalItemModel {
                 actor.update({ "system.status.wounds.value": newWounds });
             }
             catch (e) {
+                oncustomerror(`createChecks from ${this.parent?.actor?.name} threw error: ${e}.\n Arguments: ${this.parent.uuid}`, e);
                 console.error(`createChecks from ${this.parent?.actor?.name} threw error: ${e}.\n Arguments:`, this);
             }
         }

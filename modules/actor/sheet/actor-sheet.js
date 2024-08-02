@@ -513,7 +513,7 @@ export default class ActorSheetWfrp4e extends WFRP4eSheetMixin(ActorSheet) {
         data.mount.sceneName = game.scenes.get(data.actor.system.status.mount.tokenData.scene).name
     }
     catch (e) {
-      console.error(this.actor.name + ": Failed to get mount data: " + e.message)
+      oncustomerror(this.actor.name + ": Failed to get mount data: ", e);
     }
   }
 

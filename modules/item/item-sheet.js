@@ -183,8 +183,10 @@ export default class ItemSheetWfrp4e extends WFRP4eSheetMixin(ItemSheet)
   async _handleEnrichment()
   {
     let enrichment = {}
-    enrichment["system.description.value"] = await TextEditor.enrichHTML(this.item.system.description.value, { async: true, secrets: this.item.isOwner, relativeTo: this.item})
-    enrichment["system.gmdescription.value"] = await TextEditor.enrichHTML(this.item.system.gmdescription.value, { async: true, secrets: this.item.isOwner, relativeTo: this.item })
+    if (this.document.type !== "base") {
+      enrichment["system.description.value"] = await TextEditor.enrichHTML(this.item.system.description.value, { async: true, secrets: this.item.isOwner, relativeTo: this.item})
+      enrichment["system.gmdescription.value"] = await TextEditor.enrichHTML(this.item.system.gmdescription.value, { async: true, secrets: this.item.isOwner, relativeTo: this.item })
+    }
 
     return foundry.utils.expandObject(enrichment)
   }

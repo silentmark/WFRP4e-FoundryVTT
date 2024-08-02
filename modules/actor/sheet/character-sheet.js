@@ -230,7 +230,7 @@ export default class ActorSheetWfrp4eCharacter extends ActorSheetWfrp4e {
       }
       catch
       {
-        console.error(error)
+        oncustomerror(error.message, error);
         ui.notifications.error(error)
       }
     }
@@ -289,7 +289,7 @@ export default class ActorSheetWfrp4eCharacter extends ActorSheetWfrp4e {
       }
       catch
       {
-        console.error(error)
+        oncustomerror(error.message, error);
         ui.notifications(error)
       }
     }

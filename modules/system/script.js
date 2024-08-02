@@ -70,6 +70,7 @@ export default class WFRP4eScript
         }
         catch(e)
         {
+            oncustomerror(`Script ${this.Label} threw error: ${this.context.effect.uuid}.\n:`, e);
             console.error(`Script ${this.Label} threw error: ${e}.\n Context and Arguments:`, this.context, args);
         }
     }
@@ -134,6 +135,7 @@ export default class WFRP4eScript
         }
         catch(e)
         {
+            oncustomerror(`${name} Subscript ${this.Label} threw error: ${this.context.effect.uuid}.\n:`, e);
             console.error(`${name} Subscript ${this.Label} threw error: ${e}.\n Context and Arguments:`, this.context, args);
             throw e;
         }
