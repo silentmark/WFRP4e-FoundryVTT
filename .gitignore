@@ -11,3 +11,5 @@ foundryconfig.json
 build
 packs/*/*
 !packs/*/*.json
+load-scripts-pl.js
+scripts-pl/*
