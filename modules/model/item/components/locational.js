@@ -23,8 +23,8 @@ export class LocationalItemModel extends BaseItemModel {
     }
 
 
-    async preCreateData(data, options, user) {
-        let preCreateData = await super.preCreateData(data, options, user);
+    async _preCreate(data, options, user) {
+        await super._preCreate(data, options, user);
 
         if (this.parent.isOwned)
         {
@@ -39,7 +39,6 @@ export class LocationalItemModel extends BaseItemModel {
                 this.updateSource({"location.value" : game.wfrp4e.config.locations[location]})
             }
         }
-        return preCreateData;
     }
 
     checkSourceTest()
@@ -52,8 +51,8 @@ export class LocationalItemModel extends BaseItemModel {
 
             let message = game.messages.get(sourceMessageId);
             // Might come from single or opposed test
-            let test = message.getTest(); 
-            let opposed = message.getOpposedTest();
+            let test = message.system.test; 
+            let opposed = message.system.opposedTest;
 
             if (test)
             {

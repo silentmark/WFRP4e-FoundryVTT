@@ -166,19 +166,17 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
       //#endregion
 
 
-    async preCreateData(data, options, user) {
-        let preCreateData = await super.preCreateData(data, options, user);
+    async _preCreate(data, options, user) {
+        await super._preCreate(data, options, user);
 
         if (this.parent.isOwned && this.parent.actor.type != "character" && this.parent.actor.type != "vehicle") {
-            foundry.utils.setProperty(preCreateData, "system.equipped", true); // TODO: migrate this into a unified equipped property
+            this.updateSource({"system.equipped" : true}); // TODO: migrate this into a unified equipped property
         }
-
-        return preCreateData;
     }
 
 
-    async preUpdateChecks(data) {
-        await super.preUpdateChecks(data);
+    async _preUpdate(data, options, user) {
+        await super._preUpdate(data, options, user);
 
         if (this.weaponGroup.value == "throwing" && foundry.utils.getProperty(data, "system.ammunitionGroup.value") == "throwing") {
             delete data.system.ammunitionGroup.value
@@ -271,7 +269,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
         if (this.weaponGroup.value == "blackpowder")
         {
             let effect = foundry.utils.deepClone(game.wfrp4e.utility.getSystemEffects().blackpowder);
-            effect.flags.wfrp4e.applicationData.type = "target";
+            effect.system.transferData.type = "target";
             this.weaponGroup.effect = new ActiveEffect.implementation(effect, {parent : this.parent});
         }
 
@@ -348,7 +346,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
         if (game.settings.get("wfrp4e", "mooRangeBands")) {
             game.wfrp4e.utility.logHomebrew("mooRangeBands")
             if (!this.parent.getFlag("wfrp4e", "optimalRange"))
-                game.wfrp4e.utility.log("Warning: No Optimal Range set for " + this.name)
+                warhammer.utility.log("Warning: No Optimal Range set for " + this.name)
 
             rangeBands[`${game.i18n.localize("Point Blank")}`].modifier = this.#optimalDifference(game.i18n.localize("Point Blank")) * -20 + 20
             delete rangeBands[`${game.i18n.localize("Point Blank")}`].difficulty
@@ -379,7 +377,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
     #optimalDifference(range)
     {
         let keys = Object.keys(game.wfrp4e.config.rangeBands)
-        let rangeKey = game.wfrp4e.utility.findKey(range, game.wfrp4e.config.rangeBands)
+        let rangeKey = warhammer.utility.findKey(range, game.wfrp4e.config.rangeBands)
         let weaponRange = this.parent.getFlag("wfrp4e", "optimalRange")
         if (!weaponRange || !rangeKey)
             return 1
@@ -575,12 +573,6 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
         }
         return super.getOtherEffects().concat(other);
     }
-
-    shouldTransferEffect(effect)
-    {
-        return super.shouldTransferEffect(effect) && (!effect.applicationData.equipTransfer || this.isEquipped)
-    }
-
 
     async expandData(htmlOptions) {
         let data = await super.expandData(htmlOptions);

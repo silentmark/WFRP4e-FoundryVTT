@@ -30,25 +30,24 @@ export class PhysicalItemModel extends BaseItemModel
         return schema;
     }
 
-    /**
+        /**
      * Used to identify an Item as one being a child of PhysicalItemModel
      *
      * @final
      * @returns {boolean}
      */
-    get isPhysical() {
-        return true;
-    }
+        get isPhysical() {
+            return true;
+        }
+    
 
-    async preCreateData(data, options, user)
+    async _preCreate(data, options, user)
     {
-       let preCreateData = await super.preCreateData(data, options, user);
+       await super._preCreate(data, options, user);
 
        // Previously this checked if item was still owned, not sure if that's necessary 
        // It seems that every case where a new item is created, it should clear the location
-       foundry.utils.setProperty(preCreateData, "system.location.value",  "");
-
-       return preCreateData;
+       this.updateSource({"location.value" :  ""});
     }
 
     computeBase() 

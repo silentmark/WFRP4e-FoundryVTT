@@ -84,14 +84,13 @@ export class ArmourModel extends PropertiesMixin(EquippableItemModel) {
     return currentAP
   }
 
-  async preCreateData(data, options, user) {
-    let preCreateData = await super.preCreateData(data, options, user);
+  async _preCreate(data, options, user) {
+    await super._preCreate(data, options, user);
 
-    if (this.parent.isOwned && this.parent.actor.type !== "character" && this.parent.actor.type !== "vehicle") {
-      foundry.utils.setProperty(preCreateData, "system.equipped.value", true);
+    if (this.parent.isOwned && this.parent.actor.type != "character" && this.parent.actor.type != "vehicle") 
+    {
+      this.updateSource({"equipped.value" : true});
     }
-
-    return preCreateData;
   }
 
   computeBase() {
@@ -104,11 +103,6 @@ export class ArmourModel extends PropertiesMixin(EquippableItemModel) {
       "rLeg": false,
       "body": false
     }
-  }
-
-  shouldTransferEffect(effect)
-  {
-      return super.shouldTransferEffect(effect) && (!effect.applicationData.equipTransfer || this.isEquipped)
   }
 
     /** 
@@ -196,7 +190,7 @@ export class ArmourModel extends PropertiesMixin(EquippableItemModel) {
     }
 
     if (data.worn?.value) {
-      data.equipped.value = data.worn.value;
+      foundry.utils.setProperty(data, "equipped.value", data.worn.value);
     }
   }
 

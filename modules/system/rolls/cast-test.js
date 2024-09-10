@@ -1,4 +1,3 @@
-import AbilityTemplate from "../aoe.js";
 import TestWFRP from "./test-wfrp4e.js"
 
 export default class CastTest extends TestWFRP {
@@ -271,7 +270,7 @@ export default class CastTest extends TestWFRP {
           if (tableRoll.roll == 1) {
             await template?.delete();
             this.context.templates = this.context.templates.filter(i => i != id);
-            await this.updateMessageFlags();
+            await this.updateMessageData();
             continue;
           }
           else if (tableRoll.roll == 2) {

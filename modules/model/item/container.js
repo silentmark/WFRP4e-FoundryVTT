@@ -41,33 +41,31 @@ export class ContainerModel extends EquippableItemModel {
       return true;
     }
 
-    async preUpdateChecks(data, options, user) {
-      await super.preUpdateChecks(data);
+    async _preUpdate(data, options, user) {
+      await super._preUpdate(data, options, user);
       if (getProperty(data, "system.location.value") == this.parent.id)
       {
         delete foundry.utils.setProperty(data, "system.location.value", null)
       }
   }
 
-    async updateChecks(data, options, user)
+    async _onUpdate(data, options, user)
     {
-        let update = await super.updateChecks(data, options, user) || {};
+        await super._onUpdate(data, options, user);
 
         if (data.system?.location?.value) {
             let allContainers = this.parent.actor?.getItemTypes("container")
             if (this.formsLoop(this.parent, allContainers))
             {
               ui.notifications.error("Loop formed - Resetting Container Location")
-              update["system.location.value"] = "";
+              data["system.location.value"] = "";
             }
           }
-
-          return update
     }
 
 
-    async preDeleteChecks() {
-        await super.preDeleteChecks()
+    async _preDelete(options, user) {
+        await super._preDelete(options, user)
 
         // When deleting a container, remove the flag that determines whether it's collapsed in the sheet
         if (this.parent.actor) 
@@ -112,11 +110,6 @@ export class ContainerModel extends EquippableItemModel {
         enc = 0;
       }
       return enc;
-    }
-
-    shouldTransferEffect(effect)
-    {
-        return super.shouldTransferEffect(effect) && (!effect.applicationData.equipTransfer || this.isEquipped)
     }
 
 

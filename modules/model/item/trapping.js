@@ -31,35 +31,27 @@ export class TrappingModel extends PropertiesMixin(EquippableItemModel)
       return true;
     }
 
-
-  get worn() {
-    console.warn("[DEPRECATION] `container.worn` is deprecated, please use `container.equipped.value` instead");
-    return this.equipped.value;
-  }
-
-  get weighsLessEquipped() {
-    return true;
-  }
-
-  get canEquip() {
-    return this.trappingType.value === "clothingAccessories";
-  }
-
-    async preCreateData(data, options, user)
+    async _preCreate(data, options, user)
     {
-       let preCreateData = await super.preCreateData(data, options, user);
+       await super._preCreate(data, options, user);
 
        if (this.trappingType == "clothingAccessories" && this.parent.isOwned && this.parent.actor.type != "character" && this.parent.actor.type != "vehicle")
        {
-          foundry.utils.setProperty(preCreateData, "system.worn", true); // TODO: migrate this into a unified equipped property
+        this.updateSource({"worn" : true}); // TODO: migrate this into a unified equipped property
        }
-           
-       return preCreateData;
     }
 
-    shouldTransferEffect(effect)
-    {
-        return super.shouldTransferEffect(effect) && (!effect.applicationData.equipTransfer || this.isEquipped)
+    get worn() {
+      console.warn("[DEPRECATION] `container.worn` is deprecated, please use `container.equipped.value` instead");
+      return this.equipped.value;
+    }
+  
+    get weighsLessEquipped() {
+      return true;
+    }
+  
+    get canEquip() {
+      return this.trappingType.value === "clothingAccessories";
     }
 
     async expandData(htmlOptions) {
