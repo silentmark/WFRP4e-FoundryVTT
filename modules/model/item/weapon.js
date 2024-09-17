@@ -14,7 +14,8 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
     static defineSchema() {
         let schema = super.defineSchema();
         schema.damage = new fields.SchemaField({
-            value: new fields.StringField({ initial: "" })
+            value: new fields.StringField({ initial: "" }),
+            dice: new fields.StringField({ initial: "" })
         });
         schema.weaponGroup = new fields.SchemaField({
             value: new fields.StringField({ initial: "basic" })
@@ -265,13 +266,6 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
 
 
     computeOwned() {
-
-        if (this.weaponGroup.value == "blackpowder")
-        {
-            let effect = foundry.utils.deepClone(game.wfrp4e.utility.getSystemEffects().blackpowder);
-            effect.system.transferData.type = "target";
-            this.weaponGroup.effect = new ActiveEffect.implementation(effect, {parent : this.parent});
-        }
 
         if (this.isRanged && this.ammo && (this.skillToUse || this.parent.actor.type == "vehicle"))
             this._addProperties(this.ammo.properties)
