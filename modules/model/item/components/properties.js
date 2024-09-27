@@ -44,12 +44,10 @@ const PropertiesMixin = (cls) => class extends cls
             return this._properties;
         }
 
-        this._properties = {
+        else return {
             qualities: this.constructor.propertyArrayToObject(this.qualities.value, game.wfrp4e.utility.qualityList(), this.parent),
             flaws: this.constructor.propertyArrayToObject(this.flaws.value, game.wfrp4e.utility.flawList(),  this.parent),
         }
-
-        return this._properties;
     }
 
     get originalProperties() {
@@ -106,12 +104,7 @@ const PropertiesMixin = (cls) => class extends cls
 
     //#endregion
 
-    getOtherEffects()
-    {
-        return super.getOtherEffects().concat(Object.values(mergeObject(this.properties.qualities, this.properties.flaws), {inplace : false}).map(p => p.effect).filter(i => i) || []);
-    }
-
-
+    
     computeBase() {
         this._properties = null;
         super.computeBase();
@@ -168,8 +161,6 @@ const PropertiesMixin = (cls) => class extends cls
                         display: propertyObject[p.name],
                         value: p.value,
                         group: p.group,
-                        active: p.active,
-                        effect: this._createPropertyEffect(p, document)
                     }
                     if (p.value)
                         properties[p.name].display += " " + (Number.isNumeric(p.value) ? p.value : `(${p.value})`)
@@ -192,13 +183,15 @@ const PropertiesMixin = (cls) => class extends cls
         return properties
     }
 
+    //TODO: this breaks stuff...
     static _createPropertyEffect(property, document)
     {
         let effectData = foundry.utils.deepClone(game.wfrp4e.config.propertyEffects[property.name]);
         if (effectData)
         {
             let type = game.wfrp4e.config.weaponQualities[property.name] ? "qualities" : "flaws"
-            setProperty(effectData, "flags.wfrp4e", {value : property.value, path : `system.properties.${type}.${property.name}.effect`});
+            foundry.utils.setProperty(effectData, "flags.wfrp4e", {value : property.value, path : `system.properties.${type}.${property.name}.effect`});
+
             return new CONFIG.ActiveEffect.documentClass(effectData, {parent : document});
         }
     }

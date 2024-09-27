@@ -52,9 +52,11 @@ export default class AttackTest extends TestWFRP {
     }
     else // if success
     {
+      /*
+      No longer needed
       if (this.item.properties.qualities.blast)
         this.result.other.push(`<a class='aoe-template' data-type="radius"><i class="fas fa-ruler-combined"></i>${this.item.properties.qualities.blast.value} yard Blast</a>`)
-
+      */
       if (this.result.roll % 11 == 0)
         this.result.critical = game.i18n.localize("Critical")
 

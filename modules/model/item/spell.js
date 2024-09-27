@@ -114,8 +114,8 @@ export class SpellModel extends OvercastItemModel {
 
     computeBase() {
         let lore = foundry.utils.deepClone(game.wfrp4e.config.loreEffects[this.lore.value])
-        foundry.utils.setProperty(lore, "flags.wfrp4e.path", "system.lore.effect");
         if (lore) {
+            foundry.utils.setProperty(lore, "flags.wfrp4e.path", "system.lore.effect");
             this.lore.effect = new ActiveEffectWFRP4e(lore, { parent: this.parent });
         }
         this._addSpellDescription();
