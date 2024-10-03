@@ -111,9 +111,9 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
 
     get ammoList() {
     if (this.ammunitionGroup.value == "throwing")
-        return this.parent.actor.getItemTypes("weapon").filter(i => i.weaponGroup.value == "throwing")
+        return this.parent.actor.itemTags["weapon"].filter(i => i.weaponGroup.value == "throwing")
     else 
-        return this.parent.actor.getItemTypes("ammunition").filter(a => a.ammunitionType.value == this.ammunitionGroup.value)
+        return this.parent.actor.itemTags["ammunition"].filter(a => a.ammunitionType.value == this.ammunitionGroup.value)
     }
 
     get Damage() {
@@ -283,7 +283,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
             let momentum = this.qualities.value.find(q => q.name == "momentum" && q.value)
             if (momentum?.value && this.parent.actor.status.advantage.value > 0) {
                 let qualityString = momentum.value
-                this._addProperties({ qualities: game.wfrp4e.utility.propertyStringToObject(qualityString, game.wfrp4e.utility.allProperties()), flaws: {} })
+                this._addProperties({ qualities: this.constructor.propertyStringToObject(qualityString, game.wfrp4e.utility.allProperties()), flaws: {} })
                 this.qualities.value.splice(this.qualities.value.findIndex(q => q.name == "momentum"), 1)
             }
         }
@@ -480,7 +480,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
 
     getSkillToUse(actor) {
         actor = actor || this.parent.actor;
-        let skills = actor?.getItemTypes("skill") || []
+        let skills = actor?.itemTags["skill"] || []
         let skill = skills.find(x => x.name.toLowerCase() == this.skill.value.toLowerCase())
         if (!skill) {
             skill = skills.find(x => x.name.toLowerCase().includes(`(${this.WeaponGroup.toLowerCase()})`))

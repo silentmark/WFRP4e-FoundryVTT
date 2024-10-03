@@ -63,7 +63,7 @@ export default class ActorSheetWFRP4eCharacter extends ActorSheetWFRP4e {
 
     // For each career, find the current one, and set the details accordingly (top of the character sheet)
     // Additionally, set available characteristics, skills, and talents to advance (advancement indicator)
-    for (let career of sheetData.actor.getItemTypes("career")) {
+    for (let career of sheetData.actor.itemTags["career"]) {
       if (career.current.value) {
         sheetData.career.hasCurrentCareer = true; // Used to remove indicators if no current career
 
@@ -88,9 +88,9 @@ export default class ActorSheetWFRP4eCharacter extends ActorSheetWFRP4e {
 
         // Find skills that have been trained or haven't, add advancement indicators or greyed out options (untrainedSkills)
         for (let sk of career.skills.concat(career.system.addedSkills)) {
-          let trainedSkill = sheetData.actor.getItemTypes("skill").find(s => s.name.toLowerCase() == sk.toLowerCase())
+          let trainedSkill = sheetData.actor.itemTags["skill"].find(s => s.name.toLowerCase() == sk.toLowerCase())
           if (trainedSkill) 
-            trainedSkill.system._addCareerData(career)
+            trainedSkill.system.addCareerData(career)
           else 
             sheetData.career.untrainedSkills.push(sk);
           
@@ -98,9 +98,9 @@ export default class ActorSheetWFRP4eCharacter extends ActorSheetWFRP4e {
 
         // Find talents that have been trained or haven't, add advancement button or greyed out options (untrainedTalents)
         for (let talent of career.talents) {
-          let trainedTalent = sheetData.actor.getItemTypes("talent").find(t => t.name == talent)
+          let trainedTalent = sheetData.actor.itemTags["talent"].find(t => t.name == talent)
           if (trainedTalent) 
-            trainedTalent.system._addCareerData(career)
+            trainedTalent.system.addCareerData(career)
           else 
             sheetData.career.untrainedTalents.push(talent);
           
@@ -189,7 +189,7 @@ export default class ActorSheetWFRP4eCharacter extends ActorSheetWFRP4e {
 
     // Only one career can be current - make all careers not current before changing selected one
     if (type == "current" && item.current.value == false) { 
-      let updateCareers = this.actor.getItemTypes("career").map(i => i.toObject())
+      let updateCareers = this.actor.itemTags["career"].map(i => i.toObject())
       updateCareers.map(x => x.system.current.value = false)
       await this.actor.updateEmbeddedDocuments("Item", updateCareers)
     }
@@ -449,7 +449,7 @@ export default class ActorSheetWFRP4eCharacter extends ActorSheetWFRP4e {
       }      
     }
     actorUpdate.items = itemUpdates;
-    await this.actor.update(actorUpdate);
+    await this.actor.update(actorUpdate, {skipExperienceChecks : true});
   }
 
   _onExpLogDelete(ev) {

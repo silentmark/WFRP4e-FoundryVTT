@@ -221,11 +221,14 @@ export default class WFRP_Tables {
 
   static async rollToChat(table, options = {}, column = null, rollMode) {
     let chatOptions = game.wfrp4e.utility.chatDataSetup("", rollMode, true)
-    chatOptions.content = await this.formatChatRoll(table, options, column);
+    options.returnObject = true;
+    let tableResult = await this.formatChatRoll(table, options, column);
+    chatOptions.content = tableResult.result;
     chatOptions.type = 0;
     if (chatOptions.content)
       ChatMessage.create(chatOptions);
     ui.sidebar.activateTab("chat")
+    return tableResult;
   }
 
   static findTable(key, column) {
@@ -382,13 +385,20 @@ export default class WFRP_Tables {
         if (item && item.documentName == "Item")
         {
           item.postItem("inf", {"flags.wfrp4e.sourceMessageId" : options.messageId});
-          return null
+          return {}
         }
       }
 
     }
 
-    return result.result
+    if (options.returnResult)
+    {
+      return result
+    }
+    else 
+    {
+      return result.result;
+    }
 
   }
 

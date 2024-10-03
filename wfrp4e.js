@@ -75,6 +75,8 @@ import { OpposedTestMessage } from "./modules/model/message/opposed-result.js";
 import { OpposedHandlerMessage } from "./modules/model/message/oppose-handler.js";
 import  OpposedHandler from "./modules/system/opposed-handler.js";
 import CombatHelpersWFRP from "./modules/system/combat.js";
+import ActorSheetWFRP4eCharacterV2 from "./src/apps/sheets/actor/character-sheet.js";
+import { GenericAspectModel } from "./modules/model/item/generic.js";
 
 /* -------------------------------------------- */
 /*  Foundry VTT Initialization                  */
@@ -90,9 +92,11 @@ Hooks.once("init", function () {
   // Register sheet application classes
   Actors.unregisterSheet("core", ActorSheet);
   Actors.registerSheet("wfrp4e", ActorSheetWFRP4eCharacter, { types: ["character"], makeDefault: true });
+  Actors.registerSheet("wfrp4e", ActorSheetWFRP4eCharacterV2, { types: ["character"] });
   Actors.registerSheet("wfrp4e", ActorSheetWFRP4eNPC, { types: ["npc"], makeDefault: true });
   Actors.registerSheet("wfrp4e", ActorSheetWFRP4eCreature, { types: ["creature"], makeDefault: true });
   Actors.registerSheet("wfrp4e", ActorSheetWFRP4eVehicle, { types: ["vehicle"], makeDefault: true });
+  
   Items.unregisterSheet("core", ItemSheet);
   Items.registerSheet("wfrp4e", ItemSheetWfrp4e, { makeDefault: true });
   DocumentSheetConfig.registerSheet(RollTable, "wfrp4e", WFRPTableConfig, {makeDefault: true})
@@ -151,9 +155,10 @@ Hooks.once("init", function () {
       ItemProperties,
       ChargenStage
     },
-    entities: {
+    documents: {
       ActorWFRP4e,
-      ItemWfrp4e
+      ItemWfrp4e,
+      GenericAspectModel
     },
     rolls : {
       TestWFRP,

@@ -54,6 +54,24 @@ export class CareerModel extends BaseItemModel
         }
     }
 
+    async _onUpdate(data, options, user)
+    {
+        await super._onUpdate(data, options, user);
+        if (this.parent.isOwned && data.system?.current?.value)
+        {
+            let actor = this.parent.actor;
+            let careerUpdates = actor.itemTypes.career.filter(i => i.system.current.value && i.id != this.parent.id).map(i => {
+                return {
+                    "system.current.value" : false,
+                    _id : i.id
+                }
+            });
+            // Reset all other careers to not be current (only one can be current)
+            actor.update({items : careerUpdates});
+
+        }
+    }
+
 
      changeSkillName(newName, oldName) {
         let careerSkills = foundry.utils.duplicate(this.skills)
@@ -89,6 +107,12 @@ export class CareerModel extends BaseItemModel
             },
             default: 'yes'
         }).render(true);
+    }
+
+    // Career should only be applied if career is active
+    effectIsApplicable(effect) 
+    {
+        return this.current.value;
     }
     
 

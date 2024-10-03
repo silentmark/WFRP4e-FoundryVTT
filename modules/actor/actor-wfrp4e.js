@@ -30,6 +30,7 @@ import ActiveEffectWFRP4e from "../system/effect-wfrp4e.js";
 export default class ActorWFRP4e extends WarhammerActor
 {
 
+  _itemTags = null;
   /**
    *
    * Set initial actor data based on type
@@ -94,6 +95,13 @@ export default class ActorWFRP4e extends WarhammerActor
           TokenHelpers.updateAuras(this.getActiveTokens()[0]?.document);
       }
   }  
+
+  prepareBaseData()
+  {
+      this._itemTags = null
+      super.prepareBaseData();
+  }
+
   
   /**
    * @override 
@@ -189,7 +197,7 @@ export default class ActorWFRP4e extends WarhammerActor
   async setupSkill(skill, options = {}) {
     if (typeof (skill) === "string") {
       let skillName = skill
-      skill = this.itemTypes["skill"].find(sk => sk.name == skill)
+      skill = this.itemTags["skill"].find(sk => sk.name == skill)
       if (!skill)
       {
         // Skill not found, find later and use characteristic
@@ -375,7 +383,7 @@ export default class ActorWFRP4e extends WarhammerActor
       await test.roll();
     }
     else {
-      let skill = this.itemTypes["skill"].find(i => i.name == item.test.value)
+      let skill = this.itemTags["skill"].find(i => i.name == item.test.value)
       if (skill) {
         let test = await this.setupSkill(skill, options);
         await test.roll();
@@ -453,7 +461,7 @@ export default class ActorWFRP4e extends WarhammerActor
  *
  */
   async addBasicSkills() {
-    let ownedBasicSkills = this.itemTypes["skill"].filter(i => i.advanced.value == "bsc");
+    let ownedBasicSkills = this.itemTags["skill"].filter(i => i.advanced.value == "bsc");
     let allBasicSkills = await WFRP_Utility.allBasicSkills()
 
     // Filter allBasicSkills with ownedBasicSkills, resulting in all the missing skills
@@ -498,7 +506,6 @@ export default class ActorWFRP4e extends WarhammerActor
 
     // Start message update string
     let updateMsg = `<b>${game.i18n.localize("CHAT.DamageApplied")}</b><span class = 'hide-option'>: `;
-    let messageElements = [] // unused and deprecated
 
     let modifiers = {
       tb : 0,
@@ -667,7 +674,8 @@ export default class ActorWFRP4e extends WarhammerActor
     }
 
     //@HOUSE
-    if (penetrating && game.settings.get("wfrp4e", "mooPenetrating")) {
+    if (penetrating && game.settings.get("wfrp4e", "mooPenetrating")) 
+    {
       game.wfrp4e.utility.logHomebrew("mooPenetrating")
       let penetratingIgnored = penetrating.value || 2
       modifiers.ap.details.push(game.i18n.format("BREAKDOWN.PenetratingMoo", {ignored: penetratingIgnored}))
@@ -686,6 +694,14 @@ export default class ActorWFRP4e extends WarhammerActor
       {
         modifiers.ap.shield = this.status.armour.shield
       }
+    }
+
+
+    // Not really a comprehensive fix 
+    if (modifiers.ap.shield && penetrating)
+    {
+        modifiers.ap.details.push(game.i18n.format("BREAKDOWN.Penetrating", {ignored: modifiers.ap.shield, item: "Shield"}))
+        modifiers.ap.shield = 0;
     }
     
     //@HOUSE
@@ -753,8 +769,7 @@ export default class ActorWFRP4e extends WarhammerActor
       }
     }
     catch (e) { warhammer.utility.log("Sound Context Error: " + e, true) } // Ignore sound errors
-
-    let scriptArgs = { actor, opposedTest, totalWoundLoss, AP, applyAP, applyTB, damageType, updateMsg, messageElements, modifiers, ward, wardRoll, attacker, extraMessages, abort }
+    let scriptArgs = { actor, attacker, opposedTest, totalWoundLoss, AP, applyAP, applyTB, damageType, updateMsg, modifiers, ward, wardRoll, attacker, extraMessages, abort }
     await Promise.all(actor.runScripts("takeDamage", scriptArgs))
     await Promise.all(attacker.runScripts("applyDamage", scriptArgs))
     await Promise.all(opposedTest.attackerTest.item?.runScripts("applyDamage", scriptArgs))
@@ -968,42 +983,44 @@ export default class ActorWFRP4e extends WarhammerActor
 
 
   async corruptionDialog(strength) {
-    new Dialog({
+    let test;
+    Dialog.wait({
       title: game.i18n.localize("DIALOG.CorruptionTitle"),
       content: `<p>${game.i18n.format("DIALOG.CorruptionContent", { name: this.name })}</p>`,
       buttons: {
         endurance: {
           label: game.i18n.localize("NAME.Endurance"),
-          callback: () => {
-            let skill = this.itemTypes["skill"].find(i => i.name == game.i18n.localize("NAME.Endurance"))
+          callback: async () => {
+            let skill = this.itemTags["skill"].find(i => i.name == game.i18n.localize("NAME.Endurance"))
             if (skill) {
-              this.setupSkill(skill, { title: game.i18n.format("DIALOG.CorruptionTestTitle", { test: skill.name }), corruption: strength, skipTargets: true }).then(test => test.roll())
+             test = await this.setupSkill(skill, { title: game.i18n.format("DIALOG.CorruptionTestTitle", { test: skill.name }), corruption: strength, skipTargets: true })
             }
             else {
-              this.setupCharacteristic("t", { title: game.i18n.format("DIALOG.CorruptionTestTitle", { test: game.wfrp4e.config.characteristics["t"] }), corruption: strength, skipTargets : true }).then(test => test.roll())
+              test = await this.setupCharacteristic("t", { title: game.i18n.format("DIALOG.CorruptionTestTitle", { test: game.wfrp4e.config.characteristics["t"] }), corruption: strength, skipTargets : true })
             }
           }
         },
         cool: {
           label: game.i18n.localize("NAME.Cool"),
-          callback: () => {
-            let skill = this.itemTypes["skill"].find(i => i.name == game.i18n.localize("NAME.Cool"))
+          callback: async () => {
+            let skill = this.itemTags["skill"].find(i => i.name == game.i18n.localize("NAME.Cool"))
             if (skill) {
-              this.setupSkill(skill, { title: game.i18n.format("DIALOG.CorruptionTestTitle", { test: skill.name }), corruption: strength, skipTargets: true }).then(test => test.roll())
+              test = await this.setupSkill(skill, { title: game.i18n.format("DIALOG.CorruptionTestTitle", { test: skill.name }), corruption: strength, skipTargets: true })
             }
             else {
-              this.setupCharacteristic("wp", { title: game.i18n.format("DIALOG.CorruptionTestTitle", { test: game.wfrp4e.config.characteristics["wp"] }), corruption: strength, skipTargets : true }).then(test => test.roll())
+              test = await this.setupCharacteristic("wp", { title: game.i18n.format("DIALOG.CorruptionTestTitle", { test: game.wfrp4e.config.characteristics["wp"] }), corruption: strength, skipTargets : true })
             }
           }
         }
 
       }
     }).render(true)
+    return test;
   }
 
 
   has(traitName, type = "trait") {
-    return this.itemTypes[type].find(i => i.name == traitName && i.included)
+    return this.itemTags[type].find(i => i.name == traitName && i.included)
   }
 
   /**
@@ -1273,13 +1290,27 @@ export default class ActorWFRP4e extends WarhammerActor
     return this.hasCondition(key) // Same function so just reuse
   }
 
-  /**@deprecated in favor of just calling itemTypes */
-  getItemTypes(type) {
-    return this.itemTypes[type]
-  }
-
   async clearOpposed() {
     return (await this.update({ "flags.-=oppose": null }));
+  }
+
+  get itemTags() {
+    if (!this._itemTags) 
+    {
+      let tags = new Set(game.documentTypes.Item);
+      let items = this.items.contents;
+      for (const item of items) 
+      {
+        tags = tags.union(item.system.tags);
+      }
+      this._itemTags = tags.toObject().reduce((obj, tag) => 
+      {
+        obj[tag] = items.filter(i => i.system.tags.has(tag))
+        return obj;
+      }, {})
+    }
+
+    return this._itemTags;
   }
 
   // @@@@@@@@ BOOLEAN GETTERS
@@ -1289,15 +1320,15 @@ export default class ActorWFRP4e extends WarhammerActor
   }
 
   get hasSpells() {
-    return !!this.itemTypes["spell"].length > 0
+    return !!this.itemTags["spell"].length > 0
   }
 
   get hasPrayers() {
-    return !!this.itemTypes["prayer"].length > 0
+    return !!this.itemTags["prayer"].length > 0
   }
 
   get noOffhand() {
-    return !this.itemTypes["weapon"].find(i => i.offhand.value)
+    return !this.itemTags["weapon"].find(i => i.offhand.value)
   }
 
   get isOpposing() {
@@ -1339,7 +1370,6 @@ export default class ActorWFRP4e extends WarhammerActor
   }
 
 
-
   speakerData(token) {
     if (this.isToken || token) {
       return {
@@ -1355,6 +1385,13 @@ export default class ActorWFRP4e extends WarhammerActor
       }
     }
   }
+
+  // async _buildEmbedHTML(config, options={}) {
+  //   if (this.system.toEmbed)
+  //   {
+  //     return this.system.toEmbed(config, options)
+  //   }
+  // }
 
   // @@@@@@@@@@@ COMPUTED GETTERS @@@@@@@@@
   get Species() {
@@ -1383,20 +1420,6 @@ export default class ActorWFRP4e extends WarhammerActor
 
   get equipPointsAvailable() {
     return Number.isNumeric(this.flags.equipPoints) ? this.flags.equipPoints : 2
-  }
-
-  get defensive() {
-
-    // Add defensive traits and weapons together
-    return this.itemTypes["weapon"].reduce((prev, current) => {
-      if (current.isEquipped)
-        prev += current.properties.qualities.defensive ? 1 : 0
-      return prev
-    }, 0) + this.itemTypes["trait"].reduce((prev, current) => {
-      if (current.included)
-        prev += current.properties?.qualities?.defensive ? 1 : 0
-      return prev
-    }, 0)
   }
 
   get currentCareer() {

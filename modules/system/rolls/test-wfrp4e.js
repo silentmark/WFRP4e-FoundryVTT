@@ -600,19 +600,19 @@ export default class TestWFRP extends WarhammerTestBase{
     let failed = this.failed
     let corruption = 0 // Corruption GAINED
     switch (strength) {
-      case "minor":
+      case game.i18n.localize("CORRUPTION.Minor").toLowerCase():
         if (failed)
           corruption++;
         break;
 
-      case "moderate":
+        case game.i18n.localize("CORRUPTION.Moderate").toLowerCase():
         if (failed)
           corruption += 2
         else if (this.result.SL < 2)
           corruption += 1
         break;
 
-      case "major":
+        case game.i18n.localize("CORRUPTION.Major").toLowerCase():
         if (failed)
           corruption += 3
         else if (this.result.SL < 2)
@@ -670,8 +670,8 @@ export default class TestWFRP extends WarhammerTestBase{
       <p>${game.i18n.localize("CHAT.Dissolution")}</p>
       <p>${game.i18n.format("CHAT.CorruptionLoses", { name: this.actor.name, number: wpb })}
       <p>${tableText}</p>`,
-        "gmroll", false))
-      this.actor.update({ "system.status.corruption.value": Number(this.actor.system.status.corruption.value) - wpb })
+        "gmroll", false))  
+      this.actor.update({ "system.status.corruption.value": Number(this.actor.system.status.corruption.value) - wpb }, {skipCorruption: true}) // Don't keep checking corruption, causes a possible loop of dialogs
     }
     else
       ChatMessage.create(WFRP_Utility.chatDataSetup(game.i18n.localize("CHAT.MutateSuccess"), "gmroll", false))

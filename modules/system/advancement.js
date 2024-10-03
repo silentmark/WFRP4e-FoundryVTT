@@ -74,7 +74,7 @@ export default class Advancement
 
   static advancementDialog(item, advances, type, actor)
   {
-    let start = item instanceof Item ? item.advances.value : actor.characteristics[item].advances
+    let start = item instanceof Item ? item.advances.value : actor.system.characteristics[item].advances
     let end = advances;
     let name = item instanceof Item ? item.name : game.wfrp4e.config.characteristics[item]
 
@@ -140,7 +140,12 @@ export default class Advancement
             },
             free: {
               label: game.i18n.localize("Free"),
-              callback: () => { resolve(true) }
+              callback: () => {
+                  let newSpent = actor.details.experience.spent
+                  let log = actor.system.addToExpLog(0, `${name} (${end-start})`, newSpent)
+                  actor.update({ "system.details.experience.spent": newSpent, "system.details.experience.log": log })
+                  resolve(true) 
+                }
             }
           },
           close : () => {resolve(false)}
@@ -183,7 +188,7 @@ export default class Advancement
   
   static miracleGainedDialog(miracle, actor)
   {
-    let xp = 100 * (actor.itemTypes["prayer"].filter(p => p.prayerType.value == "miracle").length)
+    let xp = 100 * (actor.itemTags["prayer"].filter(p => p.prayerType.value == "miracle").length)
     if (xp) {
       new Dialog({
         title: game.i18n.localize("DIALOG.GainPrayer"),
@@ -228,11 +233,11 @@ export default class Advancement
 
     if (spell.lore.value != "petty" && spell.lore.value != game.i18n.localize("WFRP4E.MagicLores.petty"))
     {
-      currentlyKnown = actor.itemTypes["spell"].filter(i => i.lore.value == spell.lore.value && i.memorized.value).length;
+      currentlyKnown = actor.itemTags["spell"].filter(i => i.lore.value == spell.lore.value && i.memorized.value).length;
     }
     else if (spell.lore.value == "petty" || spell.lore.value == game.i18n.localize("WFRP4E.MagicLores.petty"))
     {
-      currentlyKnown = actor.itemTypes["spell"].filter(i => i.lore.value == spell.lore.value).length;
+      currentlyKnown = actor.itemTags["spell"].filter(i => i.lore.value == spell.lore.value).length;
       if (currentlyKnown < bonus)
         return 0 // First WPB petty spells are free
     }

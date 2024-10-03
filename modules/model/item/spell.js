@@ -56,6 +56,15 @@ export class SpellModel extends OvercastItemModel {
         return schema;
     }
 
+    async _preUpdate(data, options, user)
+    {
+      await super._preUpdate(data, options, user)
+      if (foundry.utils.hasProperty(data, "system.cn.SL"))
+      {
+          data.system.cn.SL = Math.clamp(data.system.cn.SL, 0, data.system.cn.value || this.cn.value)
+      }
+    }
+
     /**
      * Used to identify an Item as one being a child or instance of SpellModel
      *
@@ -73,7 +82,7 @@ export class SpellModel extends OvercastItemModel {
 
 
       get ingredientList() {
-        return this.parent.actor?.getItemTypes("trapping").filter(t => t.trappingType.value == "ingredient" && t.spellIngredient.value == this.parent.id)
+        return this.parent.actor?.itemTags["trapping"].filter(t => t.trappingType.value == "ingredient" && t.spellIngredient.value == this.parent.id)
       }
 
       get Target() {
@@ -138,7 +147,7 @@ export class SpellModel extends OvercastItemModel {
     getSkillToUse(actor) 
     {
         actor = actor || this.parent.actor;
-        let skills = actor?.getItemTypes("skill") || []
+        let skills = actor?.itemTags["skill"] || []
         let skill
         // Use skill override, if not found, use Language (Magick)
         if (this.skill.value)

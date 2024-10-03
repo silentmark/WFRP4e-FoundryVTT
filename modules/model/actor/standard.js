@@ -62,7 +62,8 @@ export class StandardActorModel extends BaseActorModel {
             allowed = allowed && item.system.category == "standard";
             if (!allowed)
             {
-                ui.notifications.error("ERROR.VehicleTraitsOnStandard");
+                ui.notifications.error("ERROR.VehicleTraitsOnStandard", {localize : true});
+                return false;
             }
         }
         return allowed
@@ -201,8 +202,8 @@ export class StandardActorModel extends BaseActorModel {
 
         this.runScripts("preAPCalc", args);
 
-        this.parent.getItemTypes("armour").filter(a => a.isEquipped).forEach(a => this.status.addArmourItem(a))
-        this.parent.getItemTypes("weapon").filter(i => i.properties.qualities.shield && i.isEquipped).forEach(i => this.status.addShieldItem(i))
+        this.parent.itemTags["armour"].filter(a => a.isEquipped).forEach(a => this.status.addArmourItem(a))
+        this.parent.itemTags["weapon"].filter(i => i.properties.qualities.shield && i.isEquipped).forEach(i => this.status.addShieldItem(i))
         
         this.runScripts("APCalc", args);
     }
@@ -279,19 +280,26 @@ export class StandardActorModel extends BaseActorModel {
 
     checkWounds(force=false) {
         if (this.parent.flags.autoCalcWounds || force) {
-            let wounds = this.computeWounds()
+            let newMaxWounds = this.computeWounds()
+            let updateCurrentWounds = this.status.wounds.value == this.status.wounds.max;
 
-            if (this.status.wounds.max != wounds) // If change detected, reassign max and current wounds
-            {
+            if (this.status.wounds.max != newMaxWounds) // If change detected, reassign max and current wounds only if current == max
+             {
                 if (this.parent.compendium || !game.actors || !this.parent.inCollection) // Initial setup, don't send update
                 {
-                  this.status.wounds.max = wounds;
-                  this.status.wounds.value = wounds;
+                  this.status.wounds.max = newMaxWounds;
+                  if (updateCurrentWounds)
+                  {
+                    this.status.wounds.value = newMaxWounds;
+                  }   
                 }
                 else
                 {
-                    if (game.user.id == getActiveDocumentOwner(this.parent)?.id) {
-                        this.parent.update({ "system.status.wounds.max": wounds, "system.status.wounds.value": wounds })
+                    if (game.user.id == getActiveDocumentOwner(this.parent)?.id) 
+                    {
+                        this.parent.update({ 
+                            "system.status.wounds.max": newMaxWounds, 
+                            "system.status.wounds.value": updateCurrentWounds ? newMaxWounds : this.status.wounds.value }) // Only update current if unwounded
                     }
                 }
             }
@@ -300,7 +308,7 @@ export class StandardActorModel extends BaseActorModel {
 
 
     async _handleGroupAdvantage(data, options) {
-        if (!options.skipGroupAdvantage && foundry.utils.hasProperty(data, "system.status.advantage.value") && game.settings.get("wfrp4e", "useGroupAdvantage")) {
+        if (!options.skipGroupAdvantage && foundry.utils.hasProperty(options.changed, "system.status.advantage.value") && game.settings.get("wfrp4e", "useGroupAdvantage")) {
             let combatant = game.combat?.getCombatantByActor(this.parent);
 
             if (!combatant) {

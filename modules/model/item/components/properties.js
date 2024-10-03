@@ -23,6 +23,11 @@ const PropertiesMixin = (cls) => class extends cls
         return true;
     }
 
+    get tags() 
+    {
+        return super.tags.add("properties");
+    }
+
     //#region getters
 
     get loading() {
@@ -104,7 +109,12 @@ const PropertiesMixin = (cls) => class extends cls
 
     //#endregion
 
-    
+    getOtherEffects()
+    {
+        return super.getOtherEffects().concat(Object.values(foundry.utils.mergeObject(foundry.utils.deepClone(this.properties.qualities), this.properties.flaws)).map(p => p.effect).filter(i => i) || []);
+    }
+
+
     computeBase() {
         this._properties = null;
         super.computeBase();
@@ -146,6 +156,7 @@ const PropertiesMixin = (cls) => class extends cls
             else
                 flaws.push({ name: f, value: properties.flaws[f].value })
         }
+        this._properties = null;
     }
 
     static propertyArrayToObject(array, propertyObject, document) {
@@ -183,7 +194,76 @@ const PropertiesMixin = (cls) => class extends cls
         return properties
     }
 
-    //TODO: this breaks stuff...
+      
+    static propertyStringToArray(propertyString, propertyObject)
+    {
+        let newProperties = []
+        let oldProperties = propertyString.toString().split(",").map(i => i.trim())
+        for (let property of oldProperties) {
+          if (!property)
+            continue
+    
+          let newProperty = {}
+          let splitProperty = property.split(" ")
+          if (Number.isNumeric(splitProperty[splitProperty.length - 1])) {
+            newProperty.value = parseInt(splitProperty[splitProperty.length - 1])
+            splitProperty.splice(splitProperty.length - 1, 1)
+          }
+    
+          splitProperty = splitProperty.join(" ")
+    
+          newProperty.name = warhammer.utility.findKey(splitProperty, propertyObject)
+          if (newProperty)
+            newProperties.push(newProperty)
+          else
+            newProperties.push(property)
+        }
+        return newProperties
+    }
+  
+    
+    static propertyStringToObject(propertyString, propertyObject)
+    {
+        let array = this.propertyStringToArray(propertyString, propertyObject)
+        return this.propertyArrayToObject(array, propertyObject)
+    }
+  
+
+      
+    static propertyStringToArray(propertyString, propertyObject)
+    {
+        let newProperties = []
+        let oldProperties = propertyString.toString().split(",").map(i => i.trim())
+        for (let property of oldProperties) {
+          if (!property)
+            continue
+    
+          let newProperty = {}
+          let splitProperty = property.split(" ")
+          if (Number.isNumeric(splitProperty[splitProperty.length - 1])) {
+            newProperty.value = parseInt(splitProperty[splitProperty.length - 1])
+            splitProperty.splice(splitProperty.length - 1, 1)
+          }
+    
+          splitProperty = splitProperty.join(" ")
+    
+          newProperty.name = warhammer.utility.findKey(splitProperty, propertyObject)
+          if (newProperty)
+            newProperties.push(newProperty)
+          else
+            newProperties.push(property)
+        }
+        return newProperties
+    }
+  
+    
+    static propertyStringToObject(propertyString, propertyObject)
+    {
+        let array = this.propertyStringToArray(propertyString, propertyObject)
+        return this.propertyArrayToObject(array, propertyObject)
+    }
+  
+
     static _createPropertyEffect(property, document)
     {
         let effectData = foundry.utils.deepClone(game.wfrp4e.config.propertyEffects[property.name]);
