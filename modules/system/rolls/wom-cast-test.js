@@ -9,7 +9,7 @@ export default class WomCastTest extends CastTest {
 
     this.result.overcasts = Math.max(0, slOver) + (this.result.totalPower ? parseInt(Math.floor(this.result.roll / 10)) : 0);    
     this.result.overcast.total = this.result.overcasts;
-    this.result.overcast.available = this.result.overcasts;    
+    this.result.overcast.available = this.result.overcasts;
     let overCastTable = game.wfrp4e.config.overCastTable(this.spell.lore.value);
 
     // Since SL is spent by overcasts, need to keep track of original
@@ -86,15 +86,13 @@ export default class WomCastTest extends CastTest {
 
       const count = overcastData.usage[choice].count;
 
-
       // If no table entry, or costs more than SL available, do nothing
       // AoE is separate column from target, so must be tested separately 
       if (choice == "target" && overcastData.usage.target.AoE) {
         if (!overCastTable["AoE"][count] || overCastTable["AoE"][count].cost > overcastData.available) {
           return overcastData;
         }
-      } 
-      
+      }
       else if (choice == "other") {
         if (overcastData.valuePerOvercast.cost) {
           otherCost = parseInt(eval(overcastData.valuePerOvercast.cost

@@ -19,7 +19,7 @@ export class OvercastItemModel extends BaseItemModel {
                additional  : new fields.StringField(),
                characteristic : new fields.StringField(),
                bonus : new fields.BooleanField(),
-               const : new fields.StringField()
+               cost : new fields.StringField()
           }),
           initial : new fields.SchemaField({
               type : new fields.StringField(),
