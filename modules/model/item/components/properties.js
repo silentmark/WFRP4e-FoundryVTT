@@ -49,10 +49,12 @@ const PropertiesMixin = (cls) => class extends cls
             return this._properties;
         }
 
-        else return {
+        this._properties = {
             qualities: this.constructor.propertyArrayToObject(this.qualities.value, game.wfrp4e.utility.qualityList(), this.parent),
             flaws: this.constructor.propertyArrayToObject(this.flaws.value, game.wfrp4e.utility.flawList(),  this.parent),
         }
+
+        return this._properties;
     }
 
     get originalProperties() {
@@ -172,6 +174,8 @@ const PropertiesMixin = (cls) => class extends cls
                         display: propertyObject[p.name],
                         value: p.value,
                         group: p.group,
+                        active: p.active,
+                        effect: this._createPropertyEffect(p, document)
                     }
                     if (p.value)
                         properties[p.name].display += " " + (Number.isNumeric(p.value) ? p.value : `(${p.value})`)
@@ -193,42 +197,12 @@ const PropertiesMixin = (cls) => class extends cls
 
         return properties
     }
-
-      
-    static propertyStringToArray(propertyString, propertyObject)
-    {
-        let newProperties = []
-        let oldProperties = propertyString.toString().split(",").map(i => i.trim())
-        for (let property of oldProperties) {
-          if (!property)
-            continue
-    
-          let newProperty = {}
-          let splitProperty = property.split(" ")
-          if (Number.isNumeric(splitProperty[splitProperty.length - 1])) {
-            newProperty.value = parseInt(splitProperty[splitProperty.length - 1])
-            splitProperty.splice(splitProperty.length - 1, 1)
-          }
-    
-          splitProperty = splitProperty.join(" ")
-    
-          newProperty.name = warhammer.utility.findKey(splitProperty, propertyObject)
-          if (newProperty)
-            newProperties.push(newProperty)
-          else
-            newProperties.push(property)
-        }
-        return newProperties
-    }
-  
     
     static propertyStringToObject(propertyString, propertyObject)
     {
         let array = this.propertyStringToArray(propertyString, propertyObject)
         return this.propertyArrayToObject(array, propertyObject)
     }
-  
-
       
     static propertyStringToArray(propertyString, propertyObject)
     {

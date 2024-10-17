@@ -11,10 +11,13 @@ let systemPath = getSystemPath(manifest.id)
 
 console.log("Bundling to " + systemPath)
 export default {
+    treeshake: {
+        propertyReadSideEffects: false
+    },
     input: [`${manifest.id}.js`, `./style/${manifest.id}.scss`],
     output: {
-        dir : systemPath
-        // file : path.join(systemPath, `${manifest.id}.js`)
+        dir : systemPath,
+        format: 'esm' // Ensure this is 'esm' for ES Module output
     },
     watch : {
         clearScreen: true

@@ -338,7 +338,6 @@ export default class OpposedTest {
         addImpact = true;
     }
 
-    //TODO: damaging as effect
     let hasDamaging = false;
     let hasImpact = false;
     if (this.attackerTest.item.properties) {
