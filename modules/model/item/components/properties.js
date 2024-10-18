@@ -197,12 +197,7 @@ const PropertiesMixin = (cls) => class extends cls
 
         return properties
     }
-    
-    static propertyStringToObject(propertyString, propertyObject)
-    {
-        let array = this.propertyStringToArray(propertyString, propertyObject)
-        return this.propertyArrayToObject(array, propertyObject)
-    }
+
       
     static propertyStringToArray(propertyString, propertyObject)
     {
@@ -245,7 +240,6 @@ const PropertiesMixin = (cls) => class extends cls
         {
             let type = game.wfrp4e.config.weaponQualities[property.name] ? "qualities" : "flaws"
             foundry.utils.setProperty(effectData, "flags.wfrp4e", {value : property.value, path : `system.properties.${type}.${property.name}.effect`});
-
             return new CONFIG.ActiveEffect.documentClass(effectData, {parent : document});
         }
     }

@@ -10,7 +10,7 @@ let systemPath = getSystemPath(manifest.id)
 
 console.log("Bundling to " + systemPath)
 export default {
-    input: [`${manifest.id}.js`, `./style/${manifest.id}.scss`],
+    input: [`${manifest.id}.js`],
     output: {
         dir : systemPath,
         format: 'esm',
@@ -34,7 +34,10 @@ export default {
         }),
         postcss({
             extract : `${manifest.id}.css`,
-            plugins: []
+            modules: false, // Set to true if you use CSS modules
+            use: {
+              sass: true,  // Enable SCSS processing
+            }
         })
     ],
     onwarn(warning, warn) {
