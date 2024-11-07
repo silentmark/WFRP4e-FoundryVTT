@@ -123,15 +123,16 @@ export default class WeaponDialog extends AttackDialog {
       this._computeAmbidextrous()
     }
   }
+  _computeAmbidextrous() 
+  {
+    this.fields.modifier += -20;
+    this.tooltips.add("modifier", -20, game.i18n.localize("SHEET.Offhand"));
 
-  _computeAmbidextrous() {
-    this.fields.modifier += -20
-    this.tooltips.addModifier(-20, game.i18n.localize("SHEET.Offhand"))
-
-    const ambiMod = Math.min(20, this.actor.flags.ambi * 10) // TODO could be handled by ambidextrous effect 
+    const ambiMod = Math.min(20, this.actor.flags.ambi * 10); // TODO could be handled by ambidextrous effect 
     this.fields.modifier += ambiMod;
-    if (this.actor.flags.ambi) {
-      this.tooltips.addModifier(ambiMod, game.i18n.localize("NAME.Ambi"));
+    if (this.actor.flags.ambi)
+    {
+      this.tooltips.add("modifier", ambiMod, game.i18n.localize("NAME.Ambi"));
     }
   }
 
@@ -170,7 +171,7 @@ export default class WeaponDialog extends AttackDialog {
       if (engagedMod)
       {
         this.fields.modifier += engagedMod
-        this.tooltips.addModifier(engagedMod, game.i18n.localize("EFFECT.ShooterEngaged"));
+        this.tooltips.add("modifier", engagedMod, game.i18n.localize("EFFECT.ShooterEngaged"));
       }
     }
     else 
@@ -179,7 +180,7 @@ export default class WeaponDialog extends AttackDialog {
       if (rangeMod) 
       {
         this.fields.modifier += rangeMod
-        this.tooltips.addModifier(rangeMod, `${game.i18n.localize("Range")} - ${currentBand}`);
+        this.tooltips.add("modifier", rangeMod, `${game.i18n.localize("Range")} - ${currentBand}`);
       }
     }
   }
