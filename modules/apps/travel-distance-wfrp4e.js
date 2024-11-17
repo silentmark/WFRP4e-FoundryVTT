@@ -1,3 +1,6 @@
+import WFRP_Utility from "../system/utility-wfrp4e.js";
+
+
 /**
  * WIP
  * This class contains functions and helpers related to the market and Pay system
@@ -116,7 +119,7 @@ export default class TravelDistanceWfrp4e {
         }
       }
     }
-    ChatMessage.create( game.wfrp4e.utility.chatDataSetup( message ) );      
+    ChatMessage.create( WFRP_Utility.chatDataSetup( message ) );      
    }
 
    /**

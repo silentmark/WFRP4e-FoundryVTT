@@ -1,4 +1,5 @@
 import TestWFRP from "../../system/rolls/test-wfrp4e";
+import WFRP_Utility from "../../system/utility-wfrp4e";
 
 export class WFRPTestMessageModel extends WarhammerTestMessageModel 
 {
@@ -69,7 +70,7 @@ export class WFRPTestMessageModel extends WarhammerTestMessageModel
             }
   
             test.context.targets = test.context.targets.concat(targets)
-            targets.map(t => game.wfrp4e.utility.getToken(t)).forEach(t => {
+            targets.map(t => WFRP_Utility.getToken(t)).forEach(t => {
               test.createOpposedMessage(t)
             })
           }
@@ -105,7 +106,7 @@ export class WFRPTestMessageModel extends WarhammerTestMessageModel
                   ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
                 } else {
                   opposedTest.defender.applyDamage(opposedTest.resultMessage.system.opposedTest, game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
-                    .then(updateMsg => game.wfrp4e.opposedHandler.updateOpposedMessage(updateMsg, opposedTest.resultMessage.id));
+                    .then(updateMsg => OpposedHandler.updateOpposedMessage(updateMsg, opposedTest.resultMessage.id));
                 }
               }
             }
@@ -114,7 +115,7 @@ export class WFRPTestMessageModel extends WarhammerTestMessageModel
         {
           name: game.i18n.localize("CHATOPT.TotalPower"),
           icon: '<i class="fa-solid fa-bolt"></i>',
-          condition: (message.isOwner || message.isAuthor) && test instanceof game.wfrp4e.rolls.CastTest && test.result.critical && game.settings.get("wfrp4e", "useWoMOvercast") && !test.result.totalPower,
+          condition: (message.isOwner || message.isAuthor) && test instanceof CastTest && test.result.critical && game.settings.get("wfrp4e", "useWoMOvercast") && !test.result.totalPower,
           callback: li => {
             let message = game.messages.get(li.attr("data-message-id"));
             let test = message.system.test;

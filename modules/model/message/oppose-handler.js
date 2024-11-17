@@ -1,3 +1,4 @@
+import OpposedHandler from "../../system/opposed-handler";
 
 let fields = foundry.data.fields;
 export class OpposedHandlerMessage extends foundry.abstract.DataModel 
@@ -11,6 +12,6 @@ export class OpposedHandlerMessage extends foundry.abstract.DataModel
 
     get opposedHandler() 
     {
-        return new game.wfrp4e.opposedHandler(this.opposedData);
+        return new OpposedHandler(this.opposedData);
     }
 }

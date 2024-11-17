@@ -1,4 +1,7 @@
+import OpposedHandler from "../system/opposed-handler.js";
 import StatBlockParser from "../apps/stat-parser.js";
+import WFRP_Utility from "../system/utility-wfrp4e.js";
+import CastTest from "../system/rolls/cast-test.js";
 
 
 export default function () {
@@ -129,7 +132,7 @@ export default function () {
       //Own the roll
       let message = game.messages.get(li.attr("data-message-id"));
       let test = message.system?.test;
-      return (message.isOwner || message.isAuthor) && test && test instanceof game.wfrp4e.rolls.CastTest && test.result.critical && game.settings.get("wfrp4e", "useWoMOvercast") && !test.result.totalPower
+      return (message.isOwner || message.isAuthor) && test && test instanceof CastTest && test.result.critical && game.settings.get("wfrp4e", "useWoMOvercast") && !test.result.totalPower
     };
 
     options.push(
@@ -151,7 +154,7 @@ export default function () {
               return ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
 
             opposedTest.defenderTest.actor.applyDamage(opposedTest, game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
-              .then(updateMsg => game.wfrp4e.opposedHandler.updateOpposedMessage(updateMsg, message.id));
+              .then(updateMsg => OpposedHandler.updateOpposedMessage(updateMsg, message.id));
           }
         }
       },
@@ -172,7 +175,7 @@ export default function () {
               return ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
 
             opposedTest.defenderTest.actor.applyDamage(opposedTest, game.wfrp4e.config.DAMAGE_TYPE.IGNORE_AP)
-              .then(updateMsg => game.wfrp4e.opposedHandler.updateOpposedMessage(updateMsg, message.id));
+              .then(updateMsg => OpposedHandler.updateOpposedMessage(updateMsg, message.id));
           }
         }
       },
@@ -193,7 +196,7 @@ export default function () {
               return ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
 
             opposedTest.defenderTest.actor.applyDamage(opposedTest, game.wfrp4e.config.DAMAGE_TYPE.IGNORE_TB)
-              .then(updateMsg => game.wfrp4e.opposedHandler.updateOpposedMessage(updateMsg, message.id));
+              .then(updateMsg => OpposedHandler.updateOpposedMessage(updateMsg, message.id));
           }
         }
       },
@@ -214,7 +217,7 @@ export default function () {
               return ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
 
             opposedTest.defenderTest.actor.applyDamage(opposedTest, game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL)
-              .then(updateMsg => game.wfrp4e.opposedHandler.updateOpposedMessage(updateMsg, message.id));
+              .then(updateMsg => OpposedHandler.updateOpposedMessage(updateMsg, message.id));
           }
         }
       },
@@ -272,7 +275,7 @@ export default function () {
           }
 
           test.context.targets = test.context.targets.concat(targets)
-          targets.map(t => game.wfrp4e.utility.getToken(t)).forEach(t => {
+          targets.map(t => WFRP_Utility.getToken(t)).forEach(t => {
             test.createOpposedMessage(t)
           })
         }
@@ -308,7 +311,7 @@ export default function () {
                 ui.notifications.error(game.i18n.localize("ErrorDamagePermission"))
               } else {
                 opposedTest.defender.applyDamage(opposedTest.resultMessage.system.opposedTest, game.wfrp4e.config.DAMAGE_TYPE.NORMAL)
-                  .then(updateMsg => game.wfrp4e.opposedHandler.updateOpposedMessage(updateMsg, opposedTest.resultMessage.id));
+                  .then(updateMsg => OpposedHandler.updateOpposedMessage(updateMsg, opposedTest.resultMessage.id));
               }
             }
           }

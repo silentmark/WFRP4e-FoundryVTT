@@ -1,3 +1,4 @@
+import OpposedHandler from "../../system/opposed-handler";
 import OpposedTest from "../../system/opposed-test";
 
 let fields = foundry.data.fields;
