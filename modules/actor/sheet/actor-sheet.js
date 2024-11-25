@@ -1216,7 +1216,6 @@ export default class ActorSheetWFRP4e extends WarhammerActorSheet {
           yes: {
             icon: '<i class="fa fa-check"></i>', label: game.i18n.localize("Yes"), callback: async dlg => {
               doc.delete();
-              li.slideUp(200, () => this.render(false))
             }
           }, cancel: { icon: '<i class="fas fa-times"></i>', label: game.i18n.localize("Cancel") },
         }, default: 'yes'
