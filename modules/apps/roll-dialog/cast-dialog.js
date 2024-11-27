@@ -23,13 +23,6 @@ export default class CastDialog extends SkillDialog {
       return this.item;
     }
 
-    _defaultFields() 
-    {
-        return mergeObject({
-            overchannelling : 0
-        }, super._defaultFields());
-    }
-
     static async setup(fields={}, data={}, options={})
     {
         let spell = data.spell
@@ -76,18 +69,11 @@ export default class CastDialog extends SkillDialog {
         }
     }
 
-    async getData() 
+    _defaultFields() 
     {
-        let context = await super.getData();
-        /*
-        if (this.userEntry.overchannelling) {
-            let overchannelling = parseInt(this.userEntry.overchannelling) ?? 0;
-            this.userEntry.overchannelling = overchannelling;
-            this.fields.overchannelling = overchannelling;
-            context.fields.overchannelling = overchannelling;
-        }
-        */
-        return context;
+        return mergeObject({
+            overchannelling : 0
+        }, super._defaultFields());
     }
 
     // Backwards compatibility for effects
