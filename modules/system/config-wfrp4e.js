@@ -398,6 +398,7 @@ WFRP4E.weaponReaches = {
 
 // Ammo Groups
 WFRP4E.ammunitionGroups = {
+    "none": "NoneAmmo",
     "BPandEng": "WFRP4E.BPandEng",
     "bow": "WFRP4E.Bow",
     "crossbow": "WFRP4E.Crossbow",
@@ -1119,6 +1120,7 @@ WFRP4E.premiumModules = {
     "wfrp4e-soc" : "Sea of Claws",
     "wfrp4e-lustria" : "Lustria",
     "wfrp4e-archives3" : "Archives of the Empire: Vol III.",
+    "wfrp4e-ua3" : "Ubersreik Adventures III"
 }
 
 WFRP4E.trade = { 
@@ -1669,7 +1671,7 @@ WFRP4E.PrepareSystemItems = function() {
                         label: "@effect.name",
                         trigger: "immediate",
                         script: `
-                            test = await this.actor.setupSkill("Cool", {appendTitle : " - " + this.effect.name, skipTargets: true, fields : {difficulty : "average"}});
+                            test = await this.actor.setupSkill(game.i18n.localize("NAME.Cool"), {appendTitle : " - " + this.effect.name, skipTargets: true, fields : {difficulty : "average"}});
                             await test.roll();
                             if (test.failed)
                             {
@@ -2322,7 +2324,7 @@ WFRP4E.PrepareSystemItems = function() {
                         label: "@effect.name",
                         trigger: "immediate",
                         script: `
-                            test = await this.actor.setupSkill("Cool", {appendTitle : " - " + this.effect.name, skipTargets: true, fields : {difficulty : "average"}});
+                            test = await this.actor.setupSkill(game.i18n.localize("NAME.Cool"), {appendTitle : " - " + this.effect.name, skipTargets: true, fields : {difficulty : "average"}});
                             await test.roll();
                             if (test.failed)
                             {
@@ -2614,7 +2616,7 @@ WFRP4E.effectTextStyle.fontFamily="CaslonAntique"
 
 WFRP4E.rollModes = CONFIG.Dice.rollModes;
 
-
+WFRP4E.transferDocumentTypes = defaultWarhammerConfig.transferDocumentTypes;
 // To migrate
 // "invoke => manual"
 // "oneTime" => "immediate"

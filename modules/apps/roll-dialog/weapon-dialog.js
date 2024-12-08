@@ -123,6 +123,7 @@ export default class WeaponDialog extends AttackDialog {
       this._computeAmbidextrous()
     }
   }
+
   _computeAmbidextrous() 
   {
     this.fields.modifier += -20;

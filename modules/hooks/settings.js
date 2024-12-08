@@ -18,7 +18,8 @@ export default function() {
                 })
             }
             // Update counter values, can't just use ui.combat because there might be popped out combat trackers
-            const trackers = [ui.combat].concat(Object.values(ui.windows).filter(w => w instanceof CombatTracker));
+            let trackers = [ui.combat].concat(Object.values(ui.windows));
+            trackers = trackers.filter(w => w instanceof CombatTracker)
             for (let tracker of trackers) {
                 tracker.element.find(".advantage-group input").each((index, input) => {
                     let group = input.dataset.group
@@ -26,7 +27,6 @@ export default function() {
                 })
             }
         }
-        
     })
 
   

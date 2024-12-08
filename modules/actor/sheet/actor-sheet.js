@@ -1701,7 +1701,8 @@ export default class ActorSheetWFRP4e extends WarhammerActorSheet {
     let dragData = JSON.parse(ev.dataTransfer.getData("text/plain"));
     let dropID = $(ev.target).parents(".item").attr("data-id");
 
-    let item = (await Item.implementation.fromDropData(dragData))
+    let item = (await Item.implementation.fromDropData(dragData)).toObject()
+
     let update = {system : {location : {value : dropID}}};
     
     if (item.system.isEquippable)
@@ -1709,7 +1710,10 @@ export default class ActorSheetWFRP4e extends WarhammerActorSheet {
       update.system.equipped = {value : false};
     }
 
-    return item.update(update);
+    foundry.utils.mergeObject(item, update);
+
+    // This handles both updating when dragging within the same sheet and creating a new item when dragging from another sheet
+    return this.actor.update({items : [item]});
   }
 
   // Dropping a character creation result

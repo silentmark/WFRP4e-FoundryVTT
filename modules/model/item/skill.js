@@ -4,16 +4,18 @@ import { BaseItemModel } from "./components/base";
 let fields = foundry.data.fields;
 
 export class SkillModel extends BaseItemModel {
+    static LOCALIZATION_PREFIXES = ["WH.Models.skill"];
+
     static defineSchema() {
         let schema = super.defineSchema();
         schema.advanced = new fields.SchemaField({
-            value: new fields.StringField(),
+            value: new fields.StringField({initial : "bsc", choices : game.wfrp4e.config.skillTypes}),
         });
         schema.grouped = new fields.SchemaField({
-            value: new fields.StringField({ initial: "noSpec" })
+            value: new fields.StringField({ initial: "noSpec", choices : game.wfrp4e.config.skillGroup })
         });
         schema.characteristic = new fields.SchemaField({
-            value: new fields.StringField({ initial: "ws" }),
+            value: new fields.StringField({ initial: "ws", choices : game.wfrp4e.config.characteristics }),
         });
         schema.advances = new fields.SchemaField({
             value: new fields.NumberField(),
@@ -52,13 +54,22 @@ export class SkillModel extends BaseItemModel {
         }
         return ""
       }
-    
+
+    get isGrouped() 
+    {
+        return this.grouped.value == "isSpec";
+    }
+
+    get isBasic()
+    {
+        return this.advanced.value == "bsc";
+    }
 
     async _preUpdate(data, options, user) {
         await super._preUpdate(data, options, user);
         let actor = this.parent.actor
 
-        if (actor?.type == "character" && this.grouped.value == "isSpec" && options.changed.name) 
+        if (actor?.type == "character" && this.isGrouped && options.changed.name) 
         {
             this._handleSkillNameChange(data.name, this.parent.name)
         }
@@ -77,10 +88,10 @@ export class SkillModel extends BaseItemModel {
 
     async _preCreate(data, options, user)
     {
-        if (this.parent.isEmbedded)
+        if (this.parent.isEmbedded && !options.skipSpecialisationChoice)
         {
             // If skill has (any) or (), ask for a specialisation
-            if (this.parent.specifier.toLowerCase() == game.i18n.localize("SPEC.Any").toLowerCase() || this.grouped.value && !this.parent.specifier)
+            if (this.parent.specifier.toLowerCase() == game.i18n.localize("SPEC.Any").toLowerCase() || (this.isGrouped && !(this.parent.specifier)))
             {
                 let skills = await warhammer.utility.findAllItems("skill", "Loading Skills", true);
                 let specialisations = skills.filter(i => i.name.split("(")[0]?.trim() == this.parent.baseName);

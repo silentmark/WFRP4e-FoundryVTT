@@ -35,7 +35,7 @@ export default class CastTest extends TestWFRP {
     await Promise.all(this.item.runScripts("preRollCastTest", { test: this, chatOptions: this.context.chatOptions }))
 
     //@HOUSE
-    if (this.preData.unofficialGrimoire && this.preData.ingredientMode == 'power' && this.hasIngredient) {
+    if (this.preData.unofficialGrimoire && this.preData.ingredientMode == 'power' && this.hasIngredient) { 
       game.wfrp4e.utility.logHomebrew("unofficialgrimoire");
       this.preData.canReverse = true;
     }
@@ -118,7 +118,7 @@ export default class CastTest extends TestWFRP {
         //@/HOUSE
       }
       //@/HOUSE
-      if (this.preData.unofficialGrimoire && this.preData.overchannelling > 0) {
+      if (this.preData.unofficialGrimoire && this.preData.overchannelling > 0) { 
         game.wfrp4e.utility.logHomebrew("overchannelling");
         this.result.tooltips.miscast.push(game.i18n.localize("CHAT.OverchannellingMiscast"))
         miscastCounter++;
@@ -130,7 +130,7 @@ export default class CastTest extends TestWFRP {
       this.result.castOutcome = "failure"
       this.result.description = game.i18n.localize("ROLL.CastingFailed")
       //@/HOUSE
-      if (this.preData.unofficialGrimoire && this.preData.overchannelling > 0) {
+      if (this.preData.unofficialGrimoire && this.preData.overchannelling > 0) { 
         game.wfrp4e.utility.logHomebrew("overchannelling");
         this.result.tooltips.miscast.push(game.i18n.localize("CHAT.OverchannellingMiscast"))
         miscastCounter++;

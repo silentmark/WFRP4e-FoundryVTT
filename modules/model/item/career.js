@@ -3,6 +3,7 @@ let fields = foundry.data.fields;
 
 export class CareerModel extends BaseItemModel
 {
+    static LOCALIZATION_PREFIXES = ["WH.Models.career"];
     static defineSchema() 
     {
         let schema = super.defineSchema();
@@ -19,13 +20,26 @@ export class CareerModel extends BaseItemModel
             value: new fields.BooleanField()
         });
         schema.level = new fields.SchemaField({
-            value: new fields.NumberField({min: 1})
+            // value: new fields.NumberField({min: 1, choices : [1, 2, 3, 4], initial : 1})
+            value: new fields.NumberField({min: 1, choices : {1 : "1", 2 : "2", 3 : "3", 4 : "4"}, initial : 1})
         });
         schema.status = new fields.SchemaField({
             standing: new fields.NumberField({min: 1}),
-            tier: new fields.StringField({choices: ["b", "s", "g"]})
+            tier: new fields.StringField({choices: game.wfrp4e.config.statusTiers})
         });
-        schema.characteristics = new fields.ArrayField(new fields.StringField());
+        schema.characteristics = new fields.SchemaField({
+            ws: new fields.BooleanField(),
+            bs: new fields.BooleanField(),
+            s: new fields.BooleanField(),
+            t: new fields.BooleanField(),
+            i: new fields.BooleanField(),
+            ag: new fields.BooleanField(),
+            dex: new fields.BooleanField(),
+            int: new fields.BooleanField(),
+            wp: new fields.BooleanField(),
+            fel: new fields.BooleanField(),
+        })
+
         schema.skills = new fields.ArrayField(new fields.StringField());
         schema.addedSkills = new fields.ArrayField(new fields.StringField());
         schema.talents = new fields.ArrayField(new fields.StringField());
@@ -58,21 +72,30 @@ export class CareerModel extends BaseItemModel
     async _onUpdate(data, options, user)
     {
         await super._onUpdate(data, options, user);
-        if (this.parent.isOwned && data.system?.current?.value)
+
+        if (game.user.id == user) 
         {
-            let actor = this.parent.actor;
-            let careerUpdates = actor.itemTypes.career.filter(i => i.system.current.value && i.id != this.parent.id).map(i => {
-                return {
-                    "system.current.value" : false,
-                    _id : i.id
-                }
-            });
-            // Reset all other careers to not be current (only one can be current)
-            actor.update({items : careerUpdates});
-        }
-        if (this.parent.isOwned && this.parent.actor.type == "npc" && foundry.utils.getProperty(options.changed, "system.complete.value"))
-        {
-            this._promptCareerAdvance()
+            if (this.parent.isOwned && data.system?.current?.value) 
+            {
+                let actor = this.parent.actor;
+                let careerUpdates = actor.itemTypes.career.filter(i => i.system.current.value && i.id != this.parent.id).map(i => {
+                    return {
+                        "system.current.value": false,
+                        _id: i.id
+                    }
+                });
+                // Reset all other careers to not be current (only one can be current)
+                actor.update({ items: careerUpdates });
+            }
+            if (this.parent.isOwned && this.parent.actor.type == "npc" && foundry.utils.getProperty(options.changed, "system.complete.value")) 
+            {
+                this._promptCareerAdvance()
+            }
+
+            if (this.parent.isOwned && this.parent.actor.type == "character" && foundry.utils.getProperty(options.changed, "system.current.value")) 
+            {
+                this.handleCareerLinking()
+            }
         }
 
         if (this.parent.isOwned && this.parent.actor.type == "character" && foundry.utils.getProperty(options.changed, "system.current.value"))
@@ -164,7 +187,7 @@ export class CareerModel extends BaseItemModel
         data.properties.push(`<b>${game.i18n.localize("Class")}</b>: ${this.class.value}`);
         data.properties.push(`<b>${game.i18n.localize("Group")}</b>: ${this.careergroup.value}`);
         data.properties.push(game.wfrp4e.config.statusTiers[this.status.tier] + " " + this.status.standing);
-        data.properties.push(`<b>${game.i18n.localize("Characteristics")}</b>: ${this.characteristics.map(i => i = " " + game.wfrp4e.config.characteristicsAbbrev[i])}`);
+        data.properties.push(`<b>${game.i18n.localize("Characteristics")}</b>: ${Object.keys(this.characteristics).filter(i => this.characteristics[i]).map(i => i = " " + game.wfrp4e.config.characteristicsAbbrev[i])}`);
         data.properties.push(`<b>${game.i18n.localize("Skills")}</b>: ${this.skills.map(i => i = " " + i)}`);
         data.properties.push(`<b>${game.i18n.localize("Talents")}</b>: ${this.talents.map(i => i = " " + i)}`);
         data.properties.push(`<b>${game.i18n.localize("Trappings")}</b>: ${this.trappings.map(i => i = " " + i)}`);
@@ -178,11 +201,43 @@ export class CareerModel extends BaseItemModel
         properties.push(`<b>${game.i18n.localize("Class")}</b>: ${this.class.value}`);
         properties.push(`<b>${game.i18n.localize("Group")}</b>: ${this.careergroup.value}`);
         properties.push(`<b>${game.i18n.localize("Status")}</b>: ${game.wfrp4e.config.statusTiers[this.status.tier] + " " + this.status.standing}`);
-        properties.push(`<b>${game.i18n.localize("Characteristics")}</b>: ${this.characteristics.map(i => i = " " + game.wfrp4e.config.characteristicsAbbrev[i])}`);
+        properties.push(`<b>${game.i18n.localize("Characteristics")}</b>: ${Object.keys(this.characteristics).filter(i => this.characteristics[i]).map(i => i = " " + game.wfrp4e.config.characteristicsAbbrev[i])}`);
         properties.push(`<b>${game.i18n.localize("Skills")}</b>: ${this.skills.map(i => i = " " + "<a class = 'skill-lookup'>" + i + "</a>")}`);
         properties.push(`<b>${game.i18n.localize("Talents")}</b>: ${this.talents.map(i => i = " " + "<a class = 'talent-lookup'>" + i + "</a>")}`);
         properties.push(`<b>${game.i18n.localize("Trappings")}</b>: ${this.trappings.map(i => i = " " + i)}`);
         properties.push(`<b>${game.i18n.localize("Income")}</b>: ${this.incomeSkill.map(i => " " + this.skills[i])}`);
         return properties;
+      }
+
+      static migrateData(data)
+      {
+        if (data.characteristics instanceof Array)
+        {
+            data.characteristics = {
+                ws : data.characteristics.includes("ws"),
+                bs : data.characteristics.includes("bs"),
+                s : data.characteristics.includes("s"),
+                t : data.characteristics.includes("t"),
+                i : data.characteristics.includes("i"),
+                ag : data.characteristics.includes("ag"),
+                dex : data.characteristics.includes("dex"),
+                int : data.characteristics.includes("int"),
+                wp : data.characteristics.includes("wp"),
+                fel : data.characteristics.includes("fel")
+            }
+        }
+
+        // if (data.skills instanceof Array)
+        // {
+        //     data.skills = {list : data.skills};
+        // }
+        // if (data.talents instanceof Array)
+        // {
+        //     data.talents = {list : data.talents};
+        // }
+        // if (data.trappings instanceof Array)
+        // {
+        //     data.trappings = {list : data.trappings};
+        // }
       }
 }

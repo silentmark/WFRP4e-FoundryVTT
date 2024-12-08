@@ -96,18 +96,7 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
     return context;
   }
 
-
-  _setupContextMenus()
-  {
-      // return  
-      return [
-        WarhammerContextMenu.create(this, this.element, ".list-row:not(.nocontext)", this._getListContextOptions()), 
-        WarhammerContextMenu.create(this, this.element, ".context-menu", this._getListContextOptions(), {eventName : "click"}),
-        WarhammerContextMenu.create(this, this.element, ".context-menu-alt", this._getListContextOptions())
-      ];
-  }
-
-  _getListContextOptions()
+  _getContetMenuOptions()
   { 
     return [
       {
@@ -127,12 +116,12 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
           let uuid = li.data("uuid") || li.parents("[data-uuid]")?.data("uuid")
           if (uuid)
           {
-            let doc = fromUuidSync(uuid);
-            if (doc?.documentName == "ActiveEffect")
+            let parsed = foundry.utils.parseUuid(uuid);
+            if (parsed.type == "ActiveEffect")
             {
-              return doc.parent.uuid == this.document.uuid; // If an effect's parent is not this document, don't show the delete option
+              return parsed.primaryId == this.document.id; // If an effect's parent is not this document, don't show the delete option
             }
-            else if (doc)
+            else if (parsed.type)
             {
               return true;
             }
@@ -154,8 +143,8 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
           let uuid = li.data("uuid") || li.parents("[data-uuid]")?.data("uuid")
           if (uuid)
           {
-            let doc = fromUuidSync(uuid);
-            return doc?.documentName == "Item"; // Can only post Items to chat
+            let parsed = foundry.utils.parseUuid(uuid);
+            return parsed.type == "Item"; // Can only post Items to chat
           }
           else return false;
         },
@@ -171,7 +160,7 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
         icon: '<i class="fa-solid fa-copy"></i>',
         condition: li => {
           let uuid = li.data("uuid") || li.parents("[data-uuid]")?.data("uuid")
-          if (uuid)
+          if (uuid && !uuid.includes("Compendium"))
           {
             let doc = fromUuidSync(uuid);
             return doc?.documentName == "Item" && doc.system.isPhysical; // Can only duplicate physical items
@@ -190,7 +179,7 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
         icon: '<i class="fa-solid fa-split"></i>',
         condition: li => {
           let uuid = li.data("uuid") || li.parents("[data-uuid]")?.data("uuid")
-          if (uuid)
+          if (uuid && !uuid.includes("Compendium"))
           {
             let doc = fromUuidSync(uuid);
             return doc?.documentName == "Item" && doc.system.isPhysical; // Can only split physical items
@@ -219,6 +208,8 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
         let document = await fromUuid(data.uuid);
         let container = await fromUuid(containerDropElement.dataset.uuid);
 
+        let documentData = document.toObject();
+
         //
         if (container.id == document.system.location.value)
         {
@@ -226,7 +217,11 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
         }
         if (container)
         {
-          document.update({"system.location.value" : container.id})
+          documentData.system.location.value = container.id;
+          documentData.system.equipped.value = false;
+          
+          // This handles both updating when dragging within the same sheet and creating a new item when dragging from another sheet
+          this.document.update({items : [documentData]});
         }
       }
       else 
@@ -352,27 +347,6 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
   
 
   //#region Action Handlers
-  static async _onCreateEffect(ev)
-    {
-        let type = ev.target.dataset.category;
-        let effectData = { name: localize("WH.NewEffect"), img: "icons/svg/aura.svg" };
-        if (type == "temporary")
-        {
-            effectData["duration.rounds"] = 1;
-        }
-        else if (type == "disabled")
-        {
-            effectData.disabled = true;
-        }
-
-        // If Item effect, use item name for effect name
-        if (this.object.documentName == "Item")
-        {
-            effectData.name = this.object.name;
-            effectData.img = this.object.img;
-        }
-        this.object.createEmbeddedDocuments("ActiveEffect", [effectData]).then(effects => effects[0].sheet.render(true));
-    }
 
     static async _onCreateItem(ev) 
     {
