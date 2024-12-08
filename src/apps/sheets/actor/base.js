@@ -460,7 +460,7 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
           test = await this.document.setupWeapon(document, options);
           break;
         case "spell":
-          test = await this.castOrChannelPrompt(document, options);
+          test = await this.spellDialog(document, options);
           break;
         case "prayer":
           test = await this.actor.setupPrayer(document, options);
@@ -470,7 +470,7 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
       test?.roll();
     }
 
-    castOrChannelPrompt(spell, options = {}) {
+    spellDialog(spell, options = {}) {
       // Do not show the dialog for Petty spells, just cast it.
       if (spell.system.lore.value == "petty" || spell.system.lore.value == game.i18n.localize("WFRP4E.MagicLores.petty"))
       {
@@ -492,23 +492,23 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
               channel: {
                 label: game.i18n.localize("Channel"),
                 callback: async btn => {
-                  return this.actor.setupChannell(spell, options);
                   // TODO: move this elsewhere
-                  // await test.roll();
-                  // if (test.context.channelUntilSuccess) {
-                  //   await warhammer.utility.sleep(200);
-                  //   do {
-                  //     if (test.item.cn.SL >= test.item.cn.value) {
-                  //       break;
-                  //     }
-                  //     if (test.result.minormis || test.result.majormis || test.result.catastrophicmis) {
-                  //       break;
-                  //     }
-                  //     test.context.messageId = null; // Clear message so new message is made
-                  //     await test.roll();
-                  //     await warhammer.utility.sleep(200);
-                  //   } while (true);
-                  // }
+                  let test = await this.actor.setupChannell(spell, options);
+                  await test.roll();
+                  if (test.context.channelUntilSuccess) {
+                    await warhammer.utility.sleep(200);
+                    do {
+                      if (test.item.cn.SL >= test.item.cn.value) {
+                        break;
+                      }
+                      if (test.result.mis || test.result.minormis || test.result.majormis || test.result.catastrophicmis) {
+                        break;
+                      }
+                      test.context.messageId = null; // Clear message so new message is made
+                      await test.roll();
+                      await warhammer.utility.sleep(200);
+                    } while (true);
+                  }
                 }
               }
             },

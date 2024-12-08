@@ -541,7 +541,7 @@ export default class ActorSheetWFRP4e extends WarhammerActorSheet {
                     if (test.item.cn.SL >= test.item.cn.value) {
                       break;
                     }
-                    if (test.result.minormis || test.result.majormis || test.result.catastrophicmis) {
+                    if (test.result.mis || test.result.minormis || test.result.majormis || test.result.catastrophicmis) {
                       break;
                     }
                     test.context.messageId = null; // Clear message so new message is made

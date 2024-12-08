@@ -214,7 +214,14 @@ export default class ChannelTest extends TestWFRP {
 
       if (this.result.criticalchannell)
       {
-        this.result.channelledSL = this.item.cn.value
+        if (this.spell.system.ritual?.value)
+        {
+            this.result.channelledSL += this.actor.system.characteristics.wp.bonus;
+        }
+        else
+        {
+            this.result.channelledSL = this.item.cn.value
+        }
       }
     }
 
