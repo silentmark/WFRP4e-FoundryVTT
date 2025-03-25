@@ -6,7 +6,7 @@ await this.actor.addCondition("poisoned", 3)
 await this.actor.modifyWounds(this.actor.system.characteristics.t.bonus)
 
 // and acquires the Regenerate Creature Trait.
-const hasRegenerate = this.actor.has("Regenerate")
+const hasRegenerate = this.actor.has("Regeneracja")
 if (hasRegenerate === undefined) {
   fromUuid("Compendium.wfrp4e-core.items.SfUUdOGjdYpr3KSR").then(trait => {
     let traitItem = trait.toObject()
@@ -14,12 +14,12 @@ if (hasRegenerate === undefined) {
   })
 }
 
-this.script.message(`<p><strong>${this.actor.prototypeToken.name}</strong> has 
+this.script.message(`<p><strong>${this.actor.prototypeToken.name}</strong> otrzymuje: 
     <ul>
-      <li>gained 3 Poisoned Conditions that cannot be resisted at first</li>
-      <li>recovered ${this.actor.system.characteristics.t.bonus} Wounds</li>
-      <li>acquired the Regenerate Creature Trait.</li>
+      <li>3 Stany Zatrucia, których początkowo nie można usunąć</li>
+      <li>odzyskano liczbę ran: ${this.actor.system.characteristics.t.bonus}</li>
+      <li>otrzymano cechę stworzenia "Regeneracja".</li>
     </ul>
-    It’s up to Ranald if their regenerating can outpace their poisoning.</p>
-    <p>When all Poisoned Conditions are lost, so too is Regenerate.</p>`, 
+    od Łaski Ranalda zależy, czy regeneracja okaże się silniejsza niż zatrucie.</p>
+    <p>Kiedy wszystkie Stany Zatrucia zostaną usunięte, usuwana jest również cecha stworzenia Regeneracja.</p>`, 
     { whisper: ChatMessage.getWhisperRecipients("GM"), blind: true })   

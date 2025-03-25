@@ -1,4 +1,4 @@
-let choice = await ItemDialog.create(ItemDialog.objectToArray(game.wfrp4e.config.locations, this.effect.img), 1, "Choose Location");
+let choice = await ItemDialog.create(ItemDialog.objectToArray(game.wfrp4e.config.locations, this.effect.img), 1, "Wybierz Lokację");
 if (choice[0])
 {
     this.effect.updateSource({name : `${this.effect.name} (${choice[0].name})`})
@@ -13,7 +13,7 @@ if (["lArm", "rArm"].includes(location))
 
     if (dropped.length)
     {
-        this.script.notification(`Dropped ${dropped.map(i => i.name).join(", ")}!`)
+        this.script.notification(`Upuszczono ${dropped.map(i => i.name).join(", ")}!`)
         for(let weapon of dropped)
         {
             await weapon.system.toggleEquip();

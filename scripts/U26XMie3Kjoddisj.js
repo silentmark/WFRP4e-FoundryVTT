@@ -1,10 +1,10 @@
 let stunned = this.actor.hasCondition("stunned")
 if (stunned)
 {
-   this.script.notification(`Cleared 1 Stunned Condition`)
+   this.script.notification(`Usunięto 1 Stan Oszołomienia`)
    this.actor.removeCondition("stunned");
 }
 else 
 {
-	this.script.notification(`No Stunned Conditions`)
+	this.script.notification(`Brak Stanów Oszołomienia do usunięcia`)
 }

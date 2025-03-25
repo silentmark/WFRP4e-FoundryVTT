@@ -1,28 +1,28 @@
-if (!this.item.name.includes("(") || this.item.system.tests.value.includes("Terrain") || this.item.system.tests.value.toLowerCase().includes("(any)"))
+if (!this.item.name.includes("(") || this.item.system.tests.value.toLowerCase().includes("teren") || this.item.system.tests.value.toLowerCase().includes("wybrany"))
 {
     let tests = this.item.system.tests.value
     let name = this.item.name
 
     // If name already specifies, make sure tests value reflects that
-    if (name.includes("(") && !name.toLowerCase().includes("(any)"))
+    if (name.includes("(") && !name.toLowerCase().includes("wybrany"))
     {
         let terrain = name.split("(")[1].split(")")[0]
-        tests = tests.replace("the Terrain", terrain)
+        tests = tests.replace("Wybrany Teren", terrain)
     }
     else // If no sense specified, provide dialog choice
     {
         let choice = await ItemDialog.create(ItemDialog.objectToArray({
-            coastal : "Coastal",
-            deserts : "Deserts",
-            marshes : "Marshes",
-            rocky : "Rocky",
+            coastal : "Wybrzeża",
+            deserts : "Pustynie",
+            marshes : "Bagna",
+            rocky : "Teren Skalisty",
             tundra : "Tundra",
-            woodlands : "Woodlands"
-        }, this.item.img), 1, "Choose Terrain");
+            woodlands : "Lasy"
+        }, this.item.img), 1, "Wybierz teren:");
         if (choice[0])
         {
             name = `${name.split("(")[0].trim()} (${choice[0].name})`
-            tests = tests.replace("the Terrain", choice[0].name + " Terrain")
+            tests = tests.replace("Wybrany Teren", choice[0].name)
         }
     }
 

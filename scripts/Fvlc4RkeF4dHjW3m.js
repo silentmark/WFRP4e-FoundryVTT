@@ -9,7 +9,7 @@ if (caster && (this.actor.has(game.i18n.localize("NAME.Undead")) || this.actor.h
         else {
             fromUuid("Compendium.wfrp4e-core.items.D0ImWEIMSDgElsnl").then(item => {
                 this.actor.createEmbeddedDocuments("Item", [item.toObject()], { fromEffect: this.effect.id })
-                ChatMessage.create({ content: `Added Unstable to ${this.actor.prototypeToken.name}`, speaker: { alias: caster.name } })
+                ChatMessage.create({ content: `${this.actor.prototypeToken.name}: otrzymano ${game.i18n.localize("NAME.Unstable")}`, speaker: { alias: caster.name } })
             })
         }
     }

@@ -1,13 +1,13 @@
 if (!this.actor.effects.find(e => e.isCondition))
 {
-	return this.script.notification("No Conditions on this Actor")
+	return this.script.notification("Aktor nie posiada Stanów");
 }
 
-let choice = await ItemDialog.create(this.actor.effects.filter(i => i.isCondition), 1, "Choose a Condition")
+let choice = await ItemDialog.create(this.actor.effects.filter(i => i.isCondition), 1, "Wybierz Stan")
 
 if (choice[0])
 {
-	await this.actor.removeCondition(choice[0].conditionId)
+	await this.actor.removeCondition(choice[0].conditionId);
 }
 
 if (this.actor.effects.find(e => e.isCondition))

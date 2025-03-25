@@ -10,10 +10,10 @@ let characteristics = {
     "wp" : 5,
     "fel" : 5
 }
-let skills = ["Cool", "Dodge"]
+let skills = ["Opanowanie", "Unik"]
 let skillAdvancements = [10, 10]
-let talents = ["Combat Reflexes", "Resolute"]
-let trappings = ["Leather Jack", "Leather Leggings", "Leather Skullcap", "Hand Weapon", "Spear", "Shield"]
+let talents = ["Bitewny Refleks", "Nieugięty"]
+let trappings = ["Skórzana kurta", "Skórzane nogawice", "Skórzany hełm", "Broń ręczna", "Włócznia", "Tarcza"]
 let items = [];
 
 let updateObj = this.actor.toObject();

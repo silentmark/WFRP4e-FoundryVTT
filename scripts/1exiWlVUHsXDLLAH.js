@@ -1,1 +1,1 @@
-this.script.notification(`Cannot enter ${this.effect.name}!`);
+this.script.notification(`Nie można wkroczyć: ${this.effect.name}!`);

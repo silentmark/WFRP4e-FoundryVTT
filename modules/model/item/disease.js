@@ -127,15 +127,9 @@ export class DiseaseModel extends BaseItemModel {
       // Alright get ready for some shit
 
       // Get all symptoms user inputted
-      let symptomText = text.split(",").map(i => i.trim());
+      let symtomNames = text.split(",").map(i => i.trim());
   
       // Extract just the name (with no severity)
-      let symtomNames = symptomText.map(s => {
-        if (s.includes("("))
-          return s.substring(0, s.indexOf("(") - 1)
-        else return s
-      })
-  
       // take those names and lookup the associated symptom key
       let symptomKeys = symtomNames.map(s => warhammer.utility.findKey(s, game.wfrp4e.config.symptoms))
   
@@ -144,7 +138,6 @@ export class DiseaseModel extends BaseItemModel {
         if (game.wfrp4e.config.symptomEffects[s])
         {
           let effect = foundry.utils.duplicate(game.wfrp4e.config.symptomEffects[s])
-          effect.name = symptomText[i];
           return effect
   
         }

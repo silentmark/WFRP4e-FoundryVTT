@@ -32,11 +32,11 @@ for(let f in flaws)
     }
 }
             
-let added = await ItemDialog.create(ItemDialog.objectToArray(qualities), "unlimited", "Choose Qualities to add");
+let added = await ItemDialog.create(ItemDialog.objectToArray(qualities), "unlimited", "Wybierz Zalety do dodania");
 let removed = []
 if (!foundry.utils.isEmpty(flaws))
 {
-    removed = await ItemDialog.create(ItemDialog.objectToArray(flaws), "unlimited", "Choose Flaws to remove");
+    removed = await ItemDialog.create(ItemDialog.objectToArray(flaws), "unlimited", "Wybierz Wady do usunięcia");
 }
 
 this.effect.updateSource({"flags.wfrp4e.propertiesChanged" : {added : added.map(i => i.id), removed : removed.map(i => i.id)}})

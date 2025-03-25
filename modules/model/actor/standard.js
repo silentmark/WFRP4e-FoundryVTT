@@ -145,11 +145,14 @@ export class StandardActorModel extends BaseActorModel {
     computeTemplates()
     {
         let templates = this.parent.itemTypes.template
-        for(let t of templates)
+        if (templates)
         {
-            for(let c in this.characteristics)
+            for(let t of templates)
             {
-                this.characteristics[c].modifier += t.system.characteristics[c]
+                for(let c in this.characteristics)
+                {
+                    this.characteristics[c].modifier += t.system.characteristics[c]
+                }
             }
         }
     }

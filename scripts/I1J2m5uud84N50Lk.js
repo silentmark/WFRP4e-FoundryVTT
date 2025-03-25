@@ -1,6 +1,6 @@
 if (["cast", "channelling", "pray"].includes(args.type))
 {
 	args.abort = true;
-	this.script.notification("Cannot cast Spells or use Prayers");
+	this.script.notification("Nie można rzucić zaklęć ani modlitw");
 }
 else return true;

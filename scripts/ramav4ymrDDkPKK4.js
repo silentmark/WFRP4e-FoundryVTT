@@ -1,9 +1,9 @@
 if (this.actor.hasCondition("bleeding"))
 {
     this.actor.removeCondition("bleeding");
-    this.script.notification("Removed 1 Bleeding Condition")
+    this.script.notification("Usunięto 1 Stan Krwawienia");
 }
 else 
 {
-    this.script.notification("No Bleeding Conditions");
+    this.script.notification("Brak Stanów Krwawienia do usunięcia");
 }

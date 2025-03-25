@@ -10,10 +10,10 @@ let characteristics = {
   "wp" : 0,
   "fel" : 10
 }
-let skills = ["Melee (Basic)", "Track"]
+let skills = ["Broń Biała (Podstawowa", "Tropienie"]
 let skillAdvancements = [8, 7]
-let talents = ["Berserk Charge", "Careful Strike", "Strike to Injure"]
-let traits = ["Flight (8)", "Fury", "Swarm", "Tracker"]
+let talents = ["Berserkerska Szarża", "Cios Mierzony", "Morderczy Atak"]
+let traits = ["Latanie (8)", "Furia", "Rój", "Tropiciel"]
 let trappings = []
 let items = [];
 let spells = [];

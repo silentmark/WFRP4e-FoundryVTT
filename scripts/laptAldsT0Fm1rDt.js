@@ -1,6 +1,6 @@
-let blunt = await Dialog.confirm({label : "test", content :`<p>Apply blunt damage reduction? (-3)</p>`})
+let blunt = await Dialog.confirm({label : "test", content :`<p>Zastosuj zmniejszenie obrażeń obuchowych? (-3)</p>`})
 
 if (blunt)
 {
-    args.modifiers.other.push({label : this.effect.name, details : "Blunt Damage Reduction", value : -3})
+    args.modifiers.other.push({label : this.effect.name, details : "Zmniejszenie Obrażeń Obuchowych", value : -3})
 }

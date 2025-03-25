@@ -10,13 +10,13 @@ let characteristics = {
   "wp" : 10,
   "fel" : 10
 }
-let skills = ["Charm", "Channelling", "Entertain (Prophecy)", "Intuition"]
+let skills = ["Charyzma", "Splatanie Magii", "Występy (Przepowiednie)", "Intuicja"]
 let skillAdvancements = [0, 0, 20, 10]
-let talents = ["Detect Artefact", "Menacing", "Sixth Sense"]
-let traits = ["Dooming", "Spellcaster (Lore of Life)", "Ward"]
+let talents = ["Rozpoznanie Artefaktu", "Groźny", "Szósty Zmysł"]
+let traits = ["Wróżba Losu", "Rzucanie Czarów (Tradycja Życia)", "Ochrona"]
 let trappings = []
 let items = [];
-let spells = ["Forest of Thorns"];
+let spells = ["Pole cierniowe"];
 
 let updateObj = this.actor.toObject();
 

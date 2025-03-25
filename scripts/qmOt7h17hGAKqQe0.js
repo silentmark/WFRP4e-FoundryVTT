@@ -1,16 +1,16 @@
 
 let choice = await Dialog.wait({
     title: this.effect.name,
-    content: `<p><strong>${this.effect.name}</strong>: Is this a ranged or magical attack that orignates outside the Dome?</p>`,
+    content: `<p><strong>${this.effect.name}</strong>: Czy ten Magiczny lub Zasięgowy atak pochodził spoza Kopuły?</p>`,
     buttons: {
         yes: {
-            label: "Yes",
+            label: "Tak",
             callback: () => {
                 return true;
             }
         },
         no: {
-            label: "No",
+            label: "Nie",
             callback: () => {
                 return false;
             }

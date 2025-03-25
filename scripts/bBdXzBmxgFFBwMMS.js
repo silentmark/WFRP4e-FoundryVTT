@@ -3,7 +3,7 @@ if(args.opposedTest.attackerTest.item?.isRanged && args.applyAP && !args.sureSho
    if (args.modifiers.ap.value)
    {
     args.sureShot = true;
-    args.modifiers.ap.details.push(`${this.effect.name} (Ignore ${this.item.Advances})`)
+    args.modifiers.ap.details.push(`${this.effect.name} (Ignoruje ${this.item.Advances})`)
     args.modifiers.ap.ignored += this.item.Advances;
    }
 }

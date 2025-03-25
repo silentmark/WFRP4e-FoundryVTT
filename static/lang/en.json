@@ -1878,6 +1878,12 @@
     "Hours": "hours",
     "Minutes": "minutes",
     "Seconds": "seconds",
+
+    "days": "days",
+    "hours": "hours",
+    "minutes": "minutes",
+    "seconds": "seconds",
+
     "Treatment": "Treatment",
     "Round": "round",
 

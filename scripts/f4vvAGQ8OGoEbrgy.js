@@ -8,7 +8,7 @@ if (SL >= 3)
    difficulty = "vhard"
    
 
-let test = await args.actor.setupCharacteristic("wp", {fields: {difficulty}, skipTargets: true, appendTitle :  " - " + this.effect.name, context : {failure: "Gain a Stunned Condition"}})
+let test = await args.actor.setupCharacteristic("wp", {fields: {difficulty}, skipTargets: true, appendTitle :  " - " + this.effect.name, context : {failure: "Otrzymano Stan Oszołomienie"}})
 await test.roll();
 if (test.failed)
 {

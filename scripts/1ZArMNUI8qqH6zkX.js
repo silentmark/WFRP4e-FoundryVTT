@@ -1,4 +1,4 @@
-let test = await args.actor.setupCharacteristic("wp", {skipTargets: true, appendTitle :  " - " + this.effect.name, context : {failure: "Gained a Stunned Condition"}})
+let test = await args.actor.setupCharacteristic("wp", {skipTargets: true, appendTitle :  " - " + this.effect.name, context : {failure: "Otrzymano Stan Oszołoemienia"}})
 await test.roll();
 if (test.failed)
 {

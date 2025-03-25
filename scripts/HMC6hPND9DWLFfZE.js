@@ -12,12 +12,12 @@ let index = game.packs
 	return i
 })
 
-let choice = await ItemDialog.create(index, 1, "Choose a Lore")
+let choice = await ItemDialog.create(index, 1, "Wybierz rodzaj wiedzy")
 let text;
 if (!choice[0])
 {
     let custom = await Dialog.wait({
-        title : "Enter Lore",
+        title : "Wpisz rodzaj wiedzy",
         content : "<input type='text'>",
         buttons : {
             confirm : {
@@ -39,5 +39,5 @@ else
     text = game.wfrp4e.utility.extractParenthesesText(choice[0].name)
 }
 
-await this.item.updateSource({name : this.item.name + ` (${text})`, "system.tests.value" : this.item.system.tests.value.replace("chosen Lore", text)})
+await this.item.updateSource({name : this.item.name + ` (${text})`, "system.tests.value" : this.item.system.tests.value.replace("wybrana wiedza", text)})
 await this.effect.updateSource({name : this.effect.name + ` (${text})`})

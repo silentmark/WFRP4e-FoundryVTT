@@ -9,12 +9,12 @@ if (this.item.name.includes("("))
 
 else 
 {
-	group = await ValueDialog.create({text : "Enter Hatred Group", title : "Hatred Group"})
+	group = await ValueDialog.create({text : "Wybierz grupę dażoną nienawiścią", title : "Obiekt Nienawiści"})
 
-	this.item.updateSource({name : this.item.name + ` (${group})`, "system.tests.value" : this.item.system.tests.value.replace("Group", group)})
+	this.item.updateSource({name : this.item.name + ` (${group})`, "system.tests.value" : this.item.system.tests.value.replace("Grupa", group)})
 	this.effect.updateSource({name : this.effect.name + ` (${group})`})
 }
 
 
-data.name = data.name.replace("Target", group);
+data.name = data.name.replace("x", group);
 await this.actor.createEmbeddedDocuments("Item", [data], {fromEffect: this.effect.id});

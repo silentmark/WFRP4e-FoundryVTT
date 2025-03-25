@@ -3,11 +3,11 @@ let data = item.toObject();
 data.system.location.key = this.item.system.location.key
 if (data.system.location.key[0] == "r")
 {
-	data.system.location.value = "Right Ankle"
+	data.system.location.value = "Prawa kostka"
 }
 else if (data.system.location.key[0] == "l")
 {
-	data.system.location.value = "Left Ankle"
+	data.system.location.value = "Lewa kostka"
 }
 
 this.actor.createEmbeddedDocuments("Item", [data], {skipLocationValue : true, fromEffect: this.effect.id})

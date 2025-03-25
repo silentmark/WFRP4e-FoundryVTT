@@ -10,10 +10,10 @@ let characteristics = {
     "wp" : 25,
     "fel" : 10
 }
-let skills = ["Cool", "Dodge", "Intimidate", "Intuition", "Leadership", "Lore (Warfare)", "Perception"]
+let skills = ["Opanowanie", "Unik", "Zastraszanie", "Intuicja", "Dowodzenie", "Wiedza (Wojenna)", "Percepcja"]
 let skillAdvancements = [15, 15, 15, 15, 15, 10, 10]
-let talents = ["Combat Aware", "Combat Reflexes", "Feint", "Inspiring", "Resolute", "War Leader"]
-let trappings = ["Hand Weapon", "Shield"]
+let talents = ["Zmysł Bitewny", "Bitewny Refleks", "Finta", "Inspirujący", "Nieugięty", "Wódz"]
+let trappings = ["Broń ręczna", "Tarcza"]
 let items = [];
 
 let updateObj = this.actor.toObject();
@@ -48,7 +48,7 @@ for (let talent of talents)
     }
     else 
     {
-        ui.notifications.warn(`Could not find ${talent}`, {permanent : true})
+        ui.notifications.warn(`Nie udało się znaleźć talentu: ${talent}`, {permanent : true})
     }
 }
 
@@ -65,7 +65,7 @@ for (let trapping of trappings)
     }
     else 
     {
-        ui.notifications.warn(`Could not find ${trapping}`, {permanent : true})
+        ui.notifications.warn(`Nie udało się znaleźć przedmiotu: ${trapping}`, {permanent : true})
     }
 }
 

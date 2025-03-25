@@ -1,7 +1,6 @@
-
-                            let fatigued = this.actor.hasCondition("fatigued")
-                            if (!fatigued)
-                            {
-                                this.actor.addCondition("fatigued")
-                                ui.notifications.notify("Fatigued added to " + this.actor.name + " which cannot be removed until the Malaise symptom is gone.")
-                            }
+let fatigued = this.actor.hasCondition("fatigued")
+if (!fatigued)
+{
+    this.actor.addCondition("fatigued")
+    ui.notifications.notify("Zmęczenie dodane do " + this.actor.name + ", które nie może zostać usunięte, dopóki objaw Apatia nie zostanie uleczony.")
+}

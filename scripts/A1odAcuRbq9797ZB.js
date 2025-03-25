@@ -1,7 +1,7 @@
 let choice1 = [
     {
         type : "skill",
-        name : "Melee (Basic)",
+        name : "Broń Biała (Podstawowa)",
         diff : {
             system : {
                 advances : {
@@ -14,7 +14,7 @@ let choice1 = [
 let choice2 = [
     {
         type : "skill",
-        name : "Melee (Polearm)",
+        name : "Broń Biała (Drzewcowa)",
         diff : {
             system : {
                 advances : {
@@ -29,22 +29,22 @@ let choice = await Dialog.wait({
     title : "Choice",
     content : 
     `<p>
-    Select your choice
+    Wybierz Umiejętność, której chcesz używać
     </p>
     <ol>
-    <li>Melee (Basic)</li>
-    <li>Melee (Polearm)</li>
+    <li>Broń Biała (Podstawowa)</li>
+    <li>Broń Biała (Drzewcowa)</li>
     </ol> 
     `,
     buttons : {
         1 : {
-            label : "Basic",
+            label : "Podstawowa",
             callback : () => {
                 return choice1;
             }
         },
         2 : {
-            label : "Polearm",
+            label : "Drzewcowa",
             callback : () => {
                 return choice2;
             }
@@ -80,7 +80,7 @@ for (let c of choice)
             items.push(foundry.utils.mergeObject(item, (c.diff || {})))
         }
         else
-            ui.notifications.warn(`Could not find ${talent}`, {permanent : true})
+            ui.notifications.warn(`Nie odnaleziono umiejętności ${c.name}`, {permanent : true})
     }
 
 }

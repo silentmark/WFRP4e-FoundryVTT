@@ -4,5 +4,5 @@ let acutesense = await fromUuid("Compendium.wfrp4e-core.items.Item.9h82z72XGo9tf
 fear = fear.toObject();
 fear.system.specification.value = 1;
 acutesense = acutesense.toObject();
-acutesense.name += " (Smell)";
+acutesense.name += " (Węch)";
 this.actor.createEmbeddedDocuments("Item", [darkvision, fear, acutesense], {fromEffect : this.effect.id})

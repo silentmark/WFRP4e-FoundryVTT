@@ -1,10 +1,10 @@
-let spells = await warhammer.utility.findAllItems("spell", "Loading Spells", true, ["system.lore.value"])
+let spells = await warhammer.utility.findAllItems("spell", "Ładowanie Zaklęć", true, ["system.lore.value"])
 
 let text = (await game.wfrp4e.tables.rollTable("random-caster", {hideDSN: true})).result
 
 lore = Array.from(text.matchAll(/{(.+?)}/gm))[0][1]
 
-if (text == "GM's Choice")
+if (text == "Wybór GMa")
 {
     return this.script.notification(text)
 }
@@ -18,5 +18,5 @@ if (spellsWithLore.length > 0)
 }
 else
 {
-    ui.notifications.notify(`Could not find ${lore} spell. Try Again`)
+    ui.notifications.notify(`Nie udało się odnaleźć zaklęcia w Tradycji ${lore}. Spróbuj ponownie.`)
 }

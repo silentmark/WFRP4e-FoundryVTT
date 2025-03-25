@@ -1,7 +1,7 @@
 let choice1 = [
     {
         type : "skill",
-        name : "Melee (Basic)",
+        name : "Broń Biała (Podstawowa)",
         diff : {
             system : {
                 advances : {
@@ -14,7 +14,7 @@ let choice1 = [
 let choice2 = [
     {
         type : "skill",
-        name : "Melee (Polearm)",
+        name : "Broń Biała (Drzewcowa)",
         diff : {
             system : {
                 advances : {
@@ -28,7 +28,7 @@ let choice2 = [
 let choice3 = [
     {
         type : "skill",
-        name : "Melee (Two-Handed)",
+        name : "Broń Biała (Dwuręczna)",
         diff : {
             system : {
                 advances : {
@@ -40,32 +40,32 @@ let choice3 = [
 ]
 
 let choice = await Dialog.wait({
-        title : "Choice",
+        title : "Wybór",
         content : 
         `<p>
-        Select your choice
+        Wybierz opcję
         </p>
         <ol>
-        <li>Melee (Basic)</li>
-        <li>Melee (Polearm)</li>
-        <li>Melee (Two-Handed)</li>
+        <li>Broń Biała (Podstawowa)</li>
+        <li>Broń Biała (Drzewcowa)</li>
+        <li>Broń Biała (Dwuręczna)</li>
         </ol> 
         `,
         buttons : {
             1 : {
-                label : "Basic",
+                label : "Podstawowa",
                 callback : () => {
                     return choice1
                 }
             },
             2 : {
-                label : "Polearm",
+                label : "Drzewcowa",
                 callback : () => {
                     return choice2
                 }
             },
             3 : {
-                label : "Two-Handed",
+                label : "Dwuręczna",
                 callback : () => {
                     return choice3
                 }

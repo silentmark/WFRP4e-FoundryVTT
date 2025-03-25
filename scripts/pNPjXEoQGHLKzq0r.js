@@ -1,4 +1,4 @@
-let talent = this.actor.has("Arcane Magic (Light)", "talent")
+let talent = this.actor.has("Magia Tajemna (Światła)", "talent")
 let demon = this.actor.has(game.i18n.localize("NAME.Daemonic"))
 
 if (!talent)

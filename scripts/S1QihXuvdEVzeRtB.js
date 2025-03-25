@@ -27,7 +27,7 @@ else if (roll = 10)
     modifier = -5
 }
 
-message = `${roll} Rolled, gain ${item.name}, ${modifier} Strength`
+message = `Wyrzucono ${roll}, Otrzymano ${item.name}, ${modifier} Siły`
 dice.toMessage(this.script.getChatData())
 
 let changes = foundry.utils.duplicate(this.effect.changes)

@@ -1,21 +1,21 @@
 let choice = await Dialog.wait({
-    title : "Option",
+    title : "Opcjonalne",
     content : 
     `<p>
-    Add Option?
+    Dodać opcjonalne przedmioty?
     </p>
     <ol>
-    <li>Ranged (Bow) +10 and a Longbow with 12 Arrows</li>
+    <li>Broń Zasięgowa (Łuk) +10 oraz długi łuk z 12 strzałami</li>
     </ol> 
     `,
     buttons : {
         1 : {
-            label : "Yes",
+            label : "Tak",
             callback : () => {
                 return [
                     {
                         type : "skill",
-                        name : "Ranged (Bow)",
+                        name : "Broń Zasięgowa (Łuk)",
                         diff : {
                             system : {
                                 advances : {
@@ -26,17 +26,17 @@ let choice = await Dialog.wait({
                     },
                     {
                         type : "weapon",
-                        name : "Longbow",
+                        name : "Łuk długi",
                     },
                     {
                         type : "ammunition",
-                        name : "Arrow",
+                        name : "Strzała",
                     }
                 ];
             }
         },
         2 : {
-            label : "No",
+            label : "Nie",
             callback : () => {
                 return [];
             }

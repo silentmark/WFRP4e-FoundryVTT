@@ -2,6 +2,6 @@ teeth = await fromUuid("Compendium.wfrp4e-core.items.fBcZhOBn8IpoVqQ1")
 teeth = teeth.toObject();
 
 let roll = await new Roll("1d10").roll();
-roll.toMessage(this.script.getChatData({flavor : "Teeth Lost"}))
+roll.toMessage(this.script.getChatData({flavor : "Utracono Zęby"}))
 teeth.system.location.value = `${roll.total} ${teeth.system.location.value}`
 this.actor.createEmbeddedDocuments("Item", [teeth])

@@ -6,5 +6,5 @@ let ones = Number(args.test.result.roll.toString().split("").pop())
 
 if (ones > SL)
 	args.test.data.result.SL = "+" + (ones + args.test.successBonus + args.test.slBonus)
-   args.test.result.other.push(`<b>${this.effect.name}</b>: Used unit dice as SL`)
+   args.test.result.other.push(`<b>${this.effect.name}</b>: Użyto wartości kości jedności jako PS`)
 }

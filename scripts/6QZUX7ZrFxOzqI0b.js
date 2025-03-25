@@ -1,4 +1,4 @@
-let regenerate = this.actor.items.getName('Regenerate')
+let regenerate = this.actor.items.getName('Regeneracja')
 
 if (regenerate)
 {

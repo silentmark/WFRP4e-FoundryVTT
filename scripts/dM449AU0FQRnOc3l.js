@@ -1,4 +1,4 @@
 if (args.opposedTest.result.hitloc.value == "head")
 {
-  args.abort = "Missed - Headless"
+  args.abort = "Pudło - Brak Głowy"
 }

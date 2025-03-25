@@ -1,6 +1,6 @@
 if (this.item.getFlag("wfrp4e", "failedCool"))
 {
-    this.item.name += " (No AP)"
+    this.item.name += " (Brak PP)"
     this.item.system.AP = {
         "head": 0,
         "lArm": 0,

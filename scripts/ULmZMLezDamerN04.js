@@ -1,16 +1,16 @@
-let spells = await warhammer.utility.findAllItems("spell", "Loading Spells", true, ["system.lore.value"])
+let spells = await warhammer.utility.findAllItems("spell", "Wczytywanie Zaklęć...", true, ["system.lore.value"])
 
 let lore = (await game.wfrp4e.tables.rollTable("random-caster", {hideDSN: true})).text
 this.script.notification(lore)
-if (lore == "GM's Choice") {
+if (lore == "Wybór Mistrza Gry") {
    return
 }
 
-else if (lore == "Arcane Magic") {
-    lore = "Arcane"
+else if (lore == "Magia Tajemna") {
+    lore = "Magia Tajemna"
 }
 
-else if (lore == "Petty Magic") {
+else if (lore == "Magia Prosta") {
     lore = "petty"
 }
 
@@ -19,7 +19,7 @@ else {
 }
 
 let spellsWithLore = []
-if (lore == "Arcane") {
+if (lore == "Magia Tajemna") {
     spellsWithLore = spells.filter(i => !i.system.lore.value)
 }
 else {

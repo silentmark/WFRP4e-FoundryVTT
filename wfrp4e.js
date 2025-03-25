@@ -1,3 +1,4 @@
+import './style/wfrp4e.scss';
 
 // Import Modules
 import ActorSheetWFRP4e from "./modules/actor/sheet/actor-sheet.js"

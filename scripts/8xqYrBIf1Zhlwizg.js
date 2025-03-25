@@ -1,5 +1,5 @@
-const repaired_message = `<p>Finished raisint <em>the anchor</em>.</p>`;
-const test = 'Strength';
+const repaired_message = `<p>Zakończono podnoszenie <em>kotwicy</em>.</p>`;
+const test = 'Siła';
 const difficulty = 'vhard';
 const target = 20;
 
@@ -24,7 +24,7 @@ const extendedTestData = {
   },
   effects: [
     {
-      name: `Repair the ${this.item.name}`,
+      name: `Podnieś kotwicę ${this.item.name}`,
       img: this.item.img,
       system: {
         transferData : {

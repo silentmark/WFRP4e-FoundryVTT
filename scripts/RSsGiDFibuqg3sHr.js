@@ -7,7 +7,7 @@ let diseaseIndex = game.packs
 	return i
 })
 
-let choice = await ItemDialog.create(diseaseIndex , 1, "Choose a Disease")
+let choice = await ItemDialog.create(diseaseIndex , 1, "Wybierz Chorobę");
 
 if (choice[0])
 {

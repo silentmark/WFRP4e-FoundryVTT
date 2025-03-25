@@ -1,11 +1,11 @@
-let careers = await warhammer.utility.findAllItems("career", "Loading Careers", true);
+let careers = await warhammer.utility.findAllItems("career", "Wyszukiwanie Profesji...", true);
 careers.forEach(c => {
     if (!c.id)
     {
         c.id = c._id;
     }
 });
-let choice = await ItemDialog.create(careers, 1, {text : "Choose Double Life Career", title : this.effect.name, indexed : true});
+let choice = await ItemDialog.create(careers, 1, {text : "Wybierz profesję dla 'Podwójne Życie'", title : this.effect.name, indexed : true});
 if (choice[0])
 {
     let career = choice[0];

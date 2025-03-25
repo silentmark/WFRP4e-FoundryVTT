@@ -6,12 +6,12 @@ if (!test.succeeded)
     let data = item.toObject();
     if (this.item.system.location.key == "rLeg")
     {
-        data.system.location.value = "Right Toe"
+        data.system.location.value = "Prawy Palec u nogi"
 	data.system.location.key = "rToe";
     }
     else if (this.item.system.location.key == "lLeg")
     {
-        data.system.location.value = "Left Toe"
+        data.system.location.value = "Lewu Palec u nogi"
 	data.system.location.key = "lToe";
     }
     this.actor.createEmbeddedDocuments("Item", [data])

@@ -542,7 +542,7 @@ export default class ActorSheetWFRP4e extends WarhammerActorSheet {
                     if (test.item.cn.SL >= test.item.cn.value) {
                       break;
                     }
-                    if (test.result.minormis || test.result.majormis || test.result.catastrophicmis) {
+                    if (test.result.mis || test.result.minormis || test.result.majormis || test.result.catastrophicmis) {
                       break;
                     }
                     test.context.messageId = null; // Clear message so new message is made
@@ -1217,7 +1217,6 @@ export default class ActorSheetWFRP4e extends WarhammerActorSheet {
           yes: {
             icon: '<i class="fa fa-check"></i>', label: game.i18n.localize("Yes"), callback: async dlg => {
               doc.delete();
-              li.slideUp(200, () => this.render(false))
             }
           }, cancel: { icon: '<i class="fas fa-times"></i>', label: game.i18n.localize("Cancel") },
         }, default: 'yes'

@@ -48,7 +48,7 @@
   "background" : "systems/wfrp4e/WFRP-Header.jpg",
   "grid": {
     "distance": 2,
-    "units": "yd",
+    "units": "m",
     "type": 1,
     "diagonals": 4
   },

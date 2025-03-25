@@ -20,11 +20,9 @@
     <label>{{localize "Overchannelling"}}</label>
     <input class="input-text" type="text" name="overchannelling" value="{{fields.overchannelling}}" title="{{localize 'DIALOG.OverchannellingTooltip'}}" />
   </div>
-  {{#if false}}
-    <div class="form-group">
-      <label>{{localize "DIALOG.Quickcasting"}}
-        <input title="{{localize 'DIALOG.QuickcastingTooltip'}}" type="checkbox" name="quickcasting" {{checked fields.quickcasting}} />
-      </label>
-    </div>
-  {{/if}}
+  <div class="form-group">
+    <label>{{localize "DIALOG.Quickcasting"}}
+      <input title="{{localize 'DIALOG.QuickcastingTooltip'}}" type="checkbox" name="quickcasting" {{checked fields.quickcasting}} />
+    </label>
+  </div>
 {{/if}}

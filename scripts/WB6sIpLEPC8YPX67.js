@@ -1,6 +1,6 @@
 if (args.options.dodge)
 {
 	args.abort = true;
-	this.script.notification("Cannot Dodge!")
+	this.script.notification("Nie można unikać!")
 }
 return ["t", "int", "wp", "fel"].includes(args.characteristic)

@@ -10,10 +10,10 @@ let characteristics = {
   "wp" : 10,
   "fel" : 10
 }
-let skills = ["Charm", "Intimidate", "Melee (Basic)"]
+let skills = ["Charyzma", "Zastraszanie", "Broń Biała (Podstawowa)"]
 let skillAdvancements = [7, 60, 7]
-let talents = ["Menacing", "Shadow"]
-let traits = ["Distracting"]
+let talents = ["Groźny", "Cień"]
+let traits = ["Dekoncentrujący"]
 let trappings = []
 let items = [];
 let spells = [];
@@ -74,7 +74,7 @@ for (let trait of traits)
 
   if (Number.isNumeric(traitVal))
   {
-      traitItem.system.specification.value = traitName.includes('Weapon','Horns','Tail','Tentacles','Bite') ? traitVal - parseInt(characteristicValues[3]/10) : traitVal;
+      traitItem.system.specification.value = traitName.includes('Broń,','Rogi','Ogon','Macki','Ugryzienie') ? traitVal - parseInt(characteristicValues[3]/10) : traitVal;
       traitItem.name = (traitItem.name +  ` ${traitSpec ? "("+ traitSpec + ")" : ""}`).trim()
   }
   else 

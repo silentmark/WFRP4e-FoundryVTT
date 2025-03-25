@@ -1,1 +1,1 @@
-this.script.notification(`Cannot enter ${this.effect.name}!`); this.actor.addCondition("broken");
+this.script.notification(`Nie można wejść: ${this.effect.name}!`); this.actor.addCondition("broken");

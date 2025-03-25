@@ -10,5 +10,5 @@ let APused = Math.max(0, APatLoc.value - metalAP); // remove metal AP at locatio
 damage -= (APused + this.actor.system.characteristics.t.bonus)
 
 let msg = await this.actor.applyBasicDamage(damage, {suppressMsg : true, damageType : game.wfrp4e.config.DAMAGE_TYPE.IGNORE_ALL});
-msg += ` (ignored ${metalAP} metal AP on ${game.wfrp4e.config.locations[loc]})`
+msg += ` (Zignorowano PP metalowego pancerza: ${metalAP} z lokacji ${game.wfrp4e.config.locations[loc]})`
 this.script.message(msg)

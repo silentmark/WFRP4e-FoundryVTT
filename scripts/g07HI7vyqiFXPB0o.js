@@ -5,8 +5,8 @@ await test.roll()
 if (test.failed) 
 {
     this.actor.addCondition("poisoned", 2)
-    this.script.message(`<p><strong>${this.actor.prototypeToken.name}</strong> has gained 2 @Condition[Poisoned] Conditions.</p>
-        <p>Any being with the Bestial Creature Trait that bites them and takes damage will not bite them again during a hostile encounter, though the creature may still attack them in other ways.</p>`, 
+    this.script.message(`<p><strong>${this.actor.prototypeToken.name}</strong> otrzymuje 2 Poziomy Stanu @Condition[Zatrucie].</p>
+        <p>Każde stworzenie cechą Zwierzęcy, która ugryzie ofiarę i otrzyma obrażenia, nie ugryzie ponownie podczas trwającego starcia, chociaż stworzenie może nadal atakować na inne sposoby.</p>`, 
     {
       whisper: ChatMessage.getWhisperRecipients("GM"), 
       blind: true 
@@ -16,7 +16,7 @@ if (test.failed)
 else if (test.succeeded) 
 {
     // Don't attempt to add Corrosive Blood if actor already has it
-    const hasCorrosiveBlood = this.actor.has("Corrosive Blood")
+    const hasCorrosiveBlood = this.actor.has("Kwasowa Krew")
     if (hasCorrosiveBlood !== undefined) return   
 
     let item = await fromUuid("Compendium.wfrp4e-core.items.M5QSWOYt2Rbv2yxW")
@@ -24,6 +24,6 @@ else if (test.succeeded)
     this.actor.createEmbeddedDocuments("Item", [data], {fromEffect: this.effect.id})
     
     const duration = 3 + parseInt(test.result.SL)
-    this.script.message(`<p><strong>${this.actor.prototypeToken.name}</strong> gains the Corrosive Blood Trait for ${duration} rounds.</p>`, 
+    this.script.message(`<p><strong>${this.actor.prototypeToken.name}</strong> otrzymuje Kwasową Krew na liczbę rund: ${duration}.</p>`, 
       { whisper: ChatMessage.getWhisperRecipients("GM"), blind: true })    
 }

@@ -3,6 +3,6 @@ let choice = await ItemDialog.create(ItemDialog.objectToArray({
     t : game.wfrp4e.config.characteristics.t,
     ag : game.wfrp4e.config.characteristics.ag,
     wp : game.wfrp4e.config.characteristics.wp
-}, this.effect.img), 1, "Choose Characteristic");
+}, this.effect.img), 1, "Wybierz Cechę");
 
 this.effect.updateSource({"flags.wfrp4e.characteristic" : choice[0].id})

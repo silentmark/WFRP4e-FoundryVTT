@@ -10,5 +10,5 @@ if (this.item.system.quantity.value)
 }
 else
 {
-	this.script.notification("None left!", "error")
+	this.script.notification("Nie nie zostało!", "error")
 }

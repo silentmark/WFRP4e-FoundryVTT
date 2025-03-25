@@ -37,6 +37,8 @@ export default function() {
           return
         
         game.wfrp4e.tables.formatChatRoll(key, {}, column).then(text => {
+          if (!text)
+            return
           let chatOptions = game.wfrp4e.utility.chatDataSetup(text, game.settings.get("core", "rollMode"), true)
           chatOptions.speaker = {alias: table.name}
           ChatMessage.create(chatOptions);

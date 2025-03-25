@@ -1,5 +1,5 @@
 if (this.actor.hasCondition("ablaze"))
 {
-    this.script.notification("Immune to Ablaze")
+    this.script.notification("Niewrażliwość na Podpalenie")
     await this.actor.hasCondition("ablaze")?.delete()
 }

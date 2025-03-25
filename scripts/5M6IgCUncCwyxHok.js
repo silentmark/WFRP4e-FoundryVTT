@@ -1,15 +1,15 @@
 let etiquette = (await fromUuid("Compendium.wfrp4e-core.items.Item.sYbgpSnRqSZWgwFP")).toObject();
-etiquette.name += ` (Followers of Tzeentch)`;
+etiquette.name += ` (Słudzy Tzeentch)`;
 
 let animosity = (await fromUuid("Compendium.wfrp4e-core.items.Item.0VpT5yubw4UL7j6f")).toObject();
-animosity.system.specification.value = "Followers of Nurgle";
+animosity.system.specification.value = "Słudzy Nurgle'a";
 
 let roll = await new Roll("ceil(1d10 / 3)").roll();
 
 roll.toMessage(this.script.getChatData());
 
 let mutations = [];
-let msg = `<p><strong>Mutations Gained</strong></p>`
+let msg = `<p><strong>Otrzymaono Mutację</strong></p>`
 for(let i = 0; i < roll.total; i++)
 {
     let item;

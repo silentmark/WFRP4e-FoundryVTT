@@ -6,7 +6,7 @@ if (Math.ceil(CONFIG.Dice.randomUniform() * 10) == 1) {
   this.item.setFlag("wfrp4e", "brittle", true)
   ChatMessage.create({
     content: `
-      <strong>${this.item.name}</strong> has run out of poison. It will shatter the next time it is used.`, 
+      <strong>${this.item.name}</strong>: trucizna skończyła się. Podczas następnego użycia zostanie roztrzaskany.`, 
     whisper: ChatMessage.getWhisperRecipients("GM"),
     blind: true
   })

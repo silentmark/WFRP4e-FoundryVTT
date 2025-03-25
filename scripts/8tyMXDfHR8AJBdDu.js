@@ -3,5 +3,5 @@ let weakpointsAP = args.AP.layers.filter(i => !i.ignored && i.weakpoints).reduce
 if (weakpointsAP > 0)
 {
     args.modifiers.ap.ignored += weakpointsAP;
-    args.modifiers.ap.details.push(`${this.effect.name} - Ignore Weakpoints (${weakpointsAP})`);
+    args.modifiers.ap.details.push(`${this.effect.name} - Ignoruje Wrażliwe Punkty (${weakpointsAP})`);
 }

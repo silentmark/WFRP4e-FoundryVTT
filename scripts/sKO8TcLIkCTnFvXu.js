@@ -1,2 +1,2 @@
 args.abort = true;
-this.script.notification(`Cannot use ${this.item.system.location.value}!`, "error")
+this.script.notification(`Nie można używać: ${this.item.system.location.value}!`, "error")

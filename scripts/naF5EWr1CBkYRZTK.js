@@ -2,16 +2,16 @@ if (args.opposedTest?.attackerTest?.item?.system?.isRanged)
 {
     let choice = await Dialog.wait({
         title: this.effect.name,
-        content: `<p>Abort damage with <strong>${this.effect.name}</strong>?`,
+        content: `<p>Zniwelować Obrażenia dzięki: <strong>${this.effect.name}</strong>?`,
         buttons: {
             yes: {
-                label: "Yes",
+                label: "Tak",
                 callback: () => {
                     return true;
                 }
             },
             no: {
-                label: "No",
+                label: "Nie",
                 callback: () => {
                     return false;
                 }
@@ -21,6 +21,6 @@ if (args.opposedTest?.attackerTest?.item?.system?.isRanged)
 
     if (choice)
     {
-        args.abort = `<strong>${this.effect.name}</strong>: Damage cancelled`
+        args.abort = `<strong>${this.effect.name}</strong>: Obrażenia Zniwelowane`
     }
 }

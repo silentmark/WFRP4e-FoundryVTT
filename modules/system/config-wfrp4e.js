@@ -1042,11 +1042,65 @@ WFRP4E.overCastTablesPerWind = {
             {cost: 2, value: 19},
             {cost: 2, value: 20}
         ]
+    },
+    "Dhar": {
+        range: [
+            {cost: 1, value: 1},
+            {cost: 2, value: 3},
+            {cost: 8, value: 4},
+            {cost: 16, value: 5}],
+        target: [
+            {cost: 1, value: 1},
+            {cost: 2, value: 2},
+            {cost: 8, value: 3},
+            {cost: 16, value: 4}],
+        AoE: [
+            {cost: 2, value: 2},
+            {cost: 9, value: 3},
+            {cost: 18, value: 4}],
+        duration: [
+            {cost: 1, value: 2},
+            {cost: 3, value: 3},
+            {cost: 6, value: 4}],
+        damage: [
+            {cost: 1, value: 1},
+            {cost: 1, value: 2},
+            {cost: 1, value: 3},
+            {cost: 1, value: 4},
+            {cost: 2, value: 5},
+            {cost: 3, value: 6},
+            {cost: 4, value: 7},
+            {cost: 8, value: 8},
+            {cost: 12, value: 9},
+            {cost: 16, value: 10}],
+        other: [
+            {cost: 1, value: 1},
+            {cost: 1, value: 2},
+            {cost: 1, value: 3},
+            {cost: 1, value: 4},
+            {cost: 1, value: 5},
+            {cost: 1, value: 6},
+            {cost: 1, value: 7},
+            {cost: 1, value: 8},
+            {cost: 1, value: 9},
+            {cost: 1, value: 10},
+            {cost: 1, value: 11},
+            {cost: 1, value: 12},
+            {cost: 1, value: 13},
+            {cost: 1, value: 14},
+            {cost: 1, value: 15},
+            {cost: 1, value: 16},
+            {cost: 1, value: 17},
+            {cost: 1, value: 18},
+            {cost: 1, value: 19},
+            {cost: 1, value: 20}
+        ]
     }
 }
 
-WFRP4E.overCastTable = function(wind) {
-    return WFRP4E.overCastTablesPerWind[wind] || WFRP4E.overCastTablesPerWind["default"]
+WFRP4E.overCastTable = function(lore) {
+    const wind = game.wfrp4e.config.magicWind[lore];
+    return game.wfrp4e.config.overCastTablesPerWind[wind] || game.wfrp4e.config.overCastTablesPerWind["default"]
 }
 
 WFRP4E.species = {};

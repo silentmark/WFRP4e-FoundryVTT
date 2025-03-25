@@ -9,7 +9,7 @@ let filters = [
     }
 ]
 
-let petty = await ItemDialog.createFromFilters(filters, 3, {text : "Choose 3 Petty Spells"})
+let petty = await ItemDialog.createFromFilters(filters, 3, {text :"Wybierz 3 Zaklęcia Proste"})
 
 
 filters = [
@@ -23,7 +23,7 @@ filters = [
     }
 ]
 
-let arcane = await ItemDialog.createFromFilters(filters, 3, {text : "Choose 3 Arcane Spells"})
+let arcane = await ItemDialog.createFromFilters(filters, 3, {text :"Wybierz 3 Zaklęcia Magii Tajemnej"})
 
 let items = petty.concat(arcane).map(i => i.toObject())
 

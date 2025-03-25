@@ -2,9 +2,9 @@
 
 if (args.equipped) {  
   this.actor.createEmbeddedDocuments("ActiveEffect", [this.item.effects.contents[1]?.convertToApplied()])  
-  this.script.message(`${this.actor.name} dons the <strong>${this.item.name}</strong>. <br>
-      They gain +1 Corruption point if an exposure Test is failed, which will need to be manually applied.<br>If they wear the mask for more than an hour or benefit from any of its effects, they are exposed to @Corruption[moderate]{Moderate Corruption} 
-      `,
+  this.script.message(`<strong>${this.item.name}</strong> została założona przez ${this.actor.name}. <br>
+      Otzymano +1 poziom Zepsucia, jeśli test na ekspozycję zakończy się niepowodzeniem, co będzie musiało zostać ręcznie zaaplikowane.<br>
+      Jeśli maska jest noszona przez ponad godzinę lub wykorzystane są jej efekty, postać jest wystawiona na @Corruption[moderate]{Przeciętne Zepsucie}`,
       {whisper: ChatMessage.getWhisperRecipients("GM")}) 
 }
 
@@ -12,8 +12,8 @@ if (args.equipped) {
 else if (!args.equipped)
 {
     await this.item.effects.contents[0].delete();
-    await this.item.update({name : this.item.name += " (Used)"})
-    this.script.message(`<strong>${this.item.name}</strong> on ${this.actor.name} has been taken off and loses its properties. However, the effects last for [[1d10+4]] days, after which they should be manually removed.`, 
+    await this.item.update({name : this.item.name += " (Wykorzystana)"})
+    this.script.message(`<strong>${this.item.name}</strong> noszona przez ${this.actor.name} została zdjęta i utraciła swoje właściwości. Jednak jej efekty trwają przez [[1d10+4]] dni, po czym powinny zostać ręcznie usunięte.`, 
     {whisper: ChatMessage.getWhisperRecipients("GM")}
     )
     

@@ -1,5 +1,5 @@
-const repaired_message = `<p>Finished repairing <em>${this.item.name}</em>.</p>`;
-const test = 'Trade (Carpenter)';
+const repaired_message = `<p>Zakończono naprawę: <em>${this.item.name}</em>.</p>`;
+const test = 'Rzemiosło (Stolarstwo)';
 const difficulty = 'challenging';
 const target = 40;
 
@@ -24,7 +24,7 @@ const extendedTestData = {
   },
   effects: [
     {
-      name: `Repair the ${this.item.name}`,
+      name: `Napraw: ${this.item.name}`,
       img: this.item.img,
       system: {
         transferData : {

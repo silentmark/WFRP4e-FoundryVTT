@@ -4,6 +4,6 @@ if (args.totalWoundLoss >= 1)
     await roll.toMessage(this.script.getChatData());
     if (roll.total == 9)
     {
-        this.script.message(`Two @UUID[Compendium.wfrp4e-eis.actors.iDy8SDTwJSlCzZMl]{Blue Horror of Tzeentch} claw their way out of ${this.actor.name}'s screaming flesh, killing them in the process.`, {whisper : ChatMessage.getWhisperRecipients("GM")})
+        this.script.message(`Dwa @UUID[Compendium.wfrp4e-eis.actors.iDy8SDTwJSlCzZMl]{Niebieskie Horrory Tzeentch} rozrywają na strzępy ${this.actor.name}' wydostając się na świat.`, {whisper : ChatMessage.getWhisperRecipients("GM")})
     }
 }

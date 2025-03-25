@@ -8,7 +8,7 @@ if (type == "cold")
 
 if (type == "corrosion")
 {
-    let damageItems = await Dialog.confirm({title : this.item.name, content : `<p>Damage all Items carried?</p>`})
+    let damageItems = await Dialog.confirm({title : this.item.name, content : `<p>Uszkodzić wszystkie noszone przedmioty?</p>`})
 	if (damageItems)
 	{
 		let msg = ``
@@ -25,17 +25,17 @@ if (type == "corrosion")
 			{
 				await item.system.damageItem(1);
 			}
-			msg += `<p><strong>${item.name}</strong> damage by 1</p>`
+			msg += `<p><strong>${item.name}</strong>: uszkodzono o 1</p>`
 		}
 		for(let item of armour)
 		{
 			await item.system.damageItem(1);
-			msg += `<p><strong>${item.name}</strong> damage by 1</p>`
+			msg += `<p><strong>${item.name}</strong>: uszkodzono o 1</p>`
 		}
 		for(let item of trappings)
 		{
 			await item.system.damageItem(1);
-			msg += `<p><strong>${item.name}</strong> damage by 1</p>`
+			msg += `<p><strong>${item.name}</strong>: uszkodzono o 1</p>`
 		}
 		if (msg)
 		{

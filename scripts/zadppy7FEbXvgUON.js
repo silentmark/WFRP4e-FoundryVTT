@@ -1,19 +1,19 @@
  let characteristics = {
-    "ws" : 5,
-    "bs" : 0,
-    "s" : 0,
-    "t" : 0,
-    "i" : 0,
-    "ag" : 10,
-    "dex" : 10,
-    "int" : 0,
-    "wp" : 0,
-    "fel" : 5
-}
-let skills = ["Perception", "Sleight of Hand", "Stealth (Urban)"]
+                    "ws" : 5,
+                    "bs" : 0,
+                    "s" : 0,
+                    "t" : 0,
+                    "i" : 0,
+                    "ag" : 10,
+                    "dex" : 10,
+                    "int" : 0,
+                    "wp" : 0,
+                    "fel" : 5
+                }
+let skills = ["Percepcja", "Zwinne Palce", "Skradanie (Miasto)"]
 let skillAdvancements = [10, 10, 10]
-let talents = ["Criminal", "Etiquette (Criminals)"]
-let trappings = ["Rope, 10 yards", "Lockpick", "Mask"]
+let talents = ["Przestępca", "Etykieta (Przestępcy)"]
+let trappings = ["Lina, 10 metrów", "Wytrychy", "Maska"]
 let items = []
 
 let updateObj = this.actor.toObject();

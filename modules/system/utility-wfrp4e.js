@@ -342,7 +342,10 @@ export default class WFRP_Utility {
    * @param {String} symptom  symptom name to be posted
    */
   static async postSymptom(symptom) {
-    let symkey = warhammer.utility.findKey(symptom.split("(")[0].trim(), game.wfrp4e.config.symptoms)
+    let symkey = warhammer.utility.findKey(symptom.split("(")[0].trim(), game.wfrp4e.config.symptoms);
+    if (!symkey) {
+      symkey = warhammer.utility.findKey(symptom.trim(), game.wfrp4e.config.symptoms);
+    }
     let content = `<b>${symptom}</b>: ${game.wfrp4e.config.symptomDescriptions[symkey]}`;
     let chatOptions = {
       user: game.user.id,
@@ -594,6 +597,8 @@ export default class WFRP_Utility {
    * @param {Object} event  click event
    */
   static async handleTableClick(event) {
+    if (!game.user.isGM) return; 
+
     let modifier = parseInt($(event.currentTarget).attr("data-modifier")) || 0;
     let messageId= $(event.currentTarget).parents(".message").attr("data-message-id");
     let html;
