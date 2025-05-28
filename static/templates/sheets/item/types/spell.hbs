@@ -4,11 +4,14 @@
     <div class="form-group">
         <label>{{localize "Lore"}}</label>
         <div class="form-fields">
-            <select name="system.lore.value">
-                {{selectOptions lores selected=system.lore.value}}
-            </select>
+            <input type="text" list="lores" data-action="editLore" value="{{loreValue}}">
         </div>
     </div>
+    <datalist id="lores">
+        {{#each (config "magicLores")}}
+            <option>{{this}}</option>
+        {{/each}}
+    </datalist>
     <fieldset>
         <legend>{{localize "Overrides"}}</legend>
         {{formGroup fields.skill.fields.value value=source.system.skill.value}}
