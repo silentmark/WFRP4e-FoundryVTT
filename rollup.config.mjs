@@ -2,7 +2,7 @@ import fs from "fs";
 import getSystemPath from "./foundry-path.mjs";
 import copy from 'rollup-plugin-copy-watch';
 import postcss from "rollup-plugin-postcss"
-import jscc from 'rollup-plugin-jscc';
+import bakedEnv from 'rollup-plugin-baked-env';
 
 let manifest = JSON.parse(fs.readFileSync("./system.json"))
 
@@ -10,7 +10,7 @@ let systemPath = getSystemPath(manifest.id, manifest.compatibility.verified);
 
 console.log("Bundling to " + systemPath)
 export default {
-    input: [`${manifest.id}.js`],
+    input: [`src/${manifest.id}.js`, `./style/${manifest.id}.scss`],
     output: {
         dir : systemPath,
         format: 'esm',
@@ -20,9 +20,7 @@ export default {
         clearScreen: true
     },
     plugins: [
-        jscc({      
-            values : {_ENV :  process.env.NODE_ENV}
-        }),
+        bakedEnv(),
         copy({
             targets : [
                 {src : "./template.json", dest : systemPath},
