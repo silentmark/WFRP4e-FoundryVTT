@@ -14,7 +14,7 @@ let index = game.packs
 	return i
 })
 
-let choice = await ItemDialog.create(index, 1, "Wybierz Umiejętność Rzemieślniczą")
+let choice = await ItemDialog.create(index, 1, {text : "Wybierz Umiejętność Rzemieślniczą lub wpisz ręcznie.", title : this.effect.name})
 let text;
 if (!choice[0])
 {
