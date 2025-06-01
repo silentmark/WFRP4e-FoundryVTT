@@ -186,7 +186,28 @@ export default class ActorWFRP4e extends WarhammerActor
    */
   async setupChannell(spell, context = {}) 
   {
-    return this._setupTest(ChannellingDialog, ChannelTest, spell, context, false)
+      let test = await this._setupTest(ChannellingDialog, ChannelTest, spell, context, false);
+      if (test.context.channelUntilSuccess){
+        await test.roll();
+        if (test.context.channelUntilSuccess) {
+          await warhammer.utility.sleep(200);
+          do {
+            if (test.item.cn.SL >= test.item.cn.value) {
+              break;
+            }
+            if (test.result.mis || test.result.minormis || test.result.majormis || test.result.catastrophicmis) {
+              break;
+            }
+
+            test.context.messageId = null; // Clear message so new message is made
+            await test.roll();
+            await warhammer.utility.sleep(200);
+          } while (true);
+        }
+      }
+      else {
+        return new Promise((resolve) => { resolve(test) }); // If channeling until success, return a promise that resolves with the test
+      }
   }
 
   /**

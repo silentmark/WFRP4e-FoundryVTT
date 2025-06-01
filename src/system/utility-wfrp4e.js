@@ -563,6 +563,8 @@ export default class WFRP_Utility {
    * @param {Object} event  click event
    */
   static async handleTableClick(event, target) {
+    if (!game.user.isGM) return;
+
     let modifier = parseInt(target.dataset.modifier) || 0;
     let messageId= this.id;
     let html;

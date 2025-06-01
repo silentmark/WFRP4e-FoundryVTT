@@ -124,6 +124,7 @@ export default class ChannelTest extends TestWFRP {
   computeTables()
   {
     super.computeTables();
+    // todo test:
     if (this.result.criticalchannell)
     {
       // Not really a table?
@@ -289,10 +290,16 @@ export default class ChannelTest extends TestWFRP {
     }
     else 
     {
-
       if (this.result.criticalchannell)
       {
-        this.result.channelledSL = this.item.cn.value
+        if (this.spell.system.ritual?.value) 
+        {
+          this.result.channelledSL += this.actor.system.characteristics.wp.bonus;
+        }
+        else 
+        {
+          this.result.channelledSL = this.item.cn.value;
+        }
       }
     }
 
