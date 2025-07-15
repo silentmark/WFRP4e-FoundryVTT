@@ -378,7 +378,7 @@ export default class CharGenWfrp4e extends FormApplication {
         localStorage.removeItem("wfrp4e-chargen")
       }
       else {
-        const payload =  {id : game.user.id, data : this.actor, options : {skipSpecialisationChoice : true}}
+        const payload =  {id : game.user.id, data : this.actor, options : {skipSpecialisationChoice : true, skipItems : true}}
         let id = await SocketHandlers.call("createActor", payload, "GM");
         let actor = game.actors.get(id);
         await actor.createEmbeddedDocuments("Item", actorItems, {skipSpecialisationChoice : true})

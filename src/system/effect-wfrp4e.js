@@ -1,3 +1,4 @@
+import TestWFRP from "./rolls/test-wfrp4e";
 
 export default class ActiveEffectWFRP4e extends WarhammerActiveEffect
 {
@@ -120,6 +121,17 @@ export default class ActiveEffectWFRP4e extends WarhammerActiveEffect
         return effect;
     }
 
+    
+    get sourceTest() 
+    {
+        let testData = this.system.sourceData.test.data
+        let message = game.messages.get(testData.context?.messageId);
+        if (testData)
+        {
+            return message ? message.system.test : TestWFRP.recreate(testData);    
+        }
+    }
+
     get show() {
         if (game.user.isGM || !this.getFlag("wfrp4e", "hide"))
           return true
@@ -143,7 +155,7 @@ export default class ActiveEffectWFRP4e extends WarhammerActiveEffect
 
     get conditionValue() 
     {
-        return this.system.condition.value || this.getFlag("wfrp4e", "value") || 0;
+        return this.system.condition.value ?? this.getFlag("wfrp4e", "value");
     }
 
     get testIndependent()
