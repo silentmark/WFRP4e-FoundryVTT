@@ -899,7 +899,7 @@ export default class TestWFRP extends WarhammerTestBase {
         await this.message.update(messageData)
       }
       else {
-        await SocketHandlers.executeOnUserAndWait("GM", "updateMessage", { id: this.message.id, updateData : messageData });
+        await SocketHandlers.call("updateMessage", { id: this.message.id, updateData : messageData }, "GM");
       }
       await this.updateMessageData()
     }
@@ -914,7 +914,7 @@ export default class TestWFRP extends WarhammerTestBase {
       await this.message.update(update)
 
     else if (this.message) {
-      await SocketHandlers.executeOnUserAndWait("GM", "updateMessage", { id: this.message.id, updateData : update });
+      await SocketHandlers.call("updateMessage", { id: this.message.id, updateData : update }, "GM");
     }
   }
 

@@ -379,7 +379,7 @@ export default class CharGenWfrp4e extends FormApplication {
       }
       else {
         const payload =  {id : game.user.id, data : this.actor, options : {skipSpecialisationChoice : true}}
-        let id = await SocketHandlers.executeOnUserAndWait("GM", "createActor", payload);
+        let id = await SocketHandlers.call("createActor", payload, "GM");
         let actor = game.actors.get(id);
         await actor.createEmbeddedDocuments("Item", actorItems, {skipSpecialisationChoice : true})
         if (actor && actor.isOwner) 
