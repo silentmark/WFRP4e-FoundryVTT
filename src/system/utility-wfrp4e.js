@@ -586,12 +586,12 @@ export default class WFRP_Utility {
       }
       else if (target.dataset.table) 
       {
-        html = await game.wfrp4e.tables.formatChatRoll(target.dataset.table,
+        html = (await game.wfrp4e.tables.formatChatRoll(target.dataset.table,
           {
             modifier: modifier,
             showRoll: true,
             messageId
-          }, target.dataset.column);
+          }, target.dataset.column)).result;
       }
 
       chatOptions["content"] = html;
