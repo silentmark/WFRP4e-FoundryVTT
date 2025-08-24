@@ -8,6 +8,21 @@ let manifest = JSON.parse(fs.readFileSync("./system.json"))
 
 let systemPath = getSystemPath(manifest.id, manifest.compatibility.verified);
 
+// eslint-disable-next-line jsdoc/require-returns
+/**
+ * Post-build plugin for Rollup
+ */
+function postBuildPlugin() {
+  return {
+    name: 'post-build-plugin',
+    async buildEnd() {
+      // eslint-disable-next-line no-undef
+      console.log('[Rollup] Build finished. Running post-build tasks...');
+      await upload();
+      await reloadAll();
+    }
+  };
+}
 console.log("Bundling to " + systemPath)
 export default {
     input: [`src/${manifest.id}.js`, `./style/${manifest.id}.scss`],
@@ -17,7 +32,7 @@ export default {
         sourcemap: true
     },
     watch : {
-        clearScreen: true
+        clearScreen: false
     },
     plugins: [
         bakedEnv(),
@@ -36,7 +51,8 @@ export default {
             use: {
               sass: true,  // Enable SCSS processing
             }
-        })
+        }),
+        postBuildPlugin()
     ],
     onwarn(warning, warn) {
         // suppress eval warnings
