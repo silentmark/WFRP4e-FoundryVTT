@@ -1,4 +1,5 @@
 import TestWFRP from "../../system/rolls/test-wfrp4e";
+import ItemWFRP4e from "../../documents/item.js";
 
 export class WFRPTestMessageModel extends WarhammerTestMessageModel 
 {
@@ -12,7 +13,8 @@ export class WFRPTestMessageModel extends WarhammerTestMessageModel
         return foundry.utils.mergeObject(super.actions, {
             overcastClick : this.onOvercastClick,
             overcastReset : this.onOvercastReset,
-            moveVortex : this.onMoveVortex
+            moveVortex : this.onMoveVortex,
+            applyCriticalDeflection : this.onApplyCriticalDeflection,
         });
     }
 
@@ -136,5 +138,32 @@ export class WFRPTestMessageModel extends WarhammerTestMessageModel
     let test = this.test
     test.moveVortex();
   }
+
+    static async onApplyCriticalDeflection(ev)
+    {
+        const targetTokens = game.user.targets.length > 0 ? game.user.targets.map(t => t.actor) : this.test.targets;
+        const targetIntersection = targetTokens.filter(t => this.test.targets.includes(t));
+        const hitLoc = this.test.hitloc.result;
+        const type = ev.target.innerText;
+
+        for (const target of targetIntersection) {
+            if (target.isOwner) {
+                let armour = target.physicalNonDamagedArmourAtLocation(hitLoc)
+                if (armour.length)
+                {
+                    let chosen = await ItemDialog.create(armour, 1, {text : game.i18n.localize("OPPOSED.ChooseArmourToDamage"), title : `${type} - ${target.name}`});
+                    if (chosen[0])
+                    {
+                        chosen[0].system.damageItem(1, [hitLoc]);
+                        ChatMessage.create({content: game.i18n.format("OPPOSED.DamageAppliedToArmour", {uuid: chosen[0].uuid, name: chosen[0].name, type: type}), speaker : ChatMessage.getSpeaker({actor : target})})
+                    }
+                }
+                else
+                {
+                    ui.notifications.error("ErrorNoArmourToDamage", {localize: true});
+                }
+            }
+        }
+    }
 
 }

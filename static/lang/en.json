@@ -423,6 +423,7 @@
 		"CritCast": "If the spell causes damage, it inflicts a",
 		"CritCastMiscast": "Miscast due to Critical Success",
 		"CritChannelMiscast": "Miscast due to Critical Channel Success",
+		"CriticalDeflection": "Critical Deflection",
 		"CriticalWoundsApplied": "Wounds applied to",
 		"CriticalsNullified": "Criticals Nullified",
 		"DamageAP": "Damage 1 AP on",
@@ -792,6 +793,7 @@
 	"ErrorCriticalWound": "Error applying wounds value",
 	"ErrorDamageCalc": "Error calculating damage",
 	"ErrorDamagePermission": "You do not have permission to apply damage to this actor.",
+	"ErrorArmourDamagePermission": "You do not have permission to apply armour damage to this actor.",
 	"ErrorExp": "Target tokens to give experience to.",
 	"ErrorHackPermission": "You do not have permission to apply Hack to this actor.",
 	"ErrorLimitedWeapons": "You can't equip any more weapons.",
@@ -1209,7 +1211,7 @@
 		"WardRoll": "<b>Ward Roll</b>: {roll}",
 		"Result": "Opposed Result",
 		"ChooseArmourToDamage": "Choose an Armour to Damage",
-		"DamageAppliedToArmour": "<p>1 Damage applied to @UUID[{uuid}]{{name}} (Hack)</p>"
+		"DamageAppliedToArmour": "<p>1 Damage applied to @UUID[{uuid}]{{name}} ({type})</p>"
 	},
 	"OPTION": {
 		"Edit": "Edit",
