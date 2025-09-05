@@ -30,7 +30,7 @@ export class OpposedTestMessage extends WarhammerMessageModel
           opposedTestData: opposeData,
           handlerId: handler.message.id,
         },
-        speaker : {alias : "Opposed Result"},
+        speaker : {alias : game.i18n.localize("OPPOSED.Result")},
         author : getActiveDocumentOwner(opposedTest.defender)?.id,
         whisper: options.whisper,
         blind: options.blind,
@@ -80,11 +80,11 @@ export class OpposedTestMessage extends WarhammerMessageModel
       let armour = opposedTest.defenderTest.actor.itemTypes.armour.filter(i => i.system.isEquipped && i.system.protects[loc] && i.system.currentAP[loc] > 0)
       if (armour.length)
       {
-        let chosen = await ItemDialog.create(armour, 1, "Choose Armour to damage");
+        let chosen = await ItemDialog.create(armour, 1, game.i18n.localize("OPPOSED.ChooseArmourToDamage"));
         if (chosen[0])
         {
           chosen[0].system.damageItem(1, [loc])
-          ChatMessage.create({content: `<p>1 Damage applied to @UUID[${chosen[0].uuid}]{${chosen[0].name}} (Hack)</p>`, speaker : ChatMessage.getSpeaker({actor : opposedTest.attackerTest.actor})})
+          ChatMessage.create({content: game.i18n.format("OPPOSED.DamageAppliedToArmour", {uuid: chosen[0].uuid, name: chosen[0].name}), speaker : ChatMessage.getSpeaker({actor : opposedTest.attackerTest.actor})})
         }
       }
       else 
@@ -112,7 +112,7 @@ export class OpposedTestMessage extends WarhammerMessageModel
       else 
       {
         targets = attackerTest.targetTokens.map(i => i.object);
-        ui.notifications.info("No Targets - Directing offhand attack at the same target as the primary attack")
+        ui.notifications.info("INFO.NoTargetsDirectingOffhandAttack", { localize: true });
       }
   
       let offhandWeapon = attackerTest.actor.itemTags["weapon"].find(w => w.offhand.value);

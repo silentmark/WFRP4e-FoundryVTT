@@ -3,6 +3,7 @@ import getSystemPath from "./foundry-path.mjs";
 import copy from 'rollup-plugin-copy-watch';
 import postcss from "rollup-plugin-postcss"
 import bakedEnv from 'rollup-plugin-baked-env';
+import { upload, reloadAll } from "./orchestrator.mjs";
 
 let manifest = JSON.parse(fs.readFileSync("./system.json"))
 

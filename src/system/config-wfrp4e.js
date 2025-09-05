@@ -53,7 +53,8 @@ WFRP4E.toTranslate = [
 "symptomTreatment",
 "reachDescription",
 "classTrappings",
-"transferTypes"
+"transferTypes",
+"seasons"
 ]
 
 // "Trappings" are more than "trapping" type items
@@ -1869,7 +1870,7 @@ WFRP4E.PrepareSystemItems = function() {
             }
         },
         "invisible" : {
-            name: "Invisible",
+            name: game.i18n.localize("EFFECT.Invisible"),
             img: "icons/svg/invisible.svg",
             statuses: ["invisible"],
             system: {}
@@ -1892,7 +1893,7 @@ WFRP4E.PrepareSystemItems = function() {
                 scriptData: [
                     {
                         trigger: "manual",
-                        label: "@effect.name",
+                        label: game.i18n.localize("WFRP4E.ConditionName.Bleeding"),
                         script: `let uiaBleeding = game.settings.get("wfrp4e", "uiaBleeding");
                             let actor = this.actor;
                             let effect = this.effect;
@@ -1976,7 +1977,7 @@ WFRP4E.PrepareSystemItems = function() {
                 scriptData: [
                     {
                         trigger: "manual",
-                        label: "@effect.name",
+                        label: game.i18n.localize("WFRP4E.ConditionName.Poisoned"),
                         script: `let actor = this.actor;
                             let effect = this.effect;
                             let msg = ""
@@ -2003,7 +2004,7 @@ WFRP4E.PrepareSystemItems = function() {
                     },
                     {
                         trigger: "dialog",
-                        label: "@effect.name",
+                        label: game.i18n.localize("WFRP4E.ConditionName.Ablaze"),
                         script: `args.fields.modifier -= 10 * this.effect.conditionValue`,
                         options: {
                                 activateScript: "return true"
@@ -2028,7 +2029,7 @@ WFRP4E.PrepareSystemItems = function() {
                 scriptData: [
                     {
                         trigger: "manual",
-                        label: "@effect.name",
+                        label: game.i18n.localize("WFRP4E.ConditionName.Ablaze"),
                         script: `let leastProtectedLoc;
                             let leastProtectedValue = 999;
                             for (let loc in this.actor.status.armour)
@@ -2084,7 +2085,7 @@ WFRP4E.PrepareSystemItems = function() {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "Tests related to hearing",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.TestsRelatedToHearing"),
                         script: `args.fields.modifier -= 10 * this.effect.conditionValue`
                     }
                 ]
@@ -2104,7 +2105,7 @@ WFRP4E.PrepareSystemItems = function() {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "Penalty to all Tests (@effect.name)",
+                        label: game.i18n.format("WFRP4E.ConditionEffects.PenaltyToAllTests", {effect: game.i18n.localize("WFRP4E.ConditionName.Stunned")}),
                         script: `args.fields.modifier -= 10 * this.effect.conditionValue`,
                         options: {
                             activateScript: "return true"
@@ -2112,14 +2113,14 @@ WFRP4E.PrepareSystemItems = function() {
                     },
                     {
                         trigger: "prePrepareData",
-                        label: "Half Movement",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.HalfMovement"),
                         script: `args.actor.system.details.move.value /= 2`
                     },
                     {
                         trigger: "endRound",
-                        label: "Roll to remove Stunned",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.RollToRemoveStunned"),
                         script: `
-const test = await this.actor.setupSkill(game.i18n.localize("NAME.Endurance"), {fields: {difficulty: "challenging"}, skipTargets: true, appendTitle :  \` - \${this.effect.name}\`, context: {success: "Removed SL + 1 Conditions.", failure: "Failed to remove Conditions."}});
+const test = await this.actor.setupSkill(game.i18n.localize("NAME.Endurance"), {fields: {difficulty: "challenging"}, skipTargets: true, appendTitle :  \` - \${this.effect.name}\`, context: {success: game.i18n.localize("WFRP4E.ConditionEffects.RemovedSLConditions"), failure: game.i18n.localize("WFRP4E.ConditionEffects.FailedToRemoveConditions")}});
 await test.roll();
 if (test.succeeded) {
   const toRemove = 1 + Number(test.result.SL);
@@ -2150,7 +2151,7 @@ if (test.succeeded) {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "Tests related to movement of any kind",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.TestsRelatedToMovement"),
                         script: `args.fields.modifier -= 10 * this.effect.conditionValue`,
                         options: {
                                 activateScript: "return ['ws', 'bs', 'ag'].includes(args.characteristic)"
@@ -2173,7 +2174,7 @@ if (test.succeeded) {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "Penalty to all Tests (@effect.name)",
+                        label: game.i18n.format("WFRP4E.ConditionEffects.PenaltyToAllTests", {effect: game.i18n.localize("WFRP4E.ConditionName.Fatigued")}),
                         script: `args.fields.modifier -= 10 * this.effect.conditionValue`,
                         options: {
                                 activateScript: "return true"
@@ -2196,7 +2197,7 @@ if (test.succeeded) {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "Tests related to sight",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.TestsRelatedToSight"),
                         script: `args.fields.modifier -= 10 * this.effect.conditionValue`,
                         options: {
                                 activateScript: "return ['ws', 'bs', 'ag'].includes(args.characteristic)"
@@ -2204,7 +2205,7 @@ if (test.succeeded) {
                     },
                     {
                         trigger: "dialog",
-                        label: "Bonus to melee attacks",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.BonusToMeleeAttacks"),
                         script: `args.fields.modifier += 10 * this.effect.conditionValue`,
                         options: {
                                 targeter: true,
@@ -2229,7 +2230,7 @@ if (test.succeeded) {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "Penalty to all Tests not involving running and hiding.",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.PenaltyToAllTestsNotInvolvingRunningAndHiding"),
                         script: `args.fields.modifier -= 10 * this.effect.conditionValue`,
                         options: {
                             activateScript: "return !args.skill?.name?.includes(game.i18n.localize('NAME.Stealth')) && args.skill?.name != game.i18n.localize('NAME.Athletics')"
@@ -2252,7 +2253,7 @@ if (test.succeeded) {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "Tests related to movement of any kind",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.TestsRelatedToMovement"),
                         script: `args.fields.modifier -= 20`,
                         options: {
                                 activateScript: "return ['ws', 'bs', 'ag'].includes(args.characteristic)"
@@ -2260,7 +2261,7 @@ if (test.succeeded) {
                     },
                     {
                         trigger: "dialog",
-                        label: "Bonus to melee attacks",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.BonusToMeleeAttacks"),
                         script: `args.fields.modifier += 20`,
                         options: {
                             targeter: true,
@@ -2285,7 +2286,7 @@ if (test.succeeded) {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "Bonus to melee attacks",
+                        label: game.i18n.localize("WFRP4E.ConditionEffects.BonusToMeleeAttacks"),
                         script: `args.fields.modifier += 20`,
                         options: {
                             targeter: true,
@@ -2336,9 +2337,9 @@ if (test.succeeded) {
                 scriptData: [
                     {
                         trigger: "dialog",
-                        label: "@effect.name",
+                        label: game.i18n.localize("WFRP4E.ConditionName.Engaged"),
                         script: `args.abort = true
-                        ui.notifications.error(game.i18n.localize("EFFECT.ShooterEngagedError"))`,
+                        ui.notifications.error("EFFECT.ShooterEngagedError", {localize: true})`,
                         options: {
                                 hideScript: "return !args.weapon || args.weapon.isMelee || args.weapon.properties.qualities.pistol",
                                 activateScript: "return args.weapon.isRanged && !args.weapon.properties.qualities.pistol"
@@ -2374,7 +2375,7 @@ if (test.succeeded) {
                     documentType : "Item"
                 },
                 scriptData : [{
-                    label : "Accurate",
+                    label : game.i18n.localize("PROPERTY.Accurate"),
                     trigger : "dialog",
                     script : "args.fields.modifier += 10;",
                     options : {
@@ -2395,7 +2396,7 @@ if (test.succeeded) {
                 },
                 scriptData: [
                     {
-                        label: "@effect.name",
+                        label: game.i18n.localize("EFFECT.BlackpowderShock"),
                         trigger: "immediate",
                         script: `
                             test = await this.actor.setupSkill(game.i18n.localize("NAME.Cool"), {appendTitle : " - " + this.effect.name, skipTargets: true, fields : {difficulty : "average"}});
@@ -2418,9 +2419,9 @@ if (test.succeeded) {
                     documentType : "Item"
                 },
                 scriptData : [{
-                    label : "Blast",
+                    label : game.i18n.localize("PROPERTY.Blast"),
                     trigger : "rollWeaponTest",
-                    script : "if (args.test.succeeded) args.test.result.other.push(`<a class='content-link' data-action='placeTemplate' data-type='radius'><i class='fas fa-ruler-combined'></i>${this.item.properties.qualities.blast.value} yard Blast</a>`)",
+                    script : "if (args.test.succeeded) args.test.result.other.push(`<a class='content-link' data-action='placeTemplate' data-type='radius'><i class='fas fa-ruler-combined'></i>${this.item.properties.qualities.blast.value} ${game.i18n.localize('PROPERTY.Blast')} (${game.i18n.localize('yards')})</a>`)",
                 }]
             }
         },
@@ -2442,7 +2443,7 @@ if (test.succeeded) {
                     equipTransfer: true
                 },
                 scriptData : [{
-                    label : "Defensive",
+                    label : game.i18n.localize("PROPERTY.Defensive"),
                     trigger : "dialog",
                     script : "args.fields.slBonus++;",
                     options : {
@@ -2469,7 +2470,7 @@ if (test.succeeded) {
                     documentType : "Item",
                 },
                 scriptData : [{
-                    label : "Entangle",
+                    label : game.i18n.localize("PROPERTY.Entangle"),
                     trigger : "applyDamage",
                     script : "args.actor.addCondition('entangled')"
                 }]
@@ -2547,7 +2548,7 @@ if (test.succeeded) {
                     documentType : "Item"
                 },
                 scriptData : [{
-                    label : "Precise",
+                    label : game.i18n.localize("PROPERTY.Precise"),
                     trigger : "dialog",
                     script : "args.fields.successBonus += 1;",
                     options : {
@@ -2633,7 +2634,7 @@ if (test.succeeded) {
                     documentType : "Item"
                 },
                 scriptData : [{
-                    label : "Imprecise",
+                    label : game.i18n.localize("PROPERTY.Imprecise"),
                     trigger : "dialog",
                     script : "args.fields.slBonus -= 1;",
                     options : {

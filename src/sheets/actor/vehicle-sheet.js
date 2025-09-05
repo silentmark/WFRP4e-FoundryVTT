@@ -2,10 +2,7 @@ import VehicleCrew from "../../apps/vehicle-crew";
 import VehicleCumulativeModifiersConfig from "../../apps/vehicle-modifiers";
 import VehicleMoveConfig from "../../apps/vehicle-move";
 import { StandardActorModel } from "../../model/actor/standard";
-import WFRP_Audio from "../../system/audio-wfrp4e";
-import WFRP_Utility from "../../system/utility-wfrp4e";
 import BaseWFRP4eActorSheet from "./base";
-import StandardWFRP4eActorSheet from "./standard-sheet";
 
 export default class ActorSheetWFRP4eVehicle extends BaseWFRP4eActorSheet
 {
@@ -112,7 +109,7 @@ export default class ActorSheetWFRP4eVehicle extends BaseWFRP4eActorSheet
     let document = await Actor.implementation.fromDropData(data);
     if (document?.system instanceof StandardActorModel) {
       if (document.pack) {
-        return ui.notification.error("Cannot use Compendium Actors with Vehicles")
+        return ui.notification.error("ERROR.CannotUseCompendiumActorsWithVehicles", {localize: true});
       }
     }
     this.actor.update(this.actor.system.passengers.add(document))
