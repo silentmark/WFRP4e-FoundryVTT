@@ -10,13 +10,13 @@ let characteristics = {
     "wp" : 20,
     "fel" : 10
 }
-let skills = ["Channelling", "Cool", "Dodge", "Entertain (Storytelling)", "Intuition", "Language (Magick)", "Lore (Magic)", "Perception"]
+let skills = ["Splatanie Magii", "Opanowanie", "Uniki", "Występy (Opowieści)", "Intuicja", "Język (Magiczny)", "Wiedza (Magia)", "Percepcja"]
 let skillAdvancements = [5, 15, 10, 10, 15, 10, 10, 20]
 
-let talents = ["Arcane Magic", "Petty Magic", "Second Sight"]
-let trappings = ["Hand Weapon", "Robes", "Quarterstaff"]
+let talents = ["Magia Tajemna", "Magia Prosta", "Percepcja Magiczna"]
+let trappings = ["Broń Ręczna", "Szaty", "Kij"]
 let specialItems = [ 
-    {name: "Magic Item", type: "trapping", trappingType: "misc" }, 
+    {name: "Magiczny Przedmiot", type: "trapping", trappingType: "misc" }, 
 ]    
 let items = [];
 
@@ -30,11 +30,11 @@ for (let ch in characteristics)
 for (let item of specialItems) {
     let newItem
     if (item.type == "weapon") {
-        newItem = new ItemWfrp4e({ name: item.name, type: item.type, system: { equipped: true, damage: {value: item.damage}}  })
+        newItem = new ItemWFRP4e({ name: item.name, type: item.type, system: { equipped: true, damage: {value: item.damage}}  })
     } else if (item.type == "trapping") {
-        newItem = new ItemWfrp4e({ img: "systems/wfrp4e/icons/blank.png", name: item.name, type: item.type, system: { worn: true, trappingType: { value: item.trappingType}  } } )
+        newItem = new ItemWFRP4e({ img: "systems/wfrp4e/icons/blank.png", name: item.name, type: item.type, system: { worn: true, trappingType: { value: item.trappingType}  } } )
     } else {
-        newItem = new ItemWfrp4e({ img: "systems/wfrp4e/icons/blank.png", name: item.name, type: item.type  })
+        newItem = new ItemWFRP4e({ img: "systems/wfrp4e/icons/blank.png", name: item.name, type: item.type  })
     }
     items.push(newItem.toObject())
 }
@@ -85,14 +85,14 @@ for (let trapping of trappings)
     }
 }
 
-let ride = await Dialog.confirm({title : "Skill", content : "Add Chaos Steed and +20 Ride (Horse)?"})
+let ride = await foundry.applications.api.DialogV2.confirm({window : {title : "Umiejętność"}, content : "Czy dodać rumaka Chaosu oraz +20 Jeździectwo (Konie)?"})
 
 if (ride)
 {
-    let skill = await game.wfrp4e.utility.findSkill("Ride (Horse)")
+    let skill = await game.wfrp4e.utility.findSkill("Jeździectwo (Konie)")
     skill = skill.toObject();
     skill.system.advances.value = 20;
-    items = items.concat({name : "Chaos Steed", type: "trapping", "system.trappingType.value" : "misc"}, skill)
+    items = items.concat({name : "Rumak Chaosu", type: "trapping", "system.trappingType.value" : "misc"}, skill)
 }
 
 
