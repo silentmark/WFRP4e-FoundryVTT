@@ -1,4 +1,4 @@
-if (args.test.spell.name == "Warp Lightning")
+if (args.test.spell.name == "Światło Spaczenia")
 {
-    args.test.preData.canReverse = true;
+    args.test.preData.reversal = {allowed : true, if: "better"};
 }

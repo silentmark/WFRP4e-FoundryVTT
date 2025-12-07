@@ -1,0 +1,1 @@
+args.modifiers.other.push({label : this.effect.name, details : "Zwiększono obrażenia", value : 2})

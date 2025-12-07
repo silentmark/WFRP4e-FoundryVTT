@@ -1,0 +1,1 @@
+return args.item?.system?.attackType == "ranged" && !this.actor.system.canFly.effects.filter(e => e.name == "Latanie")[0].disabled

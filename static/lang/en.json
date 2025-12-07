@@ -424,6 +424,7 @@
 		"CritCastMiscast": "Miscast due to Critical Success",
 		"CritChannelMiscast": "Miscast due to Critical Channel Success",
 		"CriticalDeflection": "Critical Deflection",
+	    "DamageToArmour" : "1 Damage applied to {item} ({type})",
 		"CriticalWoundsApplied": "Wounds applied to",
 		"CriticalsNullified": "Criticals Nullified",
 		"DamageAP": "Damage 1 AP on",
@@ -784,6 +785,7 @@
 	},
 	"EXP": "EXP",
 	"Earning Skill": "Earning Skill",
+    "Required Trappings" : "Required Trappings",
 	"Effects": "Effects",
 	"Encumbrance": "Encumbrance",
 	"Enemies": "Enemies",
@@ -2540,10 +2542,14 @@
 							"label": "Tests"
 						}
 					},
-					"max": {
-						"value": {
-							"label": "Max"
-						}
+					"max" : {
+                        "value" : {
+                            "label" : "Max"
+                        },
+                        "formula" : {
+                            "label" : "Formula",
+                            "hint" : "e.g. @characteristics.int.bonus + @characteristics.wp.bonus"
+                        }
 					},
 					"advances": {
 						"force": {

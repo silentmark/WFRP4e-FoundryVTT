@@ -1,0 +1,1 @@
+return args.weapon || args.skill?.name === game.i18n.localize("NAME.Dodge");

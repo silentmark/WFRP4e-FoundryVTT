@@ -16,7 +16,7 @@ let systemPath = getSystemPath(manifest.id, manifest.compatibility.verified);
 function postBuildPlugin() {
   return {
     name: 'post-build-plugin',
-    async buildEnd() {
+    async writeBundle() {
       // eslint-disable-next-line no-undef
       console.log('[Rollup] Build finished. Running post-build tasks...');
       await upload();

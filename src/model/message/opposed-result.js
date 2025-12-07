@@ -81,11 +81,11 @@ export class OpposedTestMessage extends WarhammerMessageModel
       let armour = opposedTest.defenderTest.actor.physicalNonDamagedArmourAtLocation(loc);
       if (armour.length)
       {
-        let chosen = await ItemDialog.create(armour, 1, {text : game.i18n.localize("OPPOSED.ChooseArmourToDamage"), title : type});
+        let chosen = await ItemDialog.create(armour, 1, {text : game.i18n.localize("DIALOG.ChooseArmour"), title : type});
         if (chosen[0])
         {
           chosen[0].system.damageItem(1, [loc])
-          ChatMessage.create({content: game.i18n.format("OPPOSED.DamageAppliedToArmour", {uuid: chosen[0].uuid, name: chosen[0].name, type : type}), speaker : ChatMessage.getSpeaker({actor : opposedTest.attackerTest.actor})})
+          ChatMessage.create({content: `<p>${game.i18n.format("CHAT.DamageToArmour",  {item: `@UUID[${chosen[0].uuid}]{${chosen[0].name}}`, type: type} )}</p>`, speaker : ChatMessage.getSpeaker({actor : opposedTest.attackerTest.actor})})
         }
       }
       else 
