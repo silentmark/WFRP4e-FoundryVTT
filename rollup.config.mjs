@@ -3,7 +3,12 @@ import getSystemPath from "./foundry-path.mjs";
 import copy from 'rollup-plugin-copy-watch';
 import postcss from "rollup-plugin-postcss"
 import bakedEnv from 'rollup-plugin-baked-env';
-import { upload, reloadAll } from "./orchestrator.mjs";
+import { 
+  upload, 
+  //launchChromeProfiles,
+  //reloadAll 
+} from "./orchestrator.mjs";
+//import { setTimeout } from 'timers/promises';
 
 let manifest = JSON.parse(fs.readFileSync("./system.json"))
 
@@ -17,10 +22,10 @@ function postBuildPlugin() {
   return {
     name: 'post-build-plugin',
     async writeBundle() {
-      // eslint-disable-next-line no-undef
-      console.log('[Rollup] Build finished. Running post-build tasks...');
       await upload();
-      await reloadAll();
+      //launchChromeProfiles();
+      //await setTimeout(5000); // Give Chrome time to start
+      //await reloadAll();
     }
   };
 }

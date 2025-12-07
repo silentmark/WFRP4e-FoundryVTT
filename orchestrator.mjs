@@ -23,11 +23,16 @@ export async function upload() {
     return;
   }
 
+  const secureOptions = {
+      rejectUnauthorized: false,
+      checkServerIdentity: () => { return null; },
+  };
   await client.access({
     host: config.ftp.host,
     user: config.ftp.user,
     password: config.ftp.password,
-    secure: false
+    secure: true, 
+    secureOptions: secureOptions
   });
 
   const localRoot = path.join(config.path, "systems", "wfrp4e")
@@ -125,10 +130,3 @@ export function launchChromeProfiles() {
     ], { detached: true, stdio: 'ignore' });
   });
 }
-
-console.log('Running all commands in sequence...');
-launchChromeProfiles();
-setTimeout(async () => {
-    await upload();
-    await reloadAll();
-}, 5000); // Give Chrome time to start
