@@ -523,7 +523,7 @@ export class StandardActorModel extends BaseActorModel {
 
     get vehicle()
     {
-        return game.actors.contents.find(i => i.type == "vehicle" && i.system.passengers.has(this.parent));
+        return game.actors?.contents.find(i => i.type == "vehicle" && i.system.passengers.has(this.parent));
     }
 
     advance(career)
