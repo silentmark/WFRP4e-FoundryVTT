@@ -245,6 +245,9 @@
                 height: 1.5rem;
                 padding: 0px 6px;
                 line-height: 1.5rem;
+                text-overflow: ellipsis;
+                overflow: hidden;
+                white-space: nowrap;
             }
         }
 

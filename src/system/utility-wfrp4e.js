@@ -795,11 +795,11 @@ export default class WFRP_Utility {
     }
   }
 
-  static updateGroupAdvantage({players=undefined, enemies=undefined}={})
+  static async updateGroupAdvantage({players=undefined, enemies=undefined}={})
   {
     if (!game.user.isGM)
     {
-      SocketHandlers.call("changeGroupAdvantage", {players, enemies})
+     await SocketHandlers.call("changeGroupAdvantage", {players, enemies})
     }
     else if (game.user.isUniqueGM)
     {
@@ -809,7 +809,7 @@ export default class WFRP_Utility {
       if (Number.isNumeric(enemies))
         advantage.enemies = enemies
     
-      return game.settings.set("wfrp4e", "groupAdvantageValues", advantage)
+      await game.settings.set("wfrp4e", "groupAdvantageValues", advantage)
     }
   }
   

@@ -20,13 +20,15 @@ export default function() {
             let trackers = [ui.combat].concat(foundry.applications.instances.get("combat-popout") || []);
             trackers = trackers.filter(tracker => tracker instanceof CombatTracker);
             for (const tracker of trackers) {
-                tracker.element.find(".advantage-group input").each((index, input) => {
+                let trackerElement = tracker.element;
+                if (!trackerElement.find) {
+                    trackerElement = $(trackerElement);
+                }
+                trackerElement.find(".advantage-group input").each((index, input) => {
                     let group = input.dataset.group
                     input.value = setting.value[group]
                 })
             }
         }
     })
-
-  
 }
