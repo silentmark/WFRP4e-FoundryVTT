@@ -273,6 +273,7 @@
 		"Apply": "Apply",
 		"SLEvaluatedWith": "SL Evaluated With",
 		"FastSL": "Fast SL",
+		"DissolutionTable" : "Rzuć na Tabelę Rozpadu Ciała i Umysłu dla swojej rasy:<br>@Table[corruption]",
 		"DegreesOfSuccess": "Degrees of Success",
 		"ApplyCondition": "Apply {condition}",
 		"ApplyDamageBasic": "@DAMAGE damage applied to <b>{name}</b>",

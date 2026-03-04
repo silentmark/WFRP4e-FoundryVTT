@@ -2376,6 +2376,11 @@ if (test.succeeded) {
                     value : null,
                     numbered: false
                 },
+            },
+            flags: {
+                core: {
+                    overlay: true
+                }
             }
         }
     ]
