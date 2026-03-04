@@ -1,14 +1,14 @@
 <section class="tab {{tab.cssClass}}" data-group="primary" data-tab="{{tab.id}}">
     {{formGroup fields.cn.fields.value value=source.system.cn.value}}
     {{!-- {{formGroup fields.lore.fields.value value=source.system.lore.value}} --}}
-    <div class="form-group">
-        <label>{{localize "Lore"}}</label>
-        <div class="form-fields">
-            <select name="system.lore.value">
-                {{selectOptions lores selected=source.system.lore.value}}
-            </select>
-        </div>
-    </div>
+    
+    {{> nameListInput label="Lore" list=loreNames path="system.lore.value"}}
+
+    {{!-- <datalist id="lores">
+        {{#each (config "magicLores")}}
+            <option>{{this}}</option>
+        {{/each}}
+    </datalist> --}}
     <fieldset>
         <legend>{{localize "Overrides"}}</legend>
         {{formGroup fields.skill.fields.value value=source.system.skill.value}}

@@ -1,8 +1,11 @@
 if (args.totalWoundLoss > 0) 
 {
-  args.opposedTest.result.other.push(
-  `@Corruption[minor]{Wystawienie na pomniejsze zepsucie}`
-  )
+   if (args.opposedTest)
+  {
+    args.opposedTest.result.other.push(
+      `@Corruption[minor]{Wystawienie na pomniejsze zepsucie}`
+    )
+  }
   this.script.message(
   `<strong>${this.effect.name}</strong>: 
     @Corruption[minor]{Pomniejsze Zepsucie} <br/>

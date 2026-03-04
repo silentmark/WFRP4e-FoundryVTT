@@ -1,4 +1,4 @@
-if ((args.opposedTest.attackerTest.item && args.opposedTest.attackerTest.item.isMelee) || (args.opposedTest.attackerTest.item && !args.opposedTest.attackerTest.item.name.includes("Broń Zasięgowa")))
+if ((args.sourceItem && args.sourceItem.isMelee) || (args.sourceItem && !args.sourceItem.name.includes("Broń Zasięgowa")))
 {
     let choice = await foundry.applications.api.DialogV2.confirm({window : {title : this.effect.name}, content : `<p><strong>${this.effect.name}</strong>: Zadać obrażenia atakującemu?`})
 

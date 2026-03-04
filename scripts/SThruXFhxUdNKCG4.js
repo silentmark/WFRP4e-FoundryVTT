@@ -5,4 +5,4 @@ if (test.failed) {
    this.actor.addCondition('stunned');
 }
 
-this.script.scriptNotification(`${this.actor.name} failed the Intelligence Test and gained Stunned Condition!`);
+this.script.notification(`${this.actor.name} nie zdał testu Inteligencji i otrzymał stan Oszołomienia!`);

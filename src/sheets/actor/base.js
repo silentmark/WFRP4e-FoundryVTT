@@ -37,7 +37,9 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
       toggleQuality : this._onToggleQuality,
       groupActions : this._onToggleGroupActions,
       useGroupAction : this._onUseGroupAction,
-      postItemProperty: this._postItemProperty
+      postItemProperty: this._postItemProperty,
+      sellCargo : this._onSellCargo
+
     },
     defaultTab : "main"
   }
@@ -832,8 +834,8 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
       if (key)
       {
         let description = propertyDescriptions[key]?.replace(`(${game.i18n.localize("PROPERTY.Rating")})`, value) || game.i18n.format(`SHEET.DescriptionForPropertyWasNotFound`, { property: ev.target.text });
-
-        this._toggleDropdown(ev, description)
+        
+        this._toggleDropdown(ev, await foundry.applications.ux.TextEditor.enrichHTML(description))
       }
     }
 
@@ -950,6 +952,16 @@ export default class BaseWFRP4eActorSheet extends WarhammerActorSheetV2
     {
       WFRP_Utility.postProperty(ev.target.text)
     }
+
+    
+  static _onSellCargo(ev)
+  {
+    let item = this._getDocument(ev)
+    if (item?.type == "cargo")
+    {
+      game.wfrp4e.trade.attemptSell(item);
+    }
+  }
 
     //#endregion
 }

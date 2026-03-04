@@ -1,5 +1,5 @@
 let halve;
-if (args.opposedTest.attackerTest.item?.type != "spell")
+if (args.sourceItem?.type != "spell")
 {
     halve = await foundry.applications.api.DialogV2.confirm({window : {title : this.effect.name}, content : "Obrażenia obniżone o połowę? (Zmniejsza obrażenia, które nie pochodzą od ognia, zimna i magii)"})
 }

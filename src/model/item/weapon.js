@@ -143,7 +143,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
     get Damage() {
 
         let actor = this.parent.actor
-        let damage = this.applyAmmoMods(this.computeWeaponFormula("damage"), "damage") + (actor.flags[`${this.attackType}DamageIncrease`] || 0) - Math.max((this.damageToItem.value - (this.properties.qualities.durable?.value || 0)), 0)
+        let damage = this.applyAmmoMods(this.computeWeaponFormula("damage"), "damage") + (actor.flags[`${this.attackType}DamageIncrease`] || 0) - Math.max(((this.damageToItem.value || 0) - (this.properties.qualities.durable?.value || 0)), 0)
 
         //@HOUSE
         if (game.settings.get("wfrp4e", "homebrew").mooSizeDamage && actor.system instanceof StandardActorModel)
@@ -184,7 +184,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
             return this.Damage
         }
                                                                                                                                 // Account for Durable, Math.max so durable doesn't go past damageToItem
-        return this.applyAmmoMods(this.computeWeaponFormula("damage", actor.mount), "damage") + (actor.flags[`${this.attackType}DamageIncrease`] || 0) - Math.max((this.damageToItem.value - (this.properties.qualities.durable?.value || 0)), 0)
+        return this.applyAmmoMods(this.computeWeaponFormula("damage", actor.mount), "damage") + (actor.flags[`${this.attackType}DamageIncrease`] || 0) - Math.max(((this.damageToItem.value || 0) - (this.properties.qualities.durable?.value || 0)), 0)
 
       }
 
@@ -213,7 +213,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
         }
 
         
-        if (this.parent.isOwned && this.parent.actor.typee == "character" && foundry.utils.getProperty(options.changed, "system.equipped.value")) {
+        if (this.parent.isOwned && this.parent.actor.type == "character" && foundry.utils.getProperty(options.changed, "system.equipped.value")) {
             let actor = this.parent.actor;
             let maxEquipPoints = actor.system.settings.equipPoints;
             let currentEquipPoints = actor.itemTypes.weapon.filter(i => i.system.isEquipped).reduce((points, weapon) => points + weapon.system.equipPoints, 0);
@@ -258,7 +258,7 @@ export class WeaponModel extends PropertiesMixin(EquippableItemModel) {
     async _onUpdate(data, options,user)
     {
         await super._onUpdate(data, options, user);
-        if (foundry.utils.hasProperty(options, "changed.system.loaded") && this.parent.actor)
+        if (foundry.utils.hasProperty(options, "changed.system.loaded") && this.parent.actor && game.user.id == user)
         {
             this.parent.actor.checkReloadExtendedTest(this.parent);
         }

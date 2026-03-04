@@ -2,7 +2,7 @@ let wounds = this.actor.itemTypes.disease.filter(i => i.name == "Ropiejąca Rana
 let selected;
 if (wounds.length == 0)
 {
-    return this.script.scriptNotification("Brak Ropiejących Ran!");
+    return this.script.notification("Brak Ropiejących Ran!");
 }
 else if (wounds.length == 1)
 {

@@ -34,7 +34,7 @@ if (transformToDeer ) {
 
     let items = [ugryzienie, bron, rozmiar, latanie, nightVision ];
     
-    this.script.scriptNotification(`Dodano: ${items.map(i => i.name).join(", ")}`);
+    this.script.notification(`Dodano: ${items.map(i => i.name).join(", ")}`);
     await this.actor.createEmbeddedDocuments("Item", items, {fromEffect : this.effect.id});
 
     let char = {system: { 

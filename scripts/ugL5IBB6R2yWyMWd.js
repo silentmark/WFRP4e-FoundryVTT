@@ -1,4 +1,4 @@
-if (args.totalWoundLoss > 0)
+if (args.totalWoundLoss > 0 && args.opposedTest)
 {
     let apply = await foundry.applications.api.DialogV2.confirm({window : {title : this.effect.name}, content : `<p>Zadać Obrażenia z ${this.effect.name}? Atakujący musiał użyć gołych rąk lub broni do walki w zwarciu wykonanej z metalu.`})
     if (apply)

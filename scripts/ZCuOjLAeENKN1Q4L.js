@@ -1,11 +1,11 @@
 let halve;
-if (args.opposedTest.attackerTest.item?.type != "spell")
+if (args.sourceItem?.type != "spell")
 {
     halve = await foundry.applications.api.DialogV2.confirm({window : {title : this.effect.name}, content : "Zmniejszyć obrażenia o połowę? (Zmniejsza obrażenia zadane od ognia o połowę)"})
 }
 else
 {
-    halve = args.opposedTest.attackerTest.item?.system.lore?.value == "fire";
+    halve = args.sourceItem?.system.lore?.value == "fire";
 }
 
 if (halve)

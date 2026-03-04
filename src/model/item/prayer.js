@@ -104,12 +104,12 @@ export class PrayerModel extends OvercastItemModel
     }
 
     get Target() {
-        return this.computeSpellPrayerFormula("target", this.target.aoe)
+        return this.computeSpellPrayerFormula("target", {aoe: this.target.aoe})
       }
 
 
     get Duration() {
-      let duration = this.computeSpellPrayerFormula("duration", this.range?.aoe)
+      let duration = this.computeSpellPrayerFormula("duration", {aoe: this.range?.aoe})
       return duration
     }
 
@@ -147,7 +147,7 @@ export class PrayerModel extends OvercastItemModel
     computeOwned()
     {
         super.computeOwned();
-        this.computeOvercastingData();
+        this.overcast.usage = this.computeOvercastingData(this.parent.parent);
     }
 
     getSkillToUse(actor) {

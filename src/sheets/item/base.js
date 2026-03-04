@@ -168,6 +168,17 @@ export default class BaseWFRP4eItemSheet extends WarhammerItemSheetV2
             this.item.createEmbeddedDocuments("ActiveEffect", [document.toObject()]);
         }
       },
+      {
+        name: "Usuń",
+        icon: '<i class="fas fa-times"></i>',
+        condition: li => !!li.dataset.uuid || getParent(li, "[data-uuid]"),
+        callback: async li => 
+        {
+          let uuid = li.dataset.uuid || getParent(li, "[data-uuid]").dataset.uuid;
+          const document = await fromUuid(uuid);
+          document.delete();
+        }
+      }
     ];
   }
 
