@@ -296,7 +296,7 @@
 					"Title": "Availability Test",
 					"Usage": {
 						"Command": "/avail",
-						"Example": "<br>/avail common size=town<br>/avail rare size=city modifier=20",,
+						"Example": "<br>/avail common size=town<br>/avail rare size=city modifier=20",
 						"Note": "rolls an availability test to determine the availability and the stock of an item."
 					}
 				},
